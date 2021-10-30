@@ -13,53 +13,35 @@
 
     <a-row :gutter="20" class="result-board">
       <a-col class="result-title">
-        {{ (currentYearTitle ? currentYearTitle : '0') + '年' }}
+        {{ (history && history.length > 0 ? history[history.length - 1].title : '0') + '年' }}
         <a-button style="float: right;" @click="showHistory">历史追溯</a-button>
       </a-col>
       <a-row class="total">
-        <a-col :span="5" class="result-info">
-          {{ (currentYearTitle ? currentYearTitle : '0') + '年亏损弥补总额' }}
+        <a-col :span="12">
+          <a-col :span="10" class="result-info">
+            {{ (history && history.length > 0 ? history[history.length - 1].title : '0') + '年亏损弥补总额' }}
+          </a-col>
+          <a-col :span="10" class="result-info">
+            {{ history && history.length > 0 ? history[history.length - 1].data[5] : '-' }} 元
+          </a-col>
         </a-col>
-        <a-col :span="5" class="result-info">
-          {{ currentYearResult? currentYearResult[5] : '-' }} 元
-        </a-col>
-        <a-col :span="5" class="result-info">
-          {{ (currentYearTitle ? currentYearTitle : '0') + '年应税利润' }}
-        </a-col>
-        <a-col :span="5" class="result-info">
-          {{ currentYearResult ? currentYearResult[6] : '-' }} 元
+        <a-col :span="12">
+          <a-col :span="10" class="result-info">
+            {{ (history && history.length > 0 ? history[history.length - 1].title : '0') + '年应税利润' }}
+          </a-col>
+          <a-col :span="10" class="result-info">
+            {{ history && history.length > 0 ? history[history.length - 1].data[6] : '-' }} 元
+          </a-col>
         </a-col>
       </a-row>
       <a-row>
-        <a-col :span="5" class="result-info">
-          利用{{ parseInt(currentYearTitle) - (currentYearIndex > 5 ? 1 : currentYearIndex - 4) | filterNaN }}年亏损弥补
-        </a-col>
-        <a-col :span="5" class="result-info">
-          {{ currentYearResult ? currentYearResult[4] : '-' }} 元
-        </a-col>
-        <a-col :span="5" class="result-info">
-          利用{{ parseInt(currentYearTitle) - (currentYearIndex > 5 ? 2 : currentYearIndex - 3) | filterNaN }}年亏损弥补
-        </a-col>
-        <a-col :span="5" class="result-info">
-          {{ currentYearResult ? currentYearResult[3] : '-' }} 元
-        </a-col>
-        <a-col :span="5" class="result-info">
-          利用{{ parseInt(currentYearTitle) - (currentYearIndex > 5 ? 3 : currentYearIndex - 2) | filterNaN }}年亏损弥补
-        </a-col>
-        <a-col :span="5" class="result-info">
-          {{ currentYearResult ? currentYearResult[2] : '-' }} 元
-        </a-col>
-        <a-col :span="5" class="result-info">
-          利用{{ parseInt(currentYearTitle) - (currentYearIndex > 5 ? 4 : currentYearIndex - 1) | filterNaN }}年亏损弥补
-        </a-col>
-        <a-col :span="5" class="result-info">
-          {{ currentYearResult ? currentYearResult[1] : '-' }} 元
-        </a-col>
-        <a-col :span="5" class="result-info">
-          利用{{ parseInt(currentYearTitle) - (currentYearIndex > 5 ? 5 : currentYearIndex) | filterNaN }}年亏损弥补
-        </a-col>
-        <a-col :span="5" class="result-info">
-          {{ currentYearResult ? currentYearResult[0] : '-' }} 元
+        <a-col :span="12" v-for="index of 5" :key="'result' + index">
+          <a-col :span="10" class="result-info">
+            利用{{ history && history.length > 0 ? parseInt(history[history.length - 1].title) - index : 0 | filterNaN }}年亏损弥补
+          </a-col>
+          <a-col :span="10" class="result-info">
+            {{ history && history.length > 0 ? history[history.length - 1].data[index - 1] : '-' }} 元
+          </a-col>
         </a-col>
       </a-row>
     </a-row>
@@ -72,54 +54,36 @@
       :width="1000"
     >
       <div>
-        <a-row :gutter="20" class="result-board" v-for="(h, index) of history" :key="index">
+        <a-row :gutter="20" class="result-board" v-for="(h, index) of history" :key="'history' + index">
           <a-col class="result-title">
-            {{ (currentYearTitle ? parseInt(currentYearTitle) - (history.length - index) : '0') + '年' }}
+            {{ h.title + '年' }}
           </a-col>
           <a-row class="total">
-            <a-col :span="5" class="result-info">
-              {{ (currentYearTitle ? parseInt(currentYearTitle) - (history.length - index) : '0') + '年亏损弥补总额' }}
+            <a-col :span="12">
+              <a-col :span="10" class="result-info">
+                {{ h.title + '年亏损弥补总额' }}
+              </a-col>
+              <a-col :span="10" class="result-info">
+                {{ history[index].data[5]}} 元
+              </a-col>
             </a-col>
-            <a-col :span="5" class="result-info">
-              {{ h[5] }} 元
-            </a-col>
-            <a-col :span="5" class="result-info">
-              {{ (currentYearTitle ? parseInt(currentYearTitle) - (history.length - index) : '0') + '年应税利润' }}
-            </a-col>
-            <a-col :span="5" class="result-info">
-              {{ h[6] }} 元
+            <a-col :span="12">
+              <a-col :span="10" class="result-info">
+                {{ history[index].title + '年应税利润' }}
+              </a-col>
+              <a-col :span="10" class="result-info">
+                {{ history[index].data[6] }} 元
+              </a-col>
             </a-col>
           </a-row>
           <a-row>
-            <a-col :span="5" class="result-info">
-              利用{{ parseInt(currentYearTitle) - (history.length - index) - (h[7] > 5 ? 1 : h[7] - 5) | filterNaN }}年亏损弥补
-            </a-col>
-            <a-col :span="5" class="result-info">
-              {{ h[4] }} 元
-            </a-col>
-            <a-col :span="5" class="result-info">
-              利用{{ parseInt(currentYearTitle) - (history.length - index) - (h[7] > 5 ? 2 : h[7] - 4) | filterNaN }}年亏损弥补
-            </a-col>
-            <a-col :span="5" class="result-info">
-              {{ h[3] }} 元
-            </a-col>
-            <a-col :span="5" class="result-info">
-              利用{{ parseInt(currentYearTitle) - (history.length - index) - (h[7] > 5 ? 3 : h[7] - 3) | filterNaN }}年亏损弥补
-            </a-col>
-            <a-col :span="5" class="result-info">
-              {{ h[2] }} 元
-            </a-col>
-            <a-col :span="5" class="result-info">
-              利用{{ parseInt(currentYearTitle) - (history.length - index) - (h[7] > 5 ? 4 : h[7] - 2) | filterNaN }}年亏损弥补
-            </a-col>
-            <a-col :span="5" class="result-info">
-              {{ h[1] }} 元
-            </a-col>
-            <a-col :span="5" class="result-info">
-              利用{{ parseInt(currentYearTitle) - (history.length - index) - (h[7] > 5 ? 5 : h[7] - 1) | filterNaN }}年亏损弥补
-            </a-col>
-            <a-col :span="5" class="result-info">
-              {{ h[0] }} 元
+            <a-col :span="12" v-for="index of 5" :key="'result' + index">
+              <a-col :span="10" class="result-info">
+                利用{{ parseInt(h.title) - index | filterNaN }}年亏损弥补
+              </a-col>
+              <a-col :span="10" class="result-info">
+                {{ h.data[index - 1] }} 元
+              </a-col>
             </a-col>
           </a-row>
         </a-row>
@@ -131,6 +95,8 @@
 </template>
 
 <script>
+const BASE_YEAR = 2021
+
 export default {
   data () {
     return {
@@ -164,77 +130,77 @@ export default {
       },
       inputList: [
         {
-          title: '2021',
+          title: BASE_YEAR,
           cell: 'C3',
           value: 0
         },
         {
-          title: '2022',
+          title: BASE_YEAR + 1,
           cell: 'D3',
           value: 0
         },
         {
-          title: '2023',
+          title: BASE_YEAR + 2,
           cell: 'E3',
           value: 0
         },
         {
-          title: '2024',
+          title: BASE_YEAR + 3,
           cell: 'F3',
           value: 0
         },
         {
-          title: '2025',
+          title: BASE_YEAR + 4,
           cell: 'G3',
           value: 0
         },
         {
-          title: '2026',
+          title: BASE_YEAR + 5,
           cell: 'H3',
           value: 0
         },
         {
-          title: '2027',
+          title: BASE_YEAR + 6,
           cell: 'I3',
           value: 0
         },
         {
-          title: '2028',
+          title: BASE_YEAR + 7,
           cell: 'J3',
           value: 0
         },
         {
-          title: '2029',
+          title: BASE_YEAR + 8,
           cell: 'K3',
           value: 0
         },
         {
-          title: '2030',
+          title: BASE_YEAR + 9,
           cell: 'L3',
           value: 0
         },
         {
-          title: '2031',
+          title: BASE_YEAR + 10,
           cell: 'M3',
           value: 0
         },
         {
-          title: '2032',
+          title: BASE_YEAR + 11,
           cell: 'N3',
           value: 0
         },
         {
-          title: '2033',
+          title: BASE_YEAR + 12,
           cell: 'O3',
           value: 0
         },
         {
-          title: '2034',
+          title: BASE_YEAR + 13,
           cell: 'P3',
           value: 0
         },
         {
-          title: '2035',
+          title: BASE_YEAR + 14,
           cell: 'Q3',
           value: 0
         }
@@ -323,24 +289,14 @@ export default {
     getCurrentYearResult (spread) {
       let cell = this.currentYearCell
       if (cell === null) {
-        this.currentYearResult = null
         return
       }
       // let col = parseInt(cell.match(/\d+/))
       let row = cell.match(/[A-Z]+/)[0]
       // eslint-disable-next-line no-undef
       let sheet = spread.getActiveSheet()
-      this.currentYearResult = [
-        sheet.getValue(3, this.transCol[row] - 1),
-        sheet.getValue(4, this.transCol[row] - 1),
-        sheet.getValue(5, this.transCol[row] - 1),
-        sheet.getValue(6, this.transCol[row] - 1),
-        sheet.getValue(7, this.transCol[row] - 1),
-        sheet.getValue(8, this.transCol[row] - 1),
-        sheet.getValue(9, this.transCol[row] - 1)
-      ]
       this.history = []
-      for (let i = 2; i < this.transCol[row] - 1; i++) {
+      for (let i = 2; i < this.transCol[row]; i++) {
         let temp = [
           sheet.getValue(3, i),
           sheet.getValue(4, i),
@@ -349,8 +305,9 @@ export default {
           sheet.getValue(7, i),
           sheet.getValue(8, i),
           sheet.getValue(9, i),
-          i - 1
+          i - 2 > 5 ? 5 : i - 2
         ]
+
         for (let i = 0; i < temp.length; i++) {
           if (temp[i] === null) {
             temp[i] = '-'
@@ -359,15 +316,23 @@ export default {
             temp[i] = 0
           }
         }
-        this.history.push(temp)
-      }
-      for (let i = 0; i < this.currentYearResult.length; i++) {
-        if (this.currentYearResult[i] === null) {
-          this.currentYearResult[i] = '-'
+
+        let validIndex = temp[7] - 1
+        let begin = 0
+        // 对有效亏损弥补年份进行一下反转，是下标和年份对上
+        while (begin < validIndex) {
+          let tempValue = temp[begin]
+          temp[begin] = temp[validIndex]
+          temp[validIndex] = tempValue
+          begin += 1
+          validIndex -= 1
         }
-        if (this.currentYearResult[i] === false) {
-          this.currentYearResult[i] = 0
-        }
+
+        // data = [一年前亏损弥补(今年 - 1), 二年前亏损弥补(今年 - 2), 三年前亏损弥补, 四年前亏损弥补, 五年前亏损弥补, 亏损弥补总额, 应税利润, 有效弥补年份]
+        this.history.push({
+          title: BASE_YEAR + i - 2,
+          data: temp
+        })
       }
     },
     initSpread (spread) {
