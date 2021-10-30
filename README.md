@@ -26,5 +26,13 @@ npm run e2e
 # run all tests
 npm test
 ```
+tax data struct
 
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+``` bash
+history = [
+    {
+        title: 年份,
+        data: [一年前亏损弥补(今年 - 1), 二年前亏损弥补(今年 - 2), 三年前亏损弥补, 四年前亏损弥补, 五年前亏损弥补, 亏损弥补总额, 应税利润, 有效弥补年份]
+    },
+]
+```
