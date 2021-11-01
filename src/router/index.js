@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import tax from '@/userPages/tax'
+import confirmation from '@/userPages/confirmation'
 
 Vue.use(Router)
 
@@ -15,6 +16,11 @@ export default new Router({
       path: '/tax',
       name: 'tax',
       component: tax
+    },
+    {
+      path: '/confirmation',
+      name: 'confirmation',
+      component: confirmation
     }
   ]
 })

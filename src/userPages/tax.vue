@@ -1,6 +1,6 @@
 <template>
   <div class="board">
-    <p style="font-weight: bolder">税前利润</p>
+    <p class="gray-font">税前利润</p>
     <a-row :gutter="20">
       <a-col :span="4" v-for="i of inputList" :key="i.cell">
         {{ i.title }}: <a-input type="number" :id="i.cell" v-model="i.value"/>
@@ -11,35 +11,35 @@
       <a-button @click="refresh()" type="primary" style="float:right;">计 算</a-button>
     </a-row>
 
-    <a-row :gutter="20" class="result-board">
+    <a-row :gutter="20" class="gray-board">
       <a-col class="result-title">
         {{ (history && history.length > 0 ? history[history.length - 1].title : '0') + '年' }}
         <a-button style="float: right;" @click="showHistory">历史追溯</a-button>
       </a-col>
-      <a-row class="total">
+      <a-row class="title-underline">
         <a-col :span="12">
-          <a-col :span="10" class="result-info">
+          <a-col :span="10" class="board-info">
             {{ (history && history.length > 0 ? history[history.length - 1].title : '0') + '年亏损弥补总额' }}
           </a-col>
-          <a-col :span="10" class="result-info">
+          <a-col :span="10" class="board-info">
             {{ history && history.length > 0 ? history[history.length - 1].data[5] : '-' }} 元
           </a-col>
         </a-col>
         <a-col :span="12">
-          <a-col :span="10" class="result-info">
+          <a-col :span="10" class="board-info">
             {{ (history && history.length > 0 ? history[history.length - 1].title : '0') + '年应税利润' }}
           </a-col>
-          <a-col :span="10" class="result-info">
+          <a-col :span="10" class="board-info">
             {{ history && history.length > 0 ? history[history.length - 1].data[6] : '-' }} 元
           </a-col>
         </a-col>
       </a-row>
       <a-row>
         <a-col :span="12" v-for="index of 5" :key="'result' + index">
-          <a-col :span="10" class="result-info">
+          <a-col :span="10" class="board-info">
             利用{{ history && history.length > 0 ? parseInt(history[history.length - 1].title) - index : 0 | filterNaN }}年亏损弥补
           </a-col>
-          <a-col :span="10" class="result-info">
+          <a-col :span="10" class="board-info">
             {{ history && history.length > 0 ? history[history.length - 1].data[index - 1] : '-' }} 元
           </a-col>
         </a-col>
@@ -54,34 +54,34 @@
       :width="1000"
     >
       <div>
-        <a-row :gutter="20" class="result-board" v-for="(h, index) of history" :key="'history' + index">
+        <a-row :gutter="20" class="gray-board" v-for="(h, index) of history" :key="'history' + index">
           <a-col class="result-title">
             {{ h.title + '年' }}
           </a-col>
-          <a-row class="total">
+          <a-row class="title-underline">
             <a-col :span="12">
-              <a-col :span="10" class="result-info">
+              <a-col :span="10" class="board-info">
                 {{ h.title + '年亏损弥补总额' }}
               </a-col>
-              <a-col :span="10" class="result-info">
+              <a-col :span="10" class="board-info">
                 {{ history[index].data[5]}} 元
               </a-col>
             </a-col>
             <a-col :span="12">
-              <a-col :span="10" class="result-info">
+              <a-col :span="10" class="board-info">
                 {{ history[index].title + '年应税利润' }}
               </a-col>
-              <a-col :span="10" class="result-info">
+              <a-col :span="10" class="board-info">
                 {{ history[index].data[6] }} 元
               </a-col>
             </a-col>
           </a-row>
           <a-row>
             <a-col :span="12" v-for="index of 5" :key="'result' + index">
-              <a-col :span="10" class="result-info">
+              <a-col :span="10" class="board-info">
                 利用{{ parseInt(h.title) - index | filterNaN }}年亏损弥补
               </a-col>
-              <a-col :span="10" class="result-info">
+              <a-col :span="10" class="board-info">
                 {{ h.data[index - 1] }} 元
               </a-col>
             </a-col>
@@ -205,14 +205,9 @@ export default {
           value: 0
         }
       ],
-      currentYearIndex: 0,
-      currentYearResult: null,
       historyModalVisible: false,
       currentYearCell: null,
-      currentYearTitle: null,
       history: [],
-      fileName: '',
-      excelIo: {},
       spread: {},
       spreadStyle: {
         width: '100%',
@@ -265,19 +260,13 @@ export default {
       this.historyModalVisible = true
     },
     getCurrentYearInfo () {
-      let current = null
       let cell = null
-      let index = 0
       for (let i in this.inputList) {
         if (parseInt(this.inputList[i].value) !== 0) {
-          current = this.inputList[i].title
           cell = this.inputList[i].cell
-          index = i
         }
       }
-      this.currentYearIndex = index
       this.currentYearCell = cell
-      this.currentYearTitle = current
     },
     refresh () {
       // eslint-disable-next-line no-undef
@@ -485,25 +474,9 @@ export default {
 </script>
 
 <style scoped>
-  .board {
-    margin: 20px;
-  }
-  .result-board {
-    margin-top: 20px;
-    background-color: #f2f4f5;
-    border-radius: 5px;
-  }
-  .total {
-    border-bottom: solid 2px #dfdfdf;
-  }
   .result-title {
-    margin: 10px 20px;
     color: #1890ff;
     font-weight: bold;
     font-size: 20px;
-  }
-  .result-info {
-    margin: 10px 20px;
-    font-size: 17px;
   }
 </style>
