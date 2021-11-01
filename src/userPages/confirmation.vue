@@ -46,8 +46,7 @@
             <div class="board-info normal-font" v-for="item of itemsList[0][0]" :key="item">
               <a-checkbox :value="item"><span class="board-info normal-font">{{ item }}</span></a-checkbox>
               <div style="float: right;">
-                <a-input v-show="editItemDay === item" :id="item" @blur="saveItem(item)" v-model="tempItemDay"/>
-                <span v-show="editItemDay !== item" @click="editItem(item)">{{ itemsDay[item] ? itemsDay[item] : 0 }}天</span>
+                <a-input style="width: 100px" type="number" v-model="itemsDay[item]"/> 天
               </div>
             </div>
           </a-col>
@@ -65,8 +64,7 @@
             <div class="board-info normal-font" v-for="item of itemsList[0][1]" :key="item">
               <a-checkbox :value="item"><span class="board-info normal-font">{{ item }}</span></a-checkbox>
               <div style="float: right;">
-                <a-input v-show="editItemDay === item" :id="item" @blur="saveItem(item)" v-model="tempItemDay"/>
-                <span v-show="editItemDay !== item" @click="editItem(item)">{{ itemsDay[item] ? itemsDay[item] : 0 }}天</span>
+                <a-input style="width: 100px" type="number" v-model="itemsDay[item]"/> 天
               </div>
             </div>
           </a-col>
@@ -111,8 +109,7 @@
             <div class="board-info normal-font" v-for="item of itemsList[1][0]" :key="item">
               <a-checkbox :value="item"><span class="board-info normal-font">{{ item }}</span></a-checkbox>
               <div style="float: right;">
-                <a-input v-show="editItemDay === item" :id="item" @blur="saveItem(item)" v-model="tempItemDay"/>
-                <span v-show="editItemDay !== item" @click="editItem(item)">{{ itemsDay[item] ? itemsDay[item] : 0 }}天</span>
+                <a-input style="width: 100px" type="number" v-model="itemsDay[item]"/> 天
               </div>
             </div>
           </a-col>
@@ -130,8 +127,7 @@
             <div class="board-info normal-font" v-for="item of itemsList[1][1]" :key="item">
               <a-checkbox :value="item"><span class="board-info normal-font">{{ item }}</span></a-checkbox>
               <div style="float: right;">
-                <a-input v-show="editItemDay === item" :id="item" @blur="saveItem(item)" v-model="tempItemDay"/>
-                <span v-show="editItemDay !== item" @click="editItem(item)">{{ itemsDay[item] ? itemsDay[item] : 0 }}天</span>
+                <a-input style="width: 100px" type="number" v-model="itemsDay[item]"/> 天
               </div>
             </div>
           </a-col>
@@ -179,11 +175,9 @@ export default {
           ]
         ]
       ],
-      tempItemDay: 0,
       confirmationTime: null,
       selectedItems: [],
-      itemsDay: {},
-      editItemDay: null
+      itemsDay: {}
     }
   },
   computed: {
@@ -216,17 +210,6 @@ export default {
         }
       })
       return sum
-    },
-    saveItem (item) {
-      this.$set(this.itemsDay, item, this.tempItemDay)
-      this.editItemDay = null
-    },
-    editItem (item) {
-      this.editItemDay = item
-      this.tempItemDay = this.itemsDay[item]
-      this.$nextTick(function () {
-        document.getElementById(item).focus()
-      })
     }
   }
 }
