@@ -36,3 +36,16 @@ history = [
     },
 ]
 ```
+
+confirmation data struct
+
+``` bash
+itemsDay = {
+        '方案设计单位招标（有战略）': 10,
+},
+
+selectedItems = [
+    '方案设计单位招标（有战略）',
+]
+
+```
