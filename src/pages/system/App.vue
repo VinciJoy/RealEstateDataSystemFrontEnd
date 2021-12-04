@@ -1,7 +1,9 @@
 <template>
   <a-config-provider :locale="zh_CN">
     <div id="app">
+      <navigation></navigation>
       <router-view/>
+      <systemFooter></systemFooter>
     </div>
   </a-config-provider>
 </template>
@@ -11,11 +13,17 @@
 import zh_CN from 'ant-design-vue/lib/locale-provider/zh_CN'
 import moment from 'moment'
 import 'moment/locale/zh-cn'
+import navigation from './views/components/navigation'
+import systemFooter from './views/components/systemFooter'
 
 moment.locale('zh-cn')
 
 export default {
   name: 'App',
+  components: {
+    navigation: navigation,
+    systemFooter: systemFooter
+  },
   data () {
     return {
       zh_CN

@@ -15,6 +15,7 @@ Vue.prototype.$message.config({
   duration: 2,
   top: 250
 })
+
 Vue.prototype.$error = (s) => Vue.prototype.$message.error(s)
 Vue.prototype.$info = (s) => Vue.prototype.$message.info(s)
 Vue.prototype.$success = (s) => Vue.prototype.$message.success(s)

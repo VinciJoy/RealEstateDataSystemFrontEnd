@@ -12,11 +12,29 @@
   color: black;
 }
 
+.mt-20 {
+  margin-top: 20px;
+}
+
+.mt-40 {
+  margin-top: 40px;
+}
+
+.mt-10 {
+  margin-top: 10px;
+}
+
 .gray-board {
   padding: 20px;
   margin-top: 20px;
   background-color: #f2f4f5;
   border-radius: 5px;
+}
+
+.not-allow-txt-overflow{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .white-board {

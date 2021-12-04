@@ -18,3 +18,16 @@ body {
     left: 0;
     right: 0;
 }
+
+.can-not-select {
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  user-select: none;
+}
+
+.point {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}

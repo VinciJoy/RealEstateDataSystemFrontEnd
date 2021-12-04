@@ -9,7 +9,7 @@ export default new Router({
     {
       path: '/',
       name: 'index',
-      component: () => import(/* webpackChunkName: "utils" */ '@system/views/utils/tax.vue')
+      component: () => import(/* webpackChunkName: "utils" */ '@system/views/general/home.vue')
     },
     {
       path: '/tax',
