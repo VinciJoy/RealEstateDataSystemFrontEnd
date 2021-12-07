@@ -140,7 +140,7 @@
 
 <script>
 import moment from 'moment'
-import api from '@system/api'
+import {getUserInfo} from '../../../../api/user'
 
 export default {
   data () {
@@ -201,7 +201,7 @@ export default {
   filters: {},
   methods: {
     init () {
-      api.getUserInfo()
+      userapi.getUserInfo();
     },
     partDays (part, subPart) {
       let sum = 0

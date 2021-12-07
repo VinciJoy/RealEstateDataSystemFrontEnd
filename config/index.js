@@ -23,7 +23,7 @@ module.exports = {
     // Use Eslint Loader?
     // If true, your code will be linted during bundling and
     // linting errors and warnings will be shown in the console.
-    useEslint: true,
+    useEslint: false,
     // If true, eslint errors and warnings will also be shown in the error overlay
     // in the browser.
     showEslintErrorsInOverlay: false,
@@ -49,12 +49,13 @@ module.exports = {
     systemTemplate: path.resolve(__dirname, '../src/pages/system/index.html'),
     adminIndex: path.resolve(__dirname, '../dist/admin/index.html'),
     adminTemplate: path.resolve(__dirname, '../src/pages/admin/index.html'),
-
     // Paths
     assetsRoot: path.resolve(__dirname, '../dist'),
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-
+    publicPath: './',
+    path:"/",
+    indexPath: 'index.html', // Default: 'index.html'
     /**
      * Source Maps
      */
