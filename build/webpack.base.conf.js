@@ -19,6 +19,10 @@ const createLintingRule = () => ({
   }
 })
 
+/**
+ * 多入口 配置
+ * @type {{output: {path: *, filename: string, publicPath: string}, entry: {system: string, admin: string}, node: {setImmediate: boolean, dgram: string, tls: string, child_process: string, net: string, fs: string}, resolve: {extensions: string[], alias: {'@': *, '@admin': *, '@system': *, vue$: string}}, module: {rules: [...{include: *[], test: RegExp, loader: string, options: {formatter: function(*=): *|string, emitWarning: boolean}, enforce: string}[]|*[], {test: RegExp, loader: string, options: {loaders: {css: *|string[], styl: *|string[], scss: *|string[], stylus: *|string[], less: *|string[], sass: *|string[], postcss: *|string[]}, transformToRequire: {image: string, img: string, video: string[], source: string}, cssSourceMap: boolean, cacheBusting: boolean}|{loaders?: {css: *|string[], styl: *|string[], scss: *|string[], stylus: *|string[], less: *|string[], sass: *|string[], postcss: *|string[]}, cssSourceMap?: boolean, cacheBusting?: boolean, transformToRequire?: {image: string, img: string, video: string[], source: string}}}, {include: *[], test: RegExp, loader: string}, {test: RegExp, loader: string, options: {limit: number, name: *}}, {test: RegExp, loader: string, options: {limit: number, name: *}}, {test: RegExp, loader: string, options: {limit: number, name: *}}]}, context}}
+ */
 module.exports = {
   context: path.resolve(__dirname, '../'),
   entry: {
@@ -36,7 +40,7 @@ module.exports = {
     extensions: ['.js', '.vue', '.json'],
     alias: {
       'vue$': 'vue/dist/vue.esm.js',
-      '@': resolve('src'),
+      '@': resolve('/src'),
       '@system': resolve('/src/pages/system'),
       '@admin': resolve('/src/pages/admin'),
     }

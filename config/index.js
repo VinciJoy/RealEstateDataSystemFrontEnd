@@ -4,6 +4,8 @@
 
 const path = require('path')
 
+console.log('__dirname', __dirname)
+
 module.exports = {
   dev: {
 
@@ -54,7 +56,6 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     publicPath: './',
-    path:"/",
     indexPath: 'index.html', // Default: 'index.html'
     /**
      * Source Maps
