@@ -1,0 +1,74 @@
+.board {
+  margin: 40px;
+}
+
+.normal-font {
+  font-size: 20px;
+}
+
+.board-info {
+  margin: 10px;
+  font-size: 20px;
+  color: black;
+}
+
+.mt-20 {
+  margin-top: 20px;
+}
+
+.mt-40 {
+  margin-top: 40px;
+}
+
+.mt-10 {
+  margin-top: 10px;
+}
+
+.gray-board {
+  padding: 20px;
+  margin-top: 20px;
+  background-color: #f2f4f5;
+  border-radius: 5px;
+}
+
+.not-allow-txt-overflow{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.white-board {
+  padding: 20px;
+  margin-top: 10px;
+  border-radius: 5px;
+  vertical-align:top;
+  background-color: white;
+}
+
+.title-underline {
+  border-bottom: solid 2px #dfdfdf;
+  padding-bottom: 10px;
+}
+
+.gray-font {
+  color: #b0b0b0;
+  font-size: 25px;
+  font-weight: bold;
+}
+
+.gray-number {
+  color: #b0b0b0;
+  font-size: 30px;
+  font-weight: bold;
+}
+
+.blue-number {
+  color: #1890ff;
+  font-size: 40px;
+  font-weight: bolder;
+}
+
+.blue {
+  color: #1890ff;
+  font-weight: bold;
+}
