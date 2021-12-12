@@ -115,7 +115,7 @@
 </template>
 
 <script>
-import {adminLogin, adminUserRegirest, getLoginVerifycode} from '../../../../api/user'
+import {adminLogin, adminUserRegirest, getLoginVerifycode} from '../../api/user'
 
 export default {
   name: 'navigation',

@@ -140,7 +140,7 @@
 
 <script>
 import moment from 'moment'
-import {getUserInfo} from '../../../../api/user'
+import {getUserInfo} from '../../../system/api/user'
 
 export default {
   data () {

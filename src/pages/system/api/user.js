@@ -6,21 +6,21 @@ import requester from '@/utils/request'
  * 获取用户信息
  * @returns {*}
  */
-export function  getUserInfo () {
-   return requester({
-     url: '/api/system/users/',
-     method: 'get',
-   })
+export function getUserInfo () {
+  return requester({
+    url: '/api/system/users/',
+    method: 'get'
+  })
 }
 
 /**
  * 获取登录的验证码
- * @returns {AxiosPromise}
+ * @returns { AxiosPromise }
  */
 export function getLoginVerifycode () {
   return requester({
     url: '/api/system/captchas',
-    method: 'get',
+    method: 'get'
   })
 }
 
