@@ -419,7 +419,7 @@ export default {
   data () {
     return {}
   },
-  mounted () {
+  created () {
     this.init()
   },
   methods: {
@@ -447,10 +447,6 @@ export default {
   height: 200px;
 }
 
-.part-title {
-  padding-left: 20px;
-}
-
 .tag-desc {
   font-size: 18px;
   color: #a1a1a1;
@@ -476,10 +472,6 @@ export default {
   padding: 5px 10px;
   background-color: #ebecf0;
   height: 17%;
-}
-
-.left-blue {
-  border-left: solid 4px #40a9ff;
 }
 
 .banner {

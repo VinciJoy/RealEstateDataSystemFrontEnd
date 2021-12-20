@@ -140,7 +140,6 @@
 
 <script>
 import moment from 'moment'
-import {getUserInfo} from '../../api/user'
 
 export default {
   data () {
@@ -200,9 +199,6 @@ export default {
   },
   filters: {},
   methods: {
-    init () {
-      getUserInfo()
-    },
     partDays (part, subPart) {
       let sum = 0
       this.itemsList[part][subPart].forEach((data) => {

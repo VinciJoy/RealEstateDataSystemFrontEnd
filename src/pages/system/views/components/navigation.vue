@@ -1,12 +1,13 @@
 <template>
   <div>
-    <a-menu v-model="current" mode="horizontal" theme="dark">
-      <a-menu-item class="logo can-not-select"><img src="../../../../../static/imgs/logo.png"
-                                                    style="vertical-align: middle;height: 20px"/></a-menu-item>
-      <a-menu-item key="home">
+    <a-menu v-model="activeKeys" mode="horizontal" theme="dark">
+      <a-menu-item key="logo" class="logo can-not-select">
+        <img src="../../../../../static/imgs/logo.png" style="vertical-align: middle;height: 20px"/>
+      </a-menu-item>
+      <a-menu-item key="home" @click="handleRoute('/')">
         首页
       </a-menu-item>
-      <a-sub-menu>
+      <a-sub-menu key="moreAnalyse">
         <span slot="title">
           More分析<a-icon type="caret-down"/>
         </span>
@@ -17,28 +18,26 @@
           analyse 2
         </a-menu-item>
       </a-sub-menu>
-      <a-sub-menu>
+      <a-sub-menu key="resourceBase">
         <span slot="title">
           资源Base<a-icon type="caret-down"/>
         </span>
-        <a-menu-item key="analyse:1">
-          analyse 1
+        <a-menu-item key="publishLandResource" @click="handleRoute('/publish_land_resource')">
+          发布土地资源
         </a-menu-item>
         <a-menu-item key="analyse:2">
           analyse 2
         </a-menu-item>
       </a-sub-menu>
-      <a-menu-item key="mobei-study">
+      <a-menu-item key="mobeiStudy">
         摩贝学堂
       </a-menu-item>
-      <a-menu-item key="mobei-bbs">
+      <a-menu-item key="mobeiBBS">
         摩贝论坛
       </a-menu-item>
     </a-menu>
-    <div class="navigation-user">
-      <span>
-        消息(1)
-      </span>
+
+    <div class="navigation-user" v-if="!userInfo">
       <span @click="showLoginModal">
         登录
       </span>
@@ -47,28 +46,45 @@
       </span>
     </div>
 
+    <div class="navigation-user" v-else>
+      <span>
+        消息(1)
+      </span>
+      <a-dropdown>
+        <span>
+          {{ userInfo.user_name }} <a-icon type="down" />
+        </span>
+        <a-menu slot="overlay">
+          <a-menu-item>
+            <a href="javascript:;" style="color: rgba(0, 0, 0, 0.85)!important" @click="logout">登 出</a>
+          </a-menu-item>
+        </a-menu>
+      </a-dropdown>
+    </div>
     <!--    login & register modal begin-->
     <a-modal
-      :visible="LRModalvisible"
+      :visible="modalVisible"
       :model="loginForm"
-      :title="LRModalStatus === 'login'? '欢迎登录摩贝云': '欢迎注册摩贝云'"
-      @cancel="LRModalvisible = false"
-      @change="loginFormChangWatch"
+      :title="modalMode === 'login'? '欢迎登录摩贝云': '欢迎注册摩贝云'"
+      @cancel="modalVisible = false"
       :maskClosable="false"
     >
+
+<!--      login form begin-->
       <a-form-model
+        v-show="modalMode === 'login'"
         ref="loginForm"
         :model="loginForm"
         :label-col="labelCol"
         :wrapper-col="wrapperCol"
         :rules="loginRules"
       >
-        <a-form-model-item label="用户名" prop="username" ref="username">
-          <a-input v-model="loginForm.username"
+        <a-form-model-item label="用户名" prop="user_name" ref="user_name">
+          <a-input v-model="loginForm.user_name"
                    tabindex="1"
                    @blur="
               () => {
-                $refs.username.onFieldBlur();
+                $refs.user_name.onFieldBlur();
               }
             "
           />
@@ -76,37 +92,92 @@
         <a-form-model-item label="密码" prop="password">
           <a-input
             tabindex="2"
+            type="password"
             v-model="loginForm.password"
           />
 
         </a-form-model-item>
-        <a-form-model-item label="确认密码" prop="repassword" v-if="LRModalStatus !== 'login'">
-          <a-input
-            v-model="loginForm.repassword"
-          />
-        </a-form-model-item>
 
-        <a-form-model-item label="验证码" prop="verifycode">
+        <a-form-model-item label="验证码" prop="captcha_value">
           <a-input
             style="width: 50%"
             tabindex="3"
-            v-model="loginForm.verifycode"
+            v-model="loginForm.captcha_value"
           />
-          <img @click="getcaptchaCode" class="verifycode" :src="verifycodeBas64">
-          <a-input hidden v-model="loginForm.uuid"
-          />
+          <img @click="getCaptcha" class="captchaImg" :src="captchaImgBas64">
         </a-form-model-item>
       </a-form-model>
+<!--      login form end-->
+
+<!--      register form begin-->
+      <a-form-model
+        v-show="modalMode === 'register'"
+        ref="registerForm"
+        :model="registerForm"
+        :label-col="labelCol"
+        :wrapper-col="wrapperCol"
+        :rules="registerRules"
+      >
+        <a-form-model-item label="用户名" prop="register_user_name" ref="register_user_name">
+          <a-input v-model="registerForm.register_user_name"
+                   tabindex="1"
+                   @blur="
+              () => {
+                $refs.register_user_name.onFieldBlur();
+              }
+            "
+          />
+        </a-form-model-item>
+        <a-form-model-item label="邮箱" prop="email" ref="email">
+          <a-input
+            v-model="registerForm.email"
+            tabindex="2"
+          />
+        </a-form-model-item>
+        <a-form-model-item label="密码" prop="password">
+          <a-input
+            tabindex="3"
+            type="password"
+            v-model="registerForm.password"
+          />
+
+        </a-form-model-item>
+        <a-form-model-item label="确认密码" prop="repassword" v-if="modalMode === 'register'">
+          <a-input
+            tabindex="4"
+            type="password"
+            v-model="registerForm.repassword"
+          />
+        </a-form-model-item>
+        <a-form-model-item label="验证码" prop="captcha_value">
+          <a-input
+            style="width: 50%"
+            tabindex="5"
+            v-model="registerForm.captcha_value"
+          />
+          <img @click="getCaptcha" class="captchaImg" :src="captchaImgBas64">
+        </a-form-model-item>
+      </a-form-model>
+<!--      register form end-->
+
       <template slot="footer">
         <a-button style="width: 100%" type="primary"
-                  @click="login" v-if="LRModalStatus === 'login'">
+                  @click="login" v-if="modalMode === 'login'">
           登 录
         </a-button>
         <a-button v-else style="width: 100%" type="primary"
-                  @click="registerUser">注册
+                  @click="register">注 册
         </a-button>
-        <div class="mt-10" v-if="LRModalStatus === 'login'">
-          <a style="color: #1890ff!important;">忘记密码</a>
+        <div class="mt-10" v-if="modalMode === 'login'">
+          <div style="display: inline; float:left;">
+            <a style="color: #1890ff!important;" @click="showRegisterModal">注册</a>
+          </div>
+          <div style="display: inline">
+            <a style="color: #1890ff!important;">忘记密码</a>
+          </div>
+        </div>
+        <div class="mt-10" v-show="modalMode === 'register'">
+            <a style="color: #1890ff!important;" @click="showLoginModal">登录</a>
         </div>
       </template>
     </a-modal>
@@ -115,92 +186,186 @@
 </template>
 
 <script>
-import {adminLogin, adminUserRegirest, getLoginVerifycode} from '../../api/user'
+import api from '@system/api/user'
+import utils from '@/utils/utils'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   name: 'navigation',
   data () {
+    let checkRepassword = (rule, value, callback) => {
+      if (value !== this.registerForm.password) {
+        callback(new Error('两次输入密码不一致!'))
+      }
+      callback()
+    }
     return {
-      verifycodeUuid: '',
-      verifycodeBas64: 'data:image/png;base64,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',
+      captchaImgBas64: null,
       loginRules: {
-        username: [
+        user_name: [
           {required: true, message: '请输入用户名!', trigger: 'blur'},
-          {min: 3, max: 5, message: 'Length should be 3 to 5', trigger: 'blur'}
+          {min: 5, max: 20, message: '用户名长度为5-20字符!', trigger: 'blur'}
         ],
         password: [
           {required: true, message: '请输入密码!', trigger: 'blur'},
-          {min: 3, max: 5, message: 'Length should be 3 to 5', trigger: 'blur'}
+          {min: 5, max: 256, message: '密码长度为5-256字符!', trigger: 'blur'}
+        ],
+        captcha_value: [
+          {required: true, message: '请输入验证码!', trigger: 'blur'}
+        ]
+      },
+      registerRules: {
+        register_user_name: [
+          {required: true, message: '请输入用户名!', trigger: 'blur'},
+          {min: 5, max: 20, message: '用户名长度为5-20字符!', trigger: 'blur'}
+        ],
+        password: [
+          {required: true, message: '请输入密码!', trigger: 'blur'},
+          {min: 5, max: 256, message: '密码长度为5-256字符!', trigger: 'blur'}
         ],
         repassword: [
           {required: true, message: '请输入密码!', trigger: 'blur'},
-          {min: 3, max: 5, message: 'Length should be 3 to 5', trigger: 'blur'}
+          {validator: checkRepassword, trigger: 'blur'}
         ],
-        verifycode: [
-          {required: true, message: '请输入验证码!', trigger: 'blur'},
-          {min: 4, max: 4, message: 'Length should be 3 to 5', trigger: 'blur'}
+        email: [
+          {required: true, type: 'email', trigger: 'blur', message: '请输入正确的电子邮箱!'},
+          {validator: utils.CheckEmailExist, trigger: 'blur'}
+        ],
+        captcha_value: [
+          {required: true, message: '请输入验证码!', trigger: 'blur'}
         ]
       },
       current: null,
-      LRModalvisible: false,
       labelCol: {span: 4},
       wrapperCol: {span: 20},
       loginForm: {
-        repassword: '',
-        username: null,
+        user_name: null,
         password: null,
-        uuid: '',
-        captcha: '',
-
+        captcha_uuid: '',
+        captcha_value: ''
       },
-      LRModalStatus: 'login'
+      registerForm: {
+        register_user_name: null,
+        email: null,
+        password: null,
+        repassword: null,
+        captcha_uuid: '',
+        captcha_value: ''
+      },
+      activeKeys: []
+    }
+  },
+  created () {
+    this.init()
+  },
+  watch: {
+    '$route.name' (to, from) {
+      this.activeKeys = [this.$route.name]
+    },
+    'modalMode' () {
+      this.getCaptcha()
+      this.$nextTick(() => {
+        this.$refs.loginForm.resetFields()
+      })
+      this.$nextTick(() => {
+        this.$refs.registerForm.resetFields()
+      })
+    },
+    'modalVisible' () {
+      this.getCaptcha()
+      this.$nextTick(() => {
+        this.$refs.loginForm.resetFields()
+      })
+      this.$nextTick(() => {
+        this.$refs.registerForm.resetFields()
+      })
+    }
+  },
+  computed: {
+    ...mapGetters(['modalStatus', 'userInfo']),
+    modalVisible: {
+      get () {
+        return this.modalStatus.visible
+      },
+      set (value) {
+        this.changeModalStatus({visible: value})
+      }
+    },
+    modalMode: {
+      get () {
+        return this.modalStatus.mode
+      },
+      set (value) {
+        this.changeModalStatus({mode: value})
+      }
     }
   },
   methods: {
-    getcaptchaCode () {
-      getLoginVerifycode().then((resp) => {
+    ...mapActions(['getUserInfo', 'changeModalStatus']),
+    init () {
+      this.getUserInfo()
+    },
+    handleRoute (route) {
+      if (route && route.indexOf('admin') < 0) {
+        this.$router.push(route)
+      } else {
+        window.open('/admin/')
+      }
+    },
+    logout () {
+      api.logout().then(() => {
+        this.$success('退出登录成功!')
+        this.getUserInfo()
+      })
+    },
+    getCaptcha () {
+      api.getCaptcha().then((res) => {
         // 赋值
-        this.verifycodeBas64 = resp.data.img
-        this.loginForm.uuid = resp.data.uuid
+        this.captchaImgBas64 = res.data.data.img
+        this.loginForm.captcha_uuid = res.data.data.uuid
+        this.registerForm.captcha_uuid = res.data.data.uuid
       })
     },
     login () {
-      console.log(this.loginForm)
-      let param = {
-        'user_name': this.loginForm.username,
-        'password': this.loginForm.password,
-        'captcha_uuid': this.loginForm.uuid,
-        'captcha_value': this.loginForm.captcha
-      }
-      adminLogin(param).then((resp) => {
-        console.log(resp)
+      this.$refs.loginForm.validate(valid => {
+        if (valid) {
+          api.login(this.loginForm).then((res) => {
+            this.$success('欢迎回来!')
+            this.getUserInfo()
+            this.modalVisible = false
+          }).catch((res) => {
+            this.getCaptcha()
+          })
+        }
       })
     },
-    registerUser () {
-      let param = {
-        'user_name': this.loginForm.username,
-        'password': this.loginForm.password,
-        'captcha_uuid': this.loginForm.uuid,
-        'captcha_value': this.loginForm.captcha
-      }
-      adminUserRegirest(param).then((resp) => {
-        this.$message.info(resp)
-        console.log(resp)
+    register () {
+      this.$refs.registerForm.validate(valid => {
+        if (valid) {
+          this.registerForm['user_name'] = this.registerForm['register_user_name']
+          api.register(this.registerForm).then((res) => {
+            this.$success('注册成功!')
+            this.showLoginModal()
+          }).catch(() => {
+            this.getCaptcha()
+          })
+        }
       })
     },
     showLoginModal () {
-      this.getcaptchaCode()
-      this.LRModalvisible = true
-      this.LRModalStatus = 'login'
+      this.modalVisible = true
+      this.modalMode = 'login'
+      // modal show 的时候 form 才会渲染出来，所以需要 nextTick
+      this.$nextTick(() => {
+        this.$refs.loginForm.resetFields()
+      })
     },
     showRegisterModal () {
-      this.getcaptchaCode()
-      this.LRModalvisible = true
-      this.LRModalStatus = 'register'
-    },
-    loginFormChangWatch (state) {
-
-      console.log("state",state)
+      this.modalVisible = true
+      this.modalMode = 'register'
+      this.$nextTick(() => {
+        this.$refs.loginForm.resetFields()
+      })
     }
   }
 }
@@ -223,7 +388,7 @@ a, i, span, li {
   -khtml-user-select: none;
   user-select: none;
 }
-.verifycode{
+.captchaImg {
   margin-left: 10%;
   height: 50px;
   width: 40%;

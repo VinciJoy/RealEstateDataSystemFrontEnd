@@ -6,6 +6,7 @@ import router from './router'
 import Antd from 'ant-design-vue'
 import 'ant-design-vue/dist/antd.css'
 import '../../../static/css/global.css'
+import store from '@/store/store'
 
 Vue.use(Antd)
 Vue.config.productionTip = false
@@ -24,6 +25,7 @@ Vue.prototype.$success = (s) => Vue.prototype.$message.success(s)
 new Vue({
   el: '#app',
   router,
+  store,
   components: { App },
   template: '<App/>'
 })

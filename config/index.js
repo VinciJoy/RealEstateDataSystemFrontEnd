@@ -6,18 +6,29 @@ const path = require('path')
 
 console.log('__dirname', __dirname)
 
+// const systemProxy = {
+//   onProxyReq: (proxyReq, req, res) => {
+//     proxyReq.setHeader('Referer', process.env.API_ROOT)
+//   },
+//   target: process.env.API_ROOT,
+//   changeOrigin: true,
+// }
+
+
 module.exports = {
   dev: {
 
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {},
+    proxyTable: {
+      // '/api/system': systemProxy,
+    },
 
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST
-    port: 8080, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
-    autoOpenBrowser: false,
+    port: 8081, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
+    autoOpenBrowser: true,
     errorOverlay: true,
     notifyOnErrors: true,
     poll: false, // https://webpack.js.org/configuration/dev-server/#devserver-watchoptions-
