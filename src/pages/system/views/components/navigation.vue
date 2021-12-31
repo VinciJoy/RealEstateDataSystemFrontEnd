@@ -55,7 +55,10 @@
           {{ userInfo.user_name }} <a-icon type="down" />
         </span>
         <a-menu slot="overlay">
-          <a-menu-item>
+          <a-menu-item style="text-align: center">
+            <a href="javascript:;" style="color: rgba(0, 0, 0, 0.85)!important" @click="handleRoute('/user_center')">个人中心</a>
+          </a-menu-item>
+          <a-menu-item style="text-align: center">
             <a href="javascript:;" style="color: rgba(0, 0, 0, 0.85)!important" @click="logout">登 出</a>
           </a-menu-item>
         </a-menu>

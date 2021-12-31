@@ -4,6 +4,9 @@ import ajax from '@/utils/request'
 let rootApi = '/users/'
 
 export default {
+  submitCertificateForm (data) {
+    return ajax(rootApi + 'certificate/', 'post', {data})
+  },
   getUserInfo () {
     return ajax(rootApi, 'get')
   },

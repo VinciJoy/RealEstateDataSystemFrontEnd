@@ -29,16 +29,18 @@ function ajax (url, method, options) {
       }
       resolve(res)
     }, res => {
-      // API请求异常，一般为Server error 或 network error
-      if (res.response.data.code === HTTP.NOT_LOGIN) {
+      if (res.toString().includes('404')) {
+        Vue.prototype.$error('api错误!')
+        reject(res)
+      } else if (res.response.data.code === HTTP.NOT_LOGIN) {
         store.dispatch('changeModalStatus', {'mode': 'login', 'visible': true})
-      }
-      if (res.toString().includes('Network Error')) {
+      } else if (res.toString().includes('Network Error')) {
         Vue.prototype.$error('网络错误!')
+        reject(res)
       } else {
         Vue.prototype.$error(res.response.data.msg)
+        reject(res)
       }
-      reject(res)
     })
   })
 }
