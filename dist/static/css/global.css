@@ -1,0 +1,106 @@
+.board {
+  margin: 40px;
+}
+
+.normal-font {
+  font-size: 20px;
+}
+
+.board-info {
+  margin: 10px;
+  font-size: 20px;
+  color: black;
+}
+
+.mt-20 {
+  margin-top: 20px;
+}
+
+.mt-40 {
+  margin-top: 40px;
+}
+
+.mt-10 {
+  margin-top: 10px;
+}
+
+.gray-board {
+  padding: 20px;
+  margin-top: 20px;
+  background-color: #f2f4f5;
+  border-radius: 5px;
+}
+
+.part-title {
+  padding-left: 20px;
+}
+
+.not-allow-txt-overflow{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tag-desc {
+  font-size: 18px;
+  color: #a1a1a1;
+}
+
+.info-desc-content {
+  color: #a1a1a1;
+}
+
+.tag-title {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.tag-icon {
+  margin: 20px 25%;
+  height: 60%;
+}
+
+.sub-gray-line {
+  padding-bottom: 40px;
+  border-bottom: #e0e0e0 solid 1px;
+}
+
+.left-blue {
+  border-left: solid 4px #40a9ff;
+}
+
+.white-board {
+  padding: 20px;
+  margin-top: 10px;
+  border-radius: 5px;
+  vertical-align:top;
+  background-color: white;
+}
+
+.title-underline {
+  border-bottom: solid 2px #dfdfdf;
+  padding-bottom: 10px;
+}
+
+.gray-font {
+  color: #b0b0b0;
+  font-size: 25px;
+  font-weight: bold;
+}
+
+.gray-number {
+  color: #b0b0b0;
+  font-size: 30px;
+  font-weight: bold;
+}
+
+.blue-number {
+  color: #1890ff;
+  font-size: 40px;
+  font-weight: bolder;
+}
+
+.blue {
+  color: #1890ff;
+  font-weight: bold;
+}
