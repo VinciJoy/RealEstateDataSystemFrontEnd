@@ -18,7 +18,7 @@
             </div>
           </a-col>
           <a-col :span="7" class="mt-40">
-            <a-button style="float: right" type="primary">发布土地信息</a-button>
+            <a-button style="float: right" @click="goToAdd" type="primary">发布土地信息</a-button>
           </a-col>
         </a-row>
 
@@ -177,6 +177,9 @@ export default {
         this.count = res.data.data.count
         this.itemList = res.data.data.landResources
       })
+    },
+    goToAdd () {
+      this.$router.push({name: 'publishLandResource'})
     },
     changeItemType (item) {
       this.itemType = item
