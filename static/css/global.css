@@ -41,6 +41,30 @@
   white-space: nowrap;
 }
 
+.tag-desc {
+  font-size: 18px;
+  color: #a1a1a1;
+}
+
+.info-desc-content {
+  color: #a1a1a1;
+}
+
+.tag-title {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.tag-icon {
+  margin: 20px 25%;
+  height: 60%;
+}
+
+.sub-gray-line {
+  padding-bottom: 40px;
+  border-bottom: #e0e0e0 solid 1px;
+}
+
 .left-blue {
   border-left: solid 4px #40a9ff;
 }

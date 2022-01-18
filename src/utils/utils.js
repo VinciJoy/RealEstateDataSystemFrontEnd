@@ -1,4 +1,5 @@
 import userApi from '@system/api/user'
+import { ROLE } from '@/utils/constants'
 
 function CheckMobileExist (rule, value, callback) {
   userApi.checkMobile(value).then(res => {
@@ -30,6 +31,10 @@ function CheckEmailExist (rule, value, callback) {
   }, _ => callback())
 }
 
+function IsAdmin (userRole) {
+  return [ROLE.ADMIN, ROLE.SUPER_ADMIN].includes(userRole)
+}
+
 function MobileValid (rule, value, callback) {
   if (/^1[345789]\d{9}$/.test(value) === false) {
     if (rule) {
@@ -53,6 +58,7 @@ export default {
   CheckMobileExist: CheckMobileExist,
   Copy: Copy,
   MobileValid: MobileValid,
+  IsAdmin: IsAdmin,
   getBase64: getBase64,
   CheckEmailExist: CheckEmailExist
 }

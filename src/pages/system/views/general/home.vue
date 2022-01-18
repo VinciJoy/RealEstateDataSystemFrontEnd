@@ -447,21 +447,6 @@ export default {
   height: 200px;
 }
 
-.tag-desc {
-  font-size: 18px;
-  color: #a1a1a1;
-}
-
-.tag-title {
-  font-weight: bold;
-  font-size: 20px;
-}
-
-.tag-icon {
-  margin: 20px 25%;
-  height: 60%;
-}
-
 .board-body {
   padding: 10px;
   background-color: #f2f4f5;

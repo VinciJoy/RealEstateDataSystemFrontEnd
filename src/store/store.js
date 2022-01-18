@@ -38,8 +38,8 @@ const rootMutations = {
 
 const rootActions = {
   // actions 可以包含异步操作
-  getUserInfo ({commit}) {
-    api.getUserInfo().then(res => {
+  async getUserInfo ({commit}) {
+    await api.getUserInfo().then(res => {
       commit('SET_userInfo', res.data.data.user)
     }).catch(() => {
       commit('SET_userInfo', null)

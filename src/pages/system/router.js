@@ -24,9 +24,9 @@ export default new Router({
       component: () => import(/* webpackChunkName: "utils" */ '@system/views/utils/tax.vue')
     },
     {
-      path: '/publish_land_resource',
-      name: 'publishLandResource',
-      component: () => import(/* webpackChunkName: "utils" */ '@system/views/resourceBase/publishLandResource.vue')
+      path: '/land_resource',
+      name: 'landResource',
+      component: () => import(/* webpackChunkName: "utils" */ '@system/views/resourceBase/landResource.vue')
     },
     {
       path: '/user_center',
@@ -34,21 +34,31 @@ export default new Router({
       component: () => import(/* webpackChunkName: "utils" */ '@system/views/userCenter/userCenter.vue'),
       children: [
         {
-          path: '/user_info',
+          path: 'user_info',
           name: 'userInfo',
-          component: () => import(/* webpackChunkName: "utils" */ '@system/views/userCenter/components/userInfo.vue')
+          component: () => import(/* webpackChunkName: "utils" */ '@system/views/userCenter/userInfo/userInfo.vue')
         },
         {
-          path: '/land_resource',
-          name: 'landResource',
-          component: () => import(/* webpackChunkName: "utils" */ '@system/views/userCenter/components/landResource.vue')
+          path: 'land_resource',
+          name: 'userCenterLandResource',
+          component: () => import(/* webpackChunkName: "utils" */ '@system/views/userCenter/landResource/landResource.vue')
         },
+        {
+          path: 'user_list',
+          name: 'userManage',
+          component: () => import(/* webpackChunkName: "utils" */ '@system/views/userCenter/users/users.vue')
+        },
+        {
+          path: 'publish_land_resource/:id',
+          name: 'editLandResource',
+          component: () => import(/* webpackChunkName: "utils" */ '@system/views/userCenter/landResource/publishLandResource.vue')
+        },
+        {
+          path: 'publish_land_resource',
+          name: 'publishLandResource',
+          component: () => import(/* webpackChunkName: "utils" */ '@system/views/userCenter/landResource/publishLandResource.vue')
+        }
       ]
-    },
-    {
-      path: '/publish_land_resource/:id',
-      name: 'editPublishLandResource',
-      component: () => import(/* webpackChunkName: "utils" */ '@system/views/resourceBase/publishLandResource.vue')
     },
     {
       path: '/confirmation',

@@ -10,8 +10,22 @@ export default {
   getLandResource (id) {
     return ajax(rootApi + id + '/', 'get')
   },
-  getLandResources () {
-    return ajax(rootApi, 'get')
+  getLandResources (params) {
+    if (!params['pageSize']) {
+      params['pageSize'] = 20
+    }
+    if (!params['pageIndex']) {
+      params['pageIndex'] = 1
+    }
+    if (!params['owner']) {
+      params['owner'] = false
+    }
+    return ajax(rootApi, 'get', {
+      params
+    })
+  },
+  deleteLandResource (id) {
+    return ajax(rootApi + id + '/', 'delete')
   },
   editLandResource (id, data) {
     return ajax(rootApi + id + '/', 'put', {data})

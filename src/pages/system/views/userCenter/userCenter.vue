@@ -1,22 +1,27 @@
 <template>
-  <a-row style="height: 800px">
+  <a-row style="min-height: calc(100% - 180px)">
     <a-col :span="3">
       <a-menu
-        style="width: 100%; height: 800px"
-        :default-selected-keys="['1']"
-        :open-keys.sync="openKeys"
+        style="width: 100%;"
+        :selected-keys="selectedKey"
         mode="inline"
       >
-        <a-menu-item key="1">
-          <router-link to="user_info">
-          <a-icon type="pie-chart" />
+        <a-menu-item key="userInfo">
+          <router-link :to="{ name: 'userInfo'}">
+          <a-icon type="solution" />
           <span>个人信息</span>
           </router-link>
         </a-menu-item>
-        <a-menu-item key="2">
-          <router-link to="land_resource">
+        <a-menu-item key="userCenterLandResource">
+          <router-link :to="{ name: 'userCenterLandResource'}">
             <a-icon type="pie-chart" />
             <span>土地资源</span>
+          </router-link>
+        </a-menu-item>
+        <a-menu-item v-if="utils.IsAdmin(userInfo.role)" key="userManage">
+          <router-link :to="{ name: 'userManage'}">
+            <a-icon type="team" />
+            <span>用户管理</span>
           </router-link>
         </a-menu-item>
       </a-menu>
@@ -33,12 +38,53 @@
 </template>
 
 <script>
+import utils from '@/utils/utils'
+import {mapGetters} from 'vuex'
+
+const MenuList = {
+  userCenterLandResource: [
+    'userCenterLandResource',
+    'editLandResource',
+    'publishLandResource'
+  ],
+  userInfo: [
+    'userInfo'
+  ],
+  userManage: [
+    'userManage'
+  ]
+}
+
 export default {
   name: 'userCenter',
   data () {
     return {
-      current: ['mail'],
-      openKeys: ['sub1']
+      MenuList: MenuList,
+      utils: utils,
+      selectedKey: []
+    }
+  },
+  mounted () {
+    this.init()
+  },
+  computed: {
+    ...mapGetters(['userInfo'])
+  },
+  watch: {
+    $route (to, from) {
+      this.selectMenu()
+    }
+  },
+  methods: {
+    init () {
+      this.selectMenu()
+    },
+    selectMenu () {
+      for (let key in this.MenuList) {
+        if (this.MenuList[key].includes(this.$route.name)) {
+          this.selectedKey = [key]
+        }
+      }
     }
   }
 }

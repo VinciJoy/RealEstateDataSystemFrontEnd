@@ -2,7 +2,7 @@
   <div>
     <a-menu v-model="activeKeys" mode="horizontal" theme="dark">
       <a-menu-item key="logo" class="logo can-not-select">
-        <img src="../../../../../static/imgs/logo.png" style="vertical-align: middle;height: 20px"/>
+        <img src="/static/imgs/logo.png" style="vertical-align: middle;height: 20px"/>
       </a-menu-item>
       <a-menu-item key="home" @click="handleRoute('/')">
         首页
@@ -22,8 +22,10 @@
         <span slot="title">
           资源Base<a-icon type="caret-down"/>
         </span>
-        <a-menu-item key="publishLandResource" @click="handleRoute('/publish_land_resource')">
-          发布土地资源
+        <a-menu-item key="landResource">
+          <router-link :to="{ name: 'landResource'}">
+            <span>土地资源</span>
+          </router-link>
         </a-menu-item>
         <a-menu-item key="analyse:2">
           analyse 2
@@ -56,7 +58,7 @@
         </span>
         <a-menu slot="overlay">
           <a-menu-item style="text-align: center">
-            <a href="javascript:;" style="color: rgba(0, 0, 0, 0.85)!important" @click="handleRoute('/user_center')">个人中心</a>
+            <a href="javascript:;" style="color: rgba(0, 0, 0, 0.85)!important" @click="handleRoute('/user_center/user_info')">个人中心</a>
           </a-menu-item>
           <a-menu-item style="text-align: center">
             <a href="javascript:;" style="color: rgba(0, 0, 0, 0.85)!important" @click="logout">登 出</a>
@@ -317,6 +319,7 @@ export default {
     },
     logout () {
       api.logout().then(() => {
+        this.$store.commit('SET_userInfo', null)
         this.$success('退出登录成功!')
         this.getUserInfo()
       })

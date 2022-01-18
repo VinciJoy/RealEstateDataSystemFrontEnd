@@ -7,8 +7,25 @@ export default {
   submitCertificateForm (data) {
     return ajax(rootApi + 'certificate/', 'post', {data})
   },
+  editCertificateForm (data) {
+    return ajax(rootApi + 'certificate/', 'patch', {data})
+  },
   getUserInfo () {
     return ajax(rootApi, 'get')
+  },
+  getUsers (pageSize = 20, pageIndex = 1) {
+    return ajax(rootApi + 'list/', 'get', {
+      params: {
+        pageSize: pageSize,
+        pageIndex: pageIndex
+      }
+    })
+  },
+  deleteUser (userID) {
+    return ajax(rootApi + userID + '/', 'delete')
+  },
+  editUser (userID, data) {
+    return ajax(rootApi + userID + '/', 'patch', {data})
   },
   login (data) {
     return ajax(rootApi + 'login/', 'post', {data})
