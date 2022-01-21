@@ -45,17 +45,17 @@
           <div class="tag-desc can-not-select" style="display: inline-block; float: right">
             排序：
 
-            <span class="order_by" @click="orderByUpdatedTime = 'ASC'" v-show="orderByUpdatedTime === ''">更新时间 </span>
+            <span class="clickable-txt" @click="orderByUpdatedTime = 'ASC'" v-show="orderByUpdatedTime === ''">更新时间 </span>
             <a @click="orderByUpdatedTime = 'DESC'" v-show="orderByUpdatedTime === 'ASC'">更新时间↓</a>
             <a @click="orderByUpdatedTime = ''" v-show="orderByUpdatedTime === 'DESC'">更新时间↑</a>
 
-            <span class="order_by" @click="orderBySpace = 'ASC'" v-show="orderBySpace === ''">地上建筑面积 </span>
+            <span class="clickable-txt" @click="orderBySpace = 'ASC'" v-show="orderBySpace === ''">地上建筑面积 </span>
             <a @click="orderBySpace = 'DESC'" v-show="orderBySpace === 'ASC'">地上建筑面积↓</a>
             <a @click="orderBySpace = ''" v-show="orderBySpace === 'DESC'">地上建筑面积↑</a>
 
             交易对价
 
-            <span class="order_by" @click="orderByRecommendation = 'ASC'" v-show="orderByRecommendation === ''">推荐指数 </span>
+            <span class="clickable-txt" @click="orderByRecommendation = 'ASC'" v-show="orderByRecommendation === ''">推荐指数 </span>
             <a @click="orderByRecommendation = 'DESC'" v-show="orderByRecommendation === 'ASC'">推荐指数↓</a>
             <a @click="orderByRecommendation = ''" v-show="orderByRecommendation === 'DESC'">推荐指数↑</a>
           </div>
@@ -68,9 +68,9 @@
           </p>
         </a-row>
 
-        <a-row v-for="item of itemList" :key="item.ID" class="mt-20" :gutter="20" style="height: 200px">
-          <a-col :span="6" style="background-color: gray; height: 100%; max-width: 100%">123</a-col>
-          <a-col :span="18" style="height: 100%;">
+        <a-row v-for="item of itemList" :key="item.ID" class="mt-20" :gutter="20" style="height: 200px; cursor: pointer">
+          <a-col @click="goToDetail(item.ID)" :span="6" style="background-color: gray; height: 100%; max-width: 100%">123</a-col>
+          <a-col @click="goToDetail(item.ID)" :span="18" style="height: 100%;">
             <a-col>
               <h2>
                 {{ item.title }}
@@ -169,6 +169,7 @@ export default {
         owner: false,
         itemType: this.itemType,
         exchangeType: this.exchangeType,
+        visible: true,
         orderByRecommendation: this.orderByRecommendation,
         orderByUpdatedTime: this.orderByUpdatedTime,
         orderBySpace: this.orderBySpace,
@@ -177,6 +178,9 @@ export default {
         this.count = res.data.data.count
         this.itemList = res.data.data.landResources
       })
+    },
+    goToDetail (id) {
+      this.$router.push({name: 'landResourceDetail', params: { id }})
     },
     goToAdd () {
       this.$router.push({name: 'publishLandResource'})
@@ -192,13 +196,4 @@ export default {
 </script>
 
 <style scoped>
-.order_by {
-  cursor: pointer;
-}
-
-.order_by:hover {
-  color: #40a9ff;
-  text-decoration: none;
-  outline: 0;
-}
 </style>

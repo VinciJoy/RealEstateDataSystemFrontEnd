@@ -29,6 +29,11 @@ export default new Router({
       component: () => import(/* webpackChunkName: "utils" */ '@system/views/resourceBase/landResource.vue')
     },
     {
+      path: '/land_resource/:id',
+      name: 'landResourceDetail',
+      component: () => import(/* webpackChunkName: "utils" */ '@system/views/resourceBase/landResourceDetail.vue')
+    },
+    {
       path: '/user_center',
       name: 'userCenter',
       component: () => import(/* webpackChunkName: "utils" */ '@system/views/userCenter/userCenter.vue'),

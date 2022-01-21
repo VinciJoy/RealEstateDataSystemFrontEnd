@@ -76,11 +76,10 @@
             <h2 style="font-weight: bolder">项目位置</h2>
           </a-row>
           <a-row :gutter="16">
-            <a-col :span="12">
               <baidu-map
                 v-if="mapVisible"
                 :ak="ak"
-                style="width: 100%; height: 400px"
+                style="width: 600px; height: 400px; display: inline-block"
                 :center="form.itemMap.center"
                 :scroll-wheel-zoom="true"
                 :zoom="form.itemMap.zoom"
@@ -95,9 +94,8 @@
                 <BaiduPolygon :clicking="true" :path="form.itemMap.polygonPath" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="2" :editing="true" @lineupdate="updatePolygonPath($event, 'itemMap')"/>
                 <BaiduSearch :page-capacity="2" :keyword="form.itemMap.keyword" :auto-viewport="true"></BaiduSearch>
               </baidu-map>
-            </a-col>
 
-            <a-col :span="12">
+            <div style="display: inline-block; padding-left: 20px; vertical-align: top">
                 <span class="input-tag">关键词: </span><a-input v-model="form.itemMap.keyword" style="width: 50%"></a-input>
               <a-row class="mt-20">
                 <a-button @click="addPolygonPoint('itemMap')" :disabled="form.itemMap.polygonPath.length > 0" type="primary">添 加 标 记</a-button>
@@ -105,7 +103,7 @@
               <a-row class="mt-20">
                 <a-button @click="removePolygonPoint('itemMap')" :disabled="form.itemMap.polygonPath.length === 0" type="primary">清 除 标 记</a-button>
               </a-row>
-            </a-col>
+            </div>
           </a-row>
         </div>
 <!--        item position end-->
@@ -192,28 +190,26 @@
           <a-row class="mt-20" style="height: 650px">
             <p class="input-tag">四至信息描述: </p>
             <a-row :gutter="16">
-              <a-col :span="12">
-                <baidu-map
-                  v-if="mapVisible"
-                  :ak="ak"
-                  style="width: 100%; height: 400px"
-                  :center="form.streetMap.center"
-                  :scroll-wheel-zoom="true"
-                  :zoom="form.streetMap.zoom"
-                  @moving="syncCenterAndZoom($event, 'streetMap')"
-                  @moveend="syncCenterAndZoom($event, 'streetMap')"
-                  @zoomend="syncCenterAndZoom($event, 'streetMap')"
-                >
-                  <BaiduScale anchor="BMAP_ANCHOR_BOTTOM_RIGHT"></BaiduScale>
-                  <BaiduNavigation anchor="BMAP_ANCHOR_TOP_RIGHT"></BaiduNavigation>
-                  <BaiduMapType :map-types="['BMAP_NORMAL_MAP', 'BMAP_SATELLITE_MAP', 'BMAP_HYBRID_MAP']" anchor="BMAP_ANCHOR_TOP_LEFT"></BaiduMapType>
-                  <BaiduGeolocation anchor="BMAP_ANCHOR_BOTTOM_RIGHT" :autoLocation="true"></BaiduGeolocation>
-                  <BaiduPolygon :clicking="true" :path="form.streetMap.polygonPath" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="2" :editing="true" @lineupdate="updatePolygonPath($event, 'streetMap')"/>
-                  <BaiduSearch :page-capacity="2" :keyword="form.streetMap.keyword" :auto-viewport="true"></BaiduSearch>
-                </baidu-map>
-              </a-col>
+              <baidu-map
+                v-if="mapVisible"
+                :ak="ak"
+                style="width: 600px; height: 400px; display: inline-block"
+                :center="form.streetMap.center"
+                :scroll-wheel-zoom="true"
+                :zoom="form.streetMap.zoom"
+                @moving="syncCenterAndZoom($event, 'streetMap')"
+                @moveend="syncCenterAndZoom($event, 'streetMap')"
+                @zoomend="syncCenterAndZoom($event, 'streetMap')"
+              >
+                <BaiduScale anchor="BMAP_ANCHOR_BOTTOM_RIGHT"></BaiduScale>
+                <BaiduNavigation anchor="BMAP_ANCHOR_TOP_RIGHT"></BaiduNavigation>
+                <BaiduMapType :map-types="['BMAP_NORMAL_MAP', 'BMAP_SATELLITE_MAP', 'BMAP_HYBRID_MAP']" anchor="BMAP_ANCHOR_TOP_LEFT"></BaiduMapType>
+                <BaiduGeolocation anchor="BMAP_ANCHOR_BOTTOM_RIGHT" :autoLocation="true"></BaiduGeolocation>
+                <BaiduPolygon :clicking="true" :path="form.streetMap.polygonPath" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="2" :editing="true" @lineupdate="updatePolygonPath($event, 'streetMap')"/>
+                <BaiduSearch :page-capacity="2" :keyword="form.streetMap.keyword" :auto-viewport="true"></BaiduSearch>
+              </baidu-map>
 
-              <a-col :span="12">
+              <div style="display: inline-block; padding-left: 20px; vertical-align: top">
                   <span class="input-tag">关键词: </span><a-input v-model="form.streetMap.keyword" style="width: 50%"></a-input>
                 <a-row class="mt-20">
                   <a-button @click="addPolygonPoint('streetMap')" :disabled="form.streetMap.polygonPath.length > 0" type="primary">添 加 标 记</a-button>
@@ -221,7 +217,7 @@
                 <a-row class="mt-20">
                   <a-button @click="removePolygonPoint('streetMap')" :disabled="form.streetMap.polygonPath.length === 0" type="primary">清 除 标 记</a-button>
                 </a-row>
-              </a-col>
+              </div>
             </a-row>
           </a-row>
 
@@ -620,7 +616,7 @@
                 平台将会向该项目方收取相应服务费(本项目未达成合作则不收取任何费用)。本人同意由摩贝云系统工作人员与本人联系，告知并签署相应协议。
               </a-row>
               <a-row style="text-align: center" class="mt-10">
-                <a-button :disabled="true" v-if="countDown > 0" style="margin-left:40px;width: 20%">{{ '还需阅读' + countDown + '秒' }}</a-button>
+                <a-button :disabled="true" v-if="countDown > 0" style="margin-left:40px;width: 130px">{{ '还需阅读' + countDown + '秒' }}</a-button>
                 <a-button type="primary" v-else style="margin-left:40px;width: 20%" @click="submit">提 交</a-button>
               </a-row>
             </a-modal>
@@ -860,7 +856,7 @@
 import options from '@/utils/cities'
 import api from '@system/api/landResource'
 import utils from '@/utils/utils'
-import { ITEM_TYPES, EXCHANGE_TYPES } from '@/utils/constants'
+import { ITEM_TYPES, EXCHANGE_TYPES, HTTP } from '@/utils/constants'
 import BaiduMap from 'vue-baidu-map/components/map/Map.vue'
 import BaiduScale from 'vue-baidu-map/components/controls/Scale'
 import BaiduNavigation from 'vue-baidu-map/components/controls/Navigation'
@@ -1520,35 +1516,14 @@ export default {
   margin-right: 10px;
 }
 
-.cell {
-  border: 1px solid black;
-  padding: 5px;
-  border-bottom: 0px;
-  text-align: center;
-  border-right: 0px;
-}
-
 .table-edit {
   color: #9c9c9c;
   float: right;
   cursor: pointer;
 }
 
-.table-title {
-  font-weight: bolder;
-  font-size: 15px;
-}
-
 .modal-form-item-50-percent {
   width: 49%;
   display: inline-block;
-}
-
-.border-right {
-  border-right: 1px solid black;
-}
-
-.border-bottom {
-  border-bottom: 1px solid black;
 }
 </style>
