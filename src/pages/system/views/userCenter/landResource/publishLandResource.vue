@@ -1250,7 +1250,7 @@ export default {
         this.mode = 'edit'
         api.getLandResource(this.$route.params.id).then((res) => {
           this.mapVisible = false
-          let temp = JSON.parse(res.data.data.landResource.stringify)
+          let temp = JSON.parse(res.data.data.stringify)
           temp.itemMap.keyword = ''
           temp.streetMap.keyword = ''
           this.form = temp
