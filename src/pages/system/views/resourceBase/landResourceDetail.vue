@@ -240,7 +240,7 @@
               </a-tab-pane>
               <a-tab-pane key="2" tab="二级开发节点">
                 <div v-for="progress of progressSecondSelected" :key="progress.name">
-                  {{ progress.name }}
+                  <a-icon type="check-circle" style="color: #0aa679; font-size: 16px"/> {{ progress.name }}
                 </div>
                 <div v-if="progressSecondSelected.length === 0">
                   二级开发节点暂无进度
@@ -248,7 +248,7 @@
               </a-tab-pane>
               <a-tab-pane key="3" tab="其他类项目节点">
                 <div v-for="progress of progressOthersSelected" :key="progress.name">
-                  {{ progress.name }}
+                  <a-icon type="check-circle" style="color: #0aa679; font-size: 16px"/> {{ progress.name }}
                 </div>
                 <div v-if="progressOthersSelected.length === 0">
                   其他类项目节点暂无进度
@@ -466,9 +466,6 @@ export default {
       })
     },
     async handlePreview (file) {
-      if (!file.uuid && !file.preview && file.response.data.status === 'temp') {
-        file.preview = await utils.getBase64(file.originFileObj)
-      }
       this.previewImage = (process.env.API_ROOT + '/system/pics/temp/' + file.uuid + '/') || file.preview
       this.previewVisible = true
     }
