@@ -32,6 +32,14 @@
             </a-col>
           </a-row>
           <a-row class="mt-20">
+            <span class="input-tag">发布人身份: </span>
+              <a-select v-model="form.identity" style="width: 20%" placeholder="请选择发布人身份">
+                <a-select-option v-for="identity in identities" :value="identity" :key="identity">
+                  {{ identity }}
+                </a-select-option>
+              </a-select>
+            </a-row>
+          <a-row class="mt-20">
             <a-col :span="8">
               <a-col :span="form.itemType.includes('自定义') ? 11 : 24">
                 <span class="input-tag">类型: </span>
@@ -83,6 +91,7 @@
                 :center="form.itemMap.center"
                 :scroll-wheel-zoom="true"
                 :zoom="form.itemMap.zoom"
+                mapType="BMAP_SATELLITE_MAP"
                 @moving="syncCenterAndZoom($event, 'itemMap')"
                 @moveend="syncCenterAndZoom($event, 'itemMap')"
                 @zoomend="syncCenterAndZoom($event, 'itemMap')"
@@ -93,15 +102,26 @@
                 <BaiduGeolocation anchor="BMAP_ANCHOR_BOTTOM_RIGHT" :autoLocation="true"></BaiduGeolocation>
                 <BaiduPolygon :clicking="true" :path="form.itemMap.polygonPath" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="2" :editing="true" @lineupdate="updatePolygonPath($event, 'itemMap')"/>
                 <BaiduSearch :page-capacity="2" :keyword="form.itemMap.keyword" :auto-viewport="true"></BaiduSearch>
+                <BaiduCircle :center="form.itemMap.threeCirclePath.center" :radius="form.itemMap.threeCirclePath.radius" stroke-color="blue" :fillColor="''" :stroke-opacity="0.5" :stroke-weight="2"></BaiduCircle>
+                <BaiduCircle :center="form.itemMap.fiveCirclePath.center" :radius="form.itemMap.fiveCirclePath.radius" stroke-color="blue" :fillColor="''" :stroke-opacity="0.5" :stroke-weight="2"></BaiduCircle>
               </baidu-map>
 
             <div style="display: inline-block; padding-left: 20px; vertical-align: top">
                 <span class="input-tag">关键词: </span><a-input v-model="form.itemMap.keyword" style="width: 50%"></a-input>
               <a-row class="mt-20">
+                (移动地图，拖动白色方框可勾画项目四至范围)
+              </a-row>
+              <a-row class="mt-20">
                 <a-button @click="addPolygonPoint('itemMap')" :disabled="form.itemMap.polygonPath.length > 0" type="primary">添 加 标 记</a-button>
               </a-row>
               <a-row class="mt-20">
                 <a-button @click="removePolygonPoint('itemMap')" :disabled="form.itemMap.polygonPath.length === 0" type="primary">清 除 标 记</a-button>
+              </a-row>
+              <a-row class="mt-20">
+                <a-button @click="addThreeCircle('itemMap')" :disabled="form.itemMap.polygonPath.length === 0" type="primary">周 边 三 公 里</a-button>
+              </a-row>
+              <a-row class="mt-20">
+                <a-button @click="addFiveCircle('itemMap')" :disabled="form.itemMap.polygonPath.length === 0" type="primary">周 边 五 公 里</a-button>
               </a-row>
             </div>
           </a-row>
@@ -111,131 +131,302 @@
 <!--        item desc begin-->
         <div class="mt-20 sub-gray-line">
           <a-row>
-            <h2 style="font-weight: bolder">项目身份证信息录入</h2>
+            <h2 style="font-weight: bolder">项目技术指标录入</h2>
           </a-row>
-          <a-row class="cell border-right">
-            <span class="table-title">项目基本面录入(必填)</span>
-            <span class="table-edit" @click="showItemBaseInfoModal">编辑</span>
-          </a-row>
+
           <a-row>
-            <a-col :span="6" class="cell">经营占地面积(m²)</a-col>
-            <a-col :span="6" class="cell">{{ form.itemBaseInfoForm.space | filterUndefined }}</a-col>
-            <a-col :span="6" class="cell">综合容积率</a-col>
-            <a-col :span="6" class="cell border-right">{{ form.itemBaseInfoForm.comprehensiveFAR | filterUndefined }}</a-col>
+            <p class="input-tag">项目基本面录入(必填)</p>
+            <a-radio-group name="radioGroup" v-model="form.itemBaseInfoForm.itemBaseMode">
+              <a-radio value="use">
+                用地面积输入
+              </a-radio>
+              <a-radio value="occupy">
+                占地面积输入
+              </a-radio>
+            </a-radio-group>
+
+            <table class="mt-10" style="width: 100%" bordercolor="#e8e8e8" border="2">
+              <tr>
+                <th :rowspan="form.itemBaseInfoForm.itemBaseMode === 'occupy' ? 7 : 6">地上指标</th>
+                <th>{{ form.itemBaseInfoForm.itemBaseMode === 'occupy' ? '地上建筑面积（m²）' : '经营占地面积（m²）'}}</th>
+                <td style="background-color: #fafafa; cursor:auto">
+                  <span>
+                    {{ spaceComputed | filterUndefined }}
+                  </span>
+                </td>
+                <th>综合容积率</th>
+                <td @click="editBase('baseComprehensiveFAR')">
+                  <span v-if="itemBaseEdit !== 'baseComprehensiveFAR'">
+                    {{ form.itemBaseInfoForm.comprehensiveFAR | filterUndefined }}
+                  </span>
+                  <a-input type="number" ref="baseComprehensiveFAR" @blur="itemBaseEdit = 0" v-else v-model="form.itemBaseInfoForm.comprehensiveFAR"></a-input>
+                </td>
+              </tr>
+              <tr>
+                <th>{{ form.itemBaseInfoForm.itemBaseMode === 'occupy' ? '其中——住宅建筑面积（m²）' : '其中——住宅占地面积（m²）'}}</th>
+                <td @click="editBase('baseApartmentSpace')">
+                  <span v-if="itemBaseEdit !== 'baseApartmentSpace'">
+                    {{ form.itemBaseInfoForm.apartmentSpace | filterUndefined }}
+                  </span>
+                  <a-input type="number" ref="baseApartmentSpace" @blur="itemBaseEdit = 0" v-else v-model="form.itemBaseInfoForm.apartmentSpace"></a-input>
+                </td>
+                <th>住宅容积率</th>
+                <td @click="editBase('baseApartmentFAR')">
+                  <span v-if="itemBaseEdit !== 'baseApartmentFAR'">
+                    {{ form.itemBaseInfoForm.apartmentFAR | filterUndefined }}
+                  </span>
+                  <a-input type="number" ref="baseApartmentFAR" @blur="itemBaseEdit = 0" v-else v-model="form.itemBaseInfoForm.apartmentFAR"></a-input>
+                </td>
+              </tr>
+              <tr>
+                <th>{{ form.itemBaseInfoForm.itemBaseMode === 'occupy' ? '其中——商业建筑面积（m²）' : '其中——商业占地面积（m²）'}}</th>
+                <td @click="editBase('baseBusinessSpace')">
+                  <span v-if="itemBaseEdit !== 'baseBusinessSpace'">
+                    {{ form.itemBaseInfoForm.businessSpace | filterUndefined }}
+                  </span>
+                  <a-input type="number" ref="baseBusinessSpace" @blur="itemBaseEdit = 0" v-else v-model="form.itemBaseInfoForm.businessSpace"></a-input>
+                </td>
+                <th>商业容积率</th>
+                <td @click="editBase('baseBusinessFAR')">
+                  <span v-if="itemBaseEdit !== 'baseBusinessFAR'">
+                    {{ form.itemBaseInfoForm.businessFAR | filterUndefined }}
+                  </span>
+                  <a-input type="number" ref="baseBusinessFAR" @blur="itemBaseEdit = 0" v-else v-model="form.itemBaseInfoForm.businessFAR"></a-input>
+                </td>
+              </tr>
+              <tr>
+                <th>{{ form.itemBaseInfoForm.itemBaseMode === 'occupy' ? '其中——办公建筑面积（m²）' : '其中——办公占地面积（m²）'}}</th>
+                <td @click="editBase('baseOfficeSpace')">
+                  <span v-if="itemBaseEdit !== 'baseOfficeSpace'">
+                    {{ form.itemBaseInfoForm.officeSpace | filterUndefined }}
+                  </span>
+                  <a-input type="number" ref="baseOfficeSpace" @blur="itemBaseEdit = 0" v-else v-model="form.itemBaseInfoForm.officeSpace"></a-input>
+                </td>
+                <th>办公容积率</th>
+                <td @click="editBase('baseOfficeFAR')">
+                  <span v-if="itemBaseEdit !== 'baseOfficeFAR'">
+                    {{ form.itemBaseInfoForm.officeFAR | filterUndefined }}
+                  </span>
+                  <a-input type="number" ref="baseOfficeFAR" @blur="itemBaseEdit = 0" v-else v-model="form.itemBaseInfoForm.officeFAR"></a-input>
+                </td>
+              </tr>
+              <tr>
+                <th>{{ form.itemBaseInfoForm.itemBaseMode === 'occupy' ? '其中——其他建筑面积（m²）' : '其中——其他占地面积（m²）'}}</th>
+                <td @click="editBase('baseOtherSpace')">
+                  <span v-if="itemBaseEdit !== 'baseOtherSpace'">
+                    {{ form.itemBaseInfoForm.otherSpace | filterUndefined }}
+                  </span>
+                  <a-input type="number" ref="baseOtherSpace" @blur="itemBaseEdit = 0" v-else v-model="form.itemBaseInfoForm.otherSpace"></a-input>
+                </td>
+                <th>其他容积率</th>
+                <td @click="editBase('baseOtherFAR')">
+                  <span v-if="itemBaseEdit !== 'baseOtherFAR'">
+                    {{ form.itemBaseInfoForm.otherFAR | filterUndefined }}
+                  </span>
+                  <a-input type="number" ref="baseOtherFAR" @blur="itemBaseEdit = 0" v-else v-model="form.itemBaseInfoForm.otherFAR"></a-input>
+                </td>
+              </tr>
+              <tr v-if="form.itemBaseInfoForm.itemBaseMode === 'use'">
+                <th>地上建筑面积合计（m²）</th>
+                <td style="background-color: #fafafa; cursor:auto" colspan="3">
+                  <span>
+                    {{ (spaceComputed * form.itemBaseInfoForm.comprehensiveFAR ) | filterUndefined }}
+                  </span>
+                </td>
+              </tr>
+              <tr v-if="form.itemBaseInfoForm.itemBaseMode === 'occupy'">
+                <th>经营占地面积（m²）</th>
+                <td style="background-color: #fafafa; cursor:auto" colspan="3">
+                  <span>
+                    {{ (spaceComputed / form.itemBaseInfoForm.comprehensiveFAR ) | filterUndefined }}
+                  </span>
+                </td>
+              </tr>
+              <tr v-if="form.itemBaseInfoForm.itemBaseMode === 'occupy'">
+                <th>经营占地面积（亩）</th>
+                <td style="background-color: #fafafa; cursor:auto" colspan="3">
+                  <span>
+                    {{ (spaceComputed / form.itemBaseInfoForm.comprehensiveFAR * 0.0015 ) | filterUndefined }}
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <th>地下指标</th>
+                <th>地下建筑面积合计（m²）</th>
+                <td colspan="3" @click="editBase('baseUnderGroundSpace')">
+                  <span v-if="itemBaseEdit !== 'baseUnderGroundSpace'">
+                    {{ form.itemBaseInfoForm.underGroundSpace | filterUndefined }}
+                  </span>
+                  <a-input type="number" ref="baseUnderGroundSpace" @blur="itemBaseEdit = 0" v-else v-model="form.itemBaseInfoForm.underGroundSpace"></a-input>
+                </td>
+              </tr>
+              <tr>
+                <th>总指标</th>
+                <th>总建筑面积（m²）</th>
+                <td style="background-color: #fafafa; cursor:auto" colspan="3">
+                  <span v-if="form.itemBaseInfoForm.itemBaseMode === 'use'">
+                    {{ (form.itemBaseInfoForm.underGroundSpace - '' + spaceComputed * form.itemBaseInfoForm.comprehensiveFAR) | filterUndefined }}
+                  </span>
+                  <span v-else>
+                    {{ (form.itemBaseInfoForm.underGroundSpace - '' + spaceComputed) | filterUndefined }}
+                  </span>
+                </td>
+              </tr>
+            </table>
           </a-row>
-          <a-row>
-            <a-col :span="6" class="cell">其中——住宅占地面积(m²)</a-col>
-            <a-col :span="6" class="cell">{{ form.itemBaseInfoForm.apartmentSpace | filterUndefined }}</a-col>
-            <a-col :span="6" class="cell">住宅容积率</a-col>
-            <a-col :span="6" class="cell border-right">{{ form.itemBaseInfoForm.apartmentFAR | filterUndefined }}</a-col>
-          </a-row>
-          <a-row>
-            <a-col :span="6" class="cell">其中——商业占地面积(m²)</a-col>
-            <a-col :span="6" class="cell">{{ form.itemBaseInfoForm.businessSpace | filterUndefined }}</a-col>
-            <a-col :span="6" class="cell">商业容积率</a-col>
-            <a-col :span="6" class="cell border-right">{{ form.itemBaseInfoForm.businessFAR | filterUndefined }}</a-col>
-          </a-row>
-          <a-row>
-            <a-col :span="6" class="cell">其中——办公占地面积(m²)</a-col>
-            <a-col :span="6" class="cell">{{ form.itemBaseInfoForm.officeSpace | filterUndefined }}</a-col>
-            <a-col :span="6" class="cell">办公容积率</a-col>
-            <a-col :span="6" class="cell border-right">{{ form.itemBaseInfoForm.officeFAR | filterUndefined }}</a-col>
-          </a-row>
-          <a-row type="flex">
-            <a-col :span="6" class="cell">其中——其他类占地面积(m²)，内容细项可继续增加，增加细项名称自定义，但合计等于其他类。</a-col>
-            <a-col :span="6" class="cell">{{ form.itemBaseInfoForm.otherSpace | filterUndefined }}</a-col>
-            <a-col :span="6" class="cell">其中容积率</a-col>
-            <a-col :span="6" class="cell border-right">{{ form.itemBaseInfoForm.otherFAR | filterUndefined }}</a-col>
-          </a-row>
-          <a-row class="cell border-right">
-            <span class="table-title">地上各业态录入(选填)</span>
-            <span class="table-edit" @click="showAboveGroundModal">添加</span>
-          </a-row>
-          <a-row>
-            <a-col :span="6" class="cell">业态选择类型</a-col>
-            <a-col :span="6" class="cell">具体产品</a-col>
-            <a-col :span="6" class="cell">建筑面积(m²)</a-col>
-            <a-col :span="6" class="cell border-right">可售率</a-col>
-          </a-row>
-          <a-row v-for="(item, index) of form.itemBaseInfoForm.aboveGround" :key="'aboveGround' + index">
-            <a-col :span="6" class="cell">{{ item.type }}</a-col>
-            <a-col :span="6" class="cell">{{ item.product }}</a-col>
-            <a-col :span="6" class="cell">{{ item.space }}</a-col>
-            <a-col :span="6" class="cell border-right">{{ item.percent }}</a-col>
-          </a-row>
-          <a-row class="cell border-right">
-            <span class="table-title">地下各业态录入(选填)</span>
-            <span class="table-edit" @click="showUnderGroundModal">添加</span>
-          </a-row>
-          <a-row>
-            <a-col :span="6" class="cell">业态选择类型</a-col>
-            <a-col :span="6" class="cell">具体产品</a-col>
-            <a-col :span="6" class="cell">建筑面积(m²)</a-col>
-            <a-col :span="6" class="cell border-right">可售率</a-col>
-          </a-row>
-          <a-row class="border-bottom">
-            <div v-for="(item, index) of form.itemBaseInfoForm.underGround" :key="'underGround' + index">
-              <a-col :span="6" class="cell">{{ item.type }}</a-col>
-              <a-col :span="6" class="cell">{{ item.product }}</a-col>
-              <a-col :span="6" class="cell">{{ item.space }}</a-col>
-              <a-col :span="6" class="cell border-right">{{ item.percent }}</a-col>
-            </div>
-          </a-row>
+
+<!--          <a-row class="cell border-right">-->
+<!--            <span class="table-title">项目基本面录入(必填)</span>-->
+<!--            <span class="table-edit" @click="showItemBaseInfoModal">编辑</span>-->
+<!--          </a-row>-->
+<!--          <a-row>-->
+<!--            <a-col :span="6" class="cell">经营占地面积(m²)</a-col>-->
+<!--            <a-col :span="6" class="cell">{{ form.itemBaseInfoForm.space | filterUndefined }}</a-col>-->
+<!--            <a-col :span="6" class="cell">综合容积率</a-col>-->
+<!--            <a-col :span="6" class="cell border-right">{{ form.itemBaseInfoForm.comprehensiveFAR | filterUndefined }}</a-col>-->
+<!--          </a-row>-->
+<!--          <a-row>-->
+<!--            <a-col :span="6" class="cell">其中——住宅占地面积(m²)</a-col>-->
+<!--            <a-col :span="6" class="cell">{{ form.itemBaseInfoForm.apartmentSpace | filterUndefined }}</a-col>-->
+<!--            <a-col :span="6" class="cell">住宅容积率</a-col>-->
+<!--            <a-col :span="6" class="cell border-right">{{ form.itemBaseInfoForm.apartmentFAR | filterUndefined }}</a-col>-->
+<!--          </a-row>-->
+<!--          <a-row>-->
+<!--            <a-col :span="6" class="cell">其中——商业占地面积(m²)</a-col>-->
+<!--            <a-col :span="6" class="cell">{{ form.itemBaseInfoForm.businessSpace | filterUndefined }}</a-col>-->
+<!--            <a-col :span="6" class="cell">商业容积率</a-col>-->
+<!--            <a-col :span="6" class="cell border-right">{{ form.itemBaseInfoForm.businessFAR | filterUndefined }}</a-col>-->
+<!--          </a-row>-->
+<!--          <a-row>-->
+<!--            <a-col :span="6" class="cell">其中——办公占地面积(m²)</a-col>-->
+<!--            <a-col :span="6" class="cell">{{ form.itemBaseInfoForm.officeSpace | filterUndefined }}</a-col>-->
+<!--            <a-col :span="6" class="cell">办公容积率</a-col>-->
+<!--            <a-col :span="6" class="cell border-right">{{ form.itemBaseInfoForm.officeFAR | filterUndefined }}</a-col>-->
+<!--          </a-row>-->
+<!--          <a-row type="flex">-->
+<!--            <a-col :span="6" class="cell">其中——其他类占地面积(m²)，内容细项可继续增加，增加细项名称自定义，但合计等于其他类。</a-col>-->
+<!--            <a-col :span="6" class="cell">{{ form.itemBaseInfoForm.otherSpace | filterUndefined }}</a-col>-->
+<!--            <a-col :span="6" class="cell">其中容积率</a-col>-->
+<!--            <a-col :span="6" class="cell border-right">{{ form.itemBaseInfoForm.otherFAR | filterUndefined }}</a-col>-->
+<!--          </a-row>-->
+<!--          <a-row class="cell border-right">-->
+<!--            <span class="table-title">地上各业态录入(选填)</span>-->
+<!--            <span class="table-edit" @click="showAboveGroundModal">添加</span>-->
+<!--          </a-row>-->
+<!--          <a-row>-->
+<!--            <a-col :span="6" class="cell">业态选择类型</a-col>-->
+<!--            <a-col :span="6" class="cell">具体产品</a-col>-->
+<!--            <a-col :span="6" class="cell">建筑面积(m²)</a-col>-->
+<!--            <a-col :span="6" class="cell border-right">可售率</a-col>-->
+<!--          </a-row>-->
+<!--          <a-row v-for="(item, index) of form.itemBaseInfoForm.aboveGround" :key="'aboveGround' + index">-->
+<!--            <a-col :span="6" class="cell">{{ item.type }}</a-col>-->
+<!--            <a-col :span="6" class="cell">{{ item.product }}</a-col>-->
+<!--            <a-col :span="6" class="cell">{{ item.space }}</a-col>-->
+<!--            <a-col :span="6" class="cell border-right">{{ item.percent }}</a-col>-->
+<!--          </a-row>-->
+<!--          <a-row class="cell border-right">-->
+<!--            <span class="table-title">地下各业态录入(选填)</span>-->
+<!--            <span class="table-edit" @click="showUnderGroundModal">添加</span>-->
+<!--          </a-row>-->
+<!--          <a-row>-->
+<!--            <a-col :span="6" class="cell">业态选择类型</a-col>-->
+<!--            <a-col :span="6" class="cell">具体产品</a-col>-->
+<!--            <a-col :span="6" class="cell">建筑面积(m²)</a-col>-->
+<!--            <a-col :span="6" class="cell border-right">可售率</a-col>-->
+<!--          </a-row>-->
+<!--          <a-row class="border-bottom">-->
+<!--            <div v-for="(item, index) of form.itemBaseInfoForm.underGround" :key="'underGround' + index">-->
+<!--              <a-col :span="6" class="cell">{{ item.type }}</a-col>-->
+<!--              <a-col :span="6" class="cell">{{ item.product }}</a-col>-->
+<!--              <a-col :span="6" class="cell">{{ item.space }}</a-col>-->
+<!--              <a-col :span="6" class="cell border-right">{{ item.percent }}</a-col>-->
+<!--            </div>-->
+<!--          </a-row>-->
 
           <a-row class="mt-20">
             <p class="input-tag">项目现状: </p>
             <a-textarea v-model="form.projectStatus" :maxLength="300"></a-textarea>
           </a-row>
 
-          <a-row class="mt-20" style="height: 650px">
-            <p class="input-tag">四至信息描述: </p>
-            <a-row :gutter="16">
-              <baidu-map
-                v-if="mapVisible"
-                :ak="ak"
-                style="width: 600px; height: 400px; display: inline-block"
-                :center="form.streetMap.center"
-                :scroll-wheel-zoom="true"
-                :zoom="form.streetMap.zoom"
-                @moving="syncCenterAndZoom($event, 'streetMap')"
-                @moveend="syncCenterAndZoom($event, 'streetMap')"
-                @zoomend="syncCenterAndZoom($event, 'streetMap')"
-              >
-                <BaiduScale anchor="BMAP_ANCHOR_BOTTOM_RIGHT"></BaiduScale>
-                <BaiduNavigation anchor="BMAP_ANCHOR_TOP_RIGHT"></BaiduNavigation>
-                <BaiduMapType :map-types="['BMAP_NORMAL_MAP', 'BMAP_SATELLITE_MAP', 'BMAP_HYBRID_MAP']" anchor="BMAP_ANCHOR_TOP_LEFT"></BaiduMapType>
-                <BaiduGeolocation anchor="BMAP_ANCHOR_BOTTOM_RIGHT" :autoLocation="true"></BaiduGeolocation>
-                <BaiduPolygon :clicking="true" :path="form.streetMap.polygonPath" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="2" :editing="true" @lineupdate="updatePolygonPath($event, 'streetMap')"/>
-                <BaiduSearch :page-capacity="2" :keyword="form.streetMap.keyword" :auto-viewport="true"></BaiduSearch>
-              </baidu-map>
+<!--          <a-row class="mt-20" style="height: 650px">-->
+<!--            <p class="input-tag">四至信息描述: </p>-->
+<!--            <a-row :gutter="16">-->
+<!--              <baidu-map-->
+<!--                v-if="mapVisible"-->
+<!--                :ak="ak"-->
+<!--                style="width: 600px; height: 400px; display: inline-block"-->
+<!--                :center="form.streetMap.center"-->
+<!--                :scroll-wheel-zoom="true"-->
+<!--                :zoom="form.streetMap.zoom"-->
+<!--                @moving="syncCenterAndZoom($event, 'streetMap')"-->
+<!--                @moveend="syncCenterAndZoom($event, 'streetMap')"-->
+<!--                @zoomend="syncCenterAndZoom($event, 'streetMap')"-->
+<!--              >-->
+<!--                <BaiduScale anchor="BMAP_ANCHOR_BOTTOM_RIGHT"></BaiduScale>-->
+<!--                <BaiduNavigation anchor="BMAP_ANCHOR_TOP_RIGHT"></BaiduNavigation>-->
+<!--                <BaiduMapType :map-types="['BMAP_NORMAL_MAP', 'BMAP_SATELLITE_MAP', 'BMAP_HYBRID_MAP']" anchor="BMAP_ANCHOR_TOP_LEFT"></BaiduMapType>-->
+<!--                <BaiduGeolocation anchor="BMAP_ANCHOR_BOTTOM_RIGHT" :autoLocation="true"></BaiduGeolocation>-->
+<!--                <BaiduPolygon :clicking="true" :path="form.streetMap.polygonPath" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="2" :editing="true" @lineupdate="updatePolygonPath($event, 'streetMap')"/>-->
+<!--                <BaiduSearch :page-capacity="2" :keyword="form.streetMap.keyword" :auto-viewport="true"></BaiduSearch>-->
+<!--              </baidu-map>-->
 
-              <div style="display: inline-block; padding-left: 20px; vertical-align: top">
-                  <span class="input-tag">关键词: </span><a-input v-model="form.streetMap.keyword" style="width: 50%"></a-input>
-                <a-row class="mt-20">
-                  <a-button @click="addPolygonPoint('streetMap')" :disabled="form.streetMap.polygonPath.length > 0" type="primary">添 加 标 记</a-button>
-                </a-row>
-                <a-row class="mt-20">
-                  <a-button @click="removePolygonPoint('streetMap')" :disabled="form.streetMap.polygonPath.length === 0" type="primary">清 除 标 记</a-button>
-                </a-row>
-              </div>
-            </a-row>
+<!--              <div style="display: inline-block; padding-left: 20px; vertical-align: top">-->
+<!--                  <span class="input-tag">关键词: </span><a-input v-model="form.streetMap.keyword" style="width: 50%"></a-input>-->
+<!--                <a-row class="mt-20">-->
+<!--                  <a-button @click="addPolygonPoint('streetMap')" :disabled="form.streetMap.polygonPath.length > 0" type="primary">添 加 标 记</a-button>-->
+<!--                </a-row>-->
+<!--                <a-row class="mt-20">-->
+<!--                  <a-button @click="removePolygonPoint('streetMap')" :disabled="form.streetMap.polygonPath.length === 0" type="primary">清 除 标 记</a-button>-->
+<!--                </a-row>-->
+<!--              </div>-->
+<!--            </a-row>-->
+<!--          </a-row>-->
+
+          <a-row class="mt-20">
+            <p class="input-tag">项目封面图片：</p>
+            <a-col :span="12">
+                <a-upload
+                  :action="uploadPicURL"
+                  name="file"
+                  :file-list="form.coverPicList"
+                  :withCredentials="true"
+                  @preview="handlePreview"
+                  class="file-uploader"
+                  list-type="picture-card"
+                  @change="handleChange($event, 'form','coverPicList')"
+                >
+                  <div v-if="form.coverPicList.length < 1">
+                    <a-icon :type="loading ? 'loading' : 'plus'" />
+                  </div>
+                </a-upload>
+            </a-col>
           </a-row>
 
-          <a-row>
-            <p class="input-tag">上传项目现状照片及四至道路、配套照片(选填)</p>
+          <p class="input-tag">上传项目现状照片及四至道路、配套照片(选填)：</p>
+          <a-row type="flex">
               <a-col :span="12">
+                <div style="display: inline-block" v-for="(pic, index) of form.landStatusPicList" :key="'streetPicList' + index">
+                  <div @click="handlePreview(pic)" class="upload-add" style="display: flex; justify-content: center">
+                    <img style="max-width: 100px; max-height: 100px; padding: 8px" :src="pic.thumbUrl" />
+                  </div>
+                  <div>
+                    <a-input v-model="pic.description" placeholder="描述" style="width: 104px; margin-top: 10px"></a-input>
+                  </div>
+                </div>
                 <a-upload
                   :action="uploadPicURL"
                   name="file"
                   :file-list="form.landStatusPicList"
                   :withCredentials="true"
                   @preview="handlePreview"
+                  style="vertical-align: top"
                   class="file-uploader"
-                  list-type="picture-card"
+                  list-type="text"
                   @change="handleChange($event, 'form','landStatusPicList')"
                 >
-                  <div v-if="form.landStatusPicList.length < 1">
-                    <a-icon :type="loading ? 'loading' : 'plus'" />
+                  <div class="upload-add" v-if="form.landStatusPicList.length < 4">
+                    <a-icon  class="upload-add-icon" :type="loading ? 'loading' : 'plus'" />
                   </div>
                 </a-upload>
                 <p style="margin-left: 10px">
@@ -244,18 +435,27 @@
             </a-col>
 
             <a-col :span="12">
+              <div style="display: inline-block" v-for="(pic, index) of form.streetPicList" :key="'streetPicList' + index">
+                <div @click="handlePreview(pic)" class="upload-add" style="display: flex; justify-content: center">
+                  <img style="max-width: 100px; max-height: 100px; padding: 8px" :src="pic.thumbUrl" />
+                </div>
+                <div>
+                  <a-input v-model="pic.description" placeholder="描述" style="width: 104px; margin-top: 10px"></a-input>
+                </div>
+              </div>
                 <a-upload
                   :action="uploadPicURL"
                   name="file"
                   :file-list="form.streetPicList"
                   :withCredentials="true"
                   @preview="handlePreview"
+                  style="vertical-align: top"
                   class="file-uploader"
-                  list-type="picture-card"
+                  list-type="text"
                   @change="handleChange($event, 'form','streetPicList')"
                 >
-                  <div v-if="form.streetPicList.length < 1">
-                    <a-icon :type="loading ? 'loading' : 'plus'" />
+                  <div class="upload-add" v-if="form.streetPicList.length < 4">
+                    <a-icon  class="upload-add-icon" :type="loading ? 'loading' : 'plus'" />
                   </div>
                 </a-upload>
                 <p style="margin-left: 10px">
@@ -264,18 +464,27 @@
             </a-col>
 
             <a-col :span="12">
+              <div style="display: inline-block" v-for="(pic, index) of form.effectPicList" :key="'effectPicList' + index">
+                <div @click="handlePreview(pic)" class="upload-add" style="display: flex; justify-content: center">
+                  <img style="max-width: 100px; max-height: 100px; padding: 8px" :src="pic.thumbUrl" />
+                </div>
+                <div>
+                  <a-input v-model="pic.description" placeholder="描述" style="width: 104px; margin-top: 10px"></a-input>
+                </div>
+              </div>
                 <a-upload
                   :action="uploadPicURL"
                   name="file"
                   :file-list="form.effectPicList"
                   :withCredentials="true"
                   @preview="handlePreview"
+                  style="vertical-align: top"
                   class="file-uploader"
-                  list-type="picture-card"
+                  list-type="text"
                   @change="handleChange($event, 'form','effectPicList')"
                 >
-                  <div v-if="form.effectPicList.length < 1">
-                    <a-icon :type="loading ? 'loading' : 'plus'" />
+                  <div class="upload-add" v-if="form.effectPicList.length < 4">
+                    <a-icon  class="upload-add-icon" :type="loading ? 'loading' : 'plus'" />
                   </div>
                 </a-upload>
                 <p style="margin-left: 10px">
@@ -284,18 +493,27 @@
             </a-col>
 
             <a-col :span="12">
+              <div style="display: inline-block" v-for="(pic, index) of form.facilityPicList" :key="'facilityPicList' + index">
+                <div @click="handlePreview(pic)" class="upload-add" style="display: flex; justify-content: center">
+                  <img style="max-width: 100px; max-height: 100px; padding: 8px" :src="pic.thumbUrl" />
+                </div>
+                <div>
+                  <a-input v-model="pic.description" placeholder="描述" style="width: 104px; margin-top: 10px"></a-input>
+                </div>
+              </div>
                 <a-upload
                   :action="uploadPicURL"
                   name="file"
                   :file-list="form.facilityPicList"
                   :withCredentials="true"
                   @preview="handlePreview"
+                  style="vertical-align: top"
                   class="file-uploader"
-                  list-type="picture-card"
+                  list-type="text"
                   @change="handleChange($event, 'form','facilityPicList')"
                 >
-                  <div v-if="form.facilityPicList.length < 1">
-                    <a-icon :type="loading ? 'loading' : 'plus'" />
+                  <div class="upload-add" v-if="form.facilityPicList.length < 4">
+                    <a-icon  class="upload-add-icon" :type="loading ? 'loading' : 'plus'" />
                   </div>
                 </a-upload>
                 <p style="margin-left: 10px">
@@ -346,7 +564,7 @@
           </a-row>
 
           <a-row class="mt-20">
-            <p class="input-tag">项目当前进度信息录入:</p>
+            <p class="input-tag">项目进度:</p>
             <a-tabs type="card">
               <a-tab-pane v-if="nodeVisible" key="1" tab="一级开发节点">
                 <div class="mt-20" v-for="node in firstNode" :key="node.index">
@@ -601,8 +819,8 @@
           </a-row>
 
           <a-row class="mt-20">
-            <a-button v-if="mode === 'create'" @click="showSubmitModal" type="primary">提 交 项 目 信 息</a-button>
-            <a-button v-if="mode === 'edit'" @click="showSubmitModal" type="primary">修 改 项 目 信 息</a-button>
+            <a-button v-if="mode === 'create'" :disabled="!userInfo.ID" @click="showSubmitModal" type="primary">提 交 项 目 信 息</a-button>
+            <a-button v-if="mode === 'edit'" :disabled="!userInfo.ID" @click="showSubmitModal" type="primary">修 改 项 目 信 息</a-button>
 
             <a-modal v-model="submitModalVisible" width="30%" :footer="null" @close="submitModalVisible = false">
               <div slot="title" style="text-align: center">
@@ -864,6 +1082,7 @@ import BaiduMapType from 'vue-baidu-map/components/controls/MapType'
 import BaiduGeolocation from 'vue-baidu-map/components/controls/Geolocation'
 import BaiduPolygon from 'vue-baidu-map/components/overlays/Polygon'
 import BaiduSearch from 'vue-baidu-map/components/search/LocalSearch'
+import BaiduCircle from 'vue-baidu-map/components/overlays/Circle'
 import {mapActions, mapGetters} from 'vuex'
 import userVerify from '../../components/userVerify'
 
@@ -1012,14 +1231,18 @@ export default {
     BaiduMapType,
     BaiduGeolocation,
     BaiduSearch,
-    BaiduPolygon
+    BaiduPolygon,
+    BaiduCircle
   },
   filters: {
     filterUndefined (data) {
       if (data === undefined) {
         return '\\'
       }
-      return data
+      if (data + '' === 'NaN') {
+        return '\\'
+      }
+      return (data - '').toFixed(2)
     }
   },
   watch: {
@@ -1046,6 +1269,24 @@ export default {
           this.form.itemType = '自定义/'
         }
         this.form.itemType = '自定义/' + val.trim()
+      }
+    },
+    spaceComputed: {
+      get: function () {
+        let res = 0
+        if (this.form.itemBaseInfoForm.apartmentSpace) {
+          res += this.form.itemBaseInfoForm.apartmentSpace - ''
+        }
+        if (this.form.itemBaseInfoForm.businessSpace) {
+          res += this.form.itemBaseInfoForm.businessSpace - ''
+        }
+        if (this.form.itemBaseInfoForm.officeSpace) {
+          res += this.form.itemBaseInfoForm.officeSpace - ''
+        }
+        if (this.form.itemBaseInfoForm.otherSpace) {
+          res += this.form.itemBaseInfoForm.otherSpace - ''
+        }
+        return res
       }
     },
     userDefinedExchangeType: {
@@ -1076,6 +1317,7 @@ export default {
       certificateForm: {
         certificatePicList: []
       },
+      itemBaseEdit: 0,
       currentNode: '',
       currentIndex: '',
       mapVisible: false,
@@ -1107,6 +1349,20 @@ export default {
             lng: 116.404,
             lat: 39.915
           },
+          threeCirclePath: {
+            center: {
+              lng: 116.404,
+              lat: 39.915
+            },
+            radius: 0
+          },
+          fiveCirclePath: {
+            center: {
+              lng: 116.404,
+              lat: 39.915
+            },
+            radius: 0
+          },
           zoom: 15,
           polygonPath: [],
           keyword: ''
@@ -1121,6 +1377,7 @@ export default {
           keyword: ''
         },
         itemBaseInfoForm: {
+          itemBaseMode: 'use',
           aboveGround: [],
           underGround: [],
           assetMortgage: false,
@@ -1130,6 +1387,7 @@ export default {
         landCostForm: {},
         landStatusPicList: [],
         facilityPicList: [],
+        coverPicList: [],
         effectPicList: [],
         streetPicList: [],
         progressForm: {
@@ -1252,13 +1510,41 @@ export default {
           this.mapVisible = false
           let temp = JSON.parse(res.data.data.stringify)
           temp.itemMap.keyword = ''
+          if (!temp.itemMap.threeCirclePath) {
+            temp.itemMap.threeCirclePath = {
+              center: {
+                lat: 0,
+                lng: 0
+              },
+              radius: 0
+            }
+          }
+          if (!temp.itemMap.fiveCirclePath) {
+            temp.itemMap.fiveCirclePath = {
+              center: {
+                lat: 0,
+                lng: 0
+              },
+              radius: 0
+            }
+          }
+          if (!temp.itemBaseInfoForm.itemBaseMode) {
+            temp.itemBaseInfoForm.itemBaseMode = 'use'
+          }
           temp.streetMap.keyword = ''
+          if (!temp.coverPicList) {
+            temp.coverPicList = []
+          }
           this.form = temp
           this.mapVisible = true
         })
       } else {
         this.mapVisible = true
       }
+    },
+    editBase (index) {
+      this.itemBaseEdit = index
+      this.$nextTick(() => this.$refs[index].focus())
     },
     async certificateChange () {
       await this.getUserInfo()
@@ -1272,6 +1558,23 @@ export default {
     showSubmitModal () {
       // todo: 数据合法性鉴定
       this.submitModalVisible = true
+
+      // 获取封面的uuid
+      let pic = ''
+      if (this.form.coverPicList.length) {
+        pic = this.form.coverPicList[0].uuid
+      } else if (this.form.landStatusPicList.length) {
+        pic = this.form.landStatusPicList[0].uuid
+      } else if (this.form.streetPicList.length) {
+        pic = this.form.streetPicList[0].uuid
+      } else if (this.form.effectPicList.length) {
+        pic = this.form.effectPicList[0].uuid
+      } else if (this.form.facilityPicList.length) {
+        pic = this.form.facilityPicList[0].uuid
+      }
+
+      this.form.coverPicUuid = pic
+
       this.countDown = 5
       let interval = setInterval(() => {
         if (this.countDown > 0) {
@@ -1394,9 +1697,14 @@ export default {
         return
       }
 
+      if (!info.fileList[info.fileList.length - 1].thumbUrl) {
+        info.fileList[info.fileList.length - 1].thumbUrl = await utils.getBase64(info.file.originFileObj)
+      }
+
+      this.loading = true
+
       if (!info.file.response) {
         info.fileList[info.fileList.length - 1].status = 'uploading'
-        this.loading = true
       } else if (info.file.response.code !== HTTP.SUCCESS) {
         info.fileList[info.fileList.length - 1].status = 'error'
         this.loading = false
@@ -1467,6 +1775,34 @@ export default {
     },
     removePolygonPoint (map) {
       this.form[map].polygonPath = []
+      this.form[map].threeCirclePath.radius = 0
+      this.form[map].fiveCirclePath.radius = 0
+    },
+    addThreeCircle (map) {
+      let lng = 0
+      let lat = 0
+      for (let point of this.form[map].polygonPath) {
+        lng += point.lng
+        lat += point.lat
+      }
+      this.form[map].threeCirclePath.center = {
+        lng: lng / this.form[map].polygonPath.length,
+        lat: lat / this.form[map].polygonPath.length
+      }
+      this.form[map].threeCirclePath.radius = 3000
+    },
+    addFiveCircle (map) {
+      let lng = 0
+      let lat = 0
+      for (let point of this.form[map].polygonPath) {
+        lng += point.lng
+        lat += point.lat
+      }
+      this.form[map].fiveCirclePath.center = {
+        lng: lng / this.form[map].polygonPath.length,
+        lat: lat / this.form[map].polygonPath.length
+      }
+      this.form[map].fiveCirclePath.radius = 5000
     },
     addPolygonPoint (map) {
       this.form[map].polygonPath.push(this.form[map].center)
@@ -1526,4 +1862,32 @@ export default {
   width: 49%;
   display: inline-block;
 }
+
+.upload-pictures {
+  width: 104px;
+  height: 104px;
+  display: block;
+}
+
+.upload-pictures > img {
+  width: 100%;
+  margin: 10px;
+}
+
+.upload-add-icon {
+  font-size: 32px;
+  color: #999;
+  padding: 34px;
+}
+
+th {
+  padding: 10px;
+  background-color: #fafafa;
+}
+
+td {
+  padding: 10px;
+  cursor: pointer;
+}
+
 </style>

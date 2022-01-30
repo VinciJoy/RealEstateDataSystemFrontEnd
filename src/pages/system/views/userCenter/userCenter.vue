@@ -77,6 +77,9 @@ export default {
   },
   methods: {
     init () {
+      if (!this.userInfo) {
+        console.log(123)
+      }
       this.selectMenu()
     },
     selectMenu () {

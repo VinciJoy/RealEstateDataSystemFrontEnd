@@ -39,7 +39,7 @@
       </a-menu-item>
     </a-menu>
 
-    <div class="navigation-user" v-if="!userInfo">
+    <div class="navigation-user" v-if="!userInfo.ID">
       <span @click="showLoginModal">
         登录
       </span>
@@ -194,9 +194,13 @@
 import api from '@system/api/user'
 import utils from '@/utils/utils'
 import { mapActions, mapGetters } from 'vuex'
+import { defaultUserInfo } from '@/utils/constants'
 
 export default {
   name: 'navigation',
+  inject: [
+    'reload'
+  ],
   data () {
     let checkRepassword = (rule, value, callback) => {
       if (value !== this.registerForm.password) {
@@ -319,9 +323,10 @@ export default {
     },
     logout () {
       api.logout().then(() => {
-        this.$store.commit('SET_userInfo', null)
+        this.$store.commit('SET_userInfo', defaultUserInfo)
         this.$success('退出登录成功!')
         this.getUserInfo()
+        this.reload()
       })
     },
     getCaptcha () {
@@ -338,6 +343,7 @@ export default {
           api.login(this.loginForm).then((res) => {
             this.$success('欢迎回来!')
             this.getUserInfo()
+            this.reload()
             this.modalVisible = false
           }).catch((res) => {
             this.getCaptcha()

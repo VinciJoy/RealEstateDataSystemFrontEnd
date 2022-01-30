@@ -24,6 +24,14 @@ export const ITEM_TYPES = [
   '自定义'
 ]
 
+export const defaultUserInfo = {
+  role: '',
+  ID: '',
+  certificate: {
+    ID: ''
+  }
+}
+
 export const EXCHANGE_TYPES = [
   '股权转让',
   '资产转让',

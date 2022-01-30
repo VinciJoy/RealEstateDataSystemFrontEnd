@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import api from '@system/api/user'
+import { defaultUserInfo } from '@/utils/constants'
 
 Vue.use(Vuex)
 
@@ -9,7 +10,7 @@ const rootState = {
     mode: 'login', // or 'register',
     visible: false
   },
-  userInfo: null
+  userInfo: defaultUserInfo
 }
 
 const rootGetters = {
@@ -42,7 +43,7 @@ const rootActions = {
     await api.getUserInfo().then(res => {
       commit('SET_userInfo', res.data.data.user)
     }).catch(() => {
-      commit('SET_userInfo', null)
+      commit('SET_userInfo', defaultUserInfo)
     })
   },
   changeModalStatus ({commit}, payload) {

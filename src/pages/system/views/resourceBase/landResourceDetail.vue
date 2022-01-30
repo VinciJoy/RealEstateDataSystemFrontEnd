@@ -4,7 +4,10 @@
     <a-col :span="20">
 <!--      head-->
       <a-row class="mt-20 sub-gray-line" :gutter="20" style="height: 200px;">
-        <a-col :span="6" style="background-color: gray; height: 100%; max-width: 100%">123</a-col>
+        <a-col :span="6" style="height: 100%; max-width: 100%; display: flex; justify-content: center">
+          <img v-if="itemBaseInfo.coverPicUuid" style="max-width: 100%; max-height: 100%" :src="picBaseURL + itemBaseInfo.coverPicUuid"/>
+          <img v-else style="width: 100%; height: 100%" src="static/imgs/default-img.jpeg"/>
+        </a-col>
         <a-col :span="18" style="height: 100%;">
           <a-col>
             <a-col :span="16">
@@ -15,6 +18,9 @@
             <a-col class="info-desc-content" style="text-align: right" :span="8">
               <p style="margin-bottom: 0">
                 更新时间：{{ itemBaseInfo.updatedAt }}
+              </p>
+              <p style="margin-bottom: 0">
+                发布人身份：{{ form.identity }}
               </p>
               <p>
                 300k
@@ -41,7 +47,6 @@
         <a-col class="right-gray-line" :span="18">
           <a-col class="mt-10" style="text-align: center">
             <span :class="'clickable-txt ' + (selectedTag === 'basic' ? 'selected' : '')" @click="selectedTag = 'basic'">基础信息</span>
-            <span :class="'clickable-txt ' + (selectedTag === 'rank' ? 'selected' : '')" @click="selectedTag = 'rank'">对接具体职级</span>
             <span :class="'clickable-txt ' + (selectedTag === 'review' ? 'selected' : '')" @click="selectedTag = 'review'">审核意见</span>
             <span :class="'clickable-txt ' + (selectedTag === 'more' ? 'selected' : '')" @click="selectedTag = 'more'">更多资讯</span>
           </a-col>
@@ -54,13 +59,17 @@
               :ak="ak"
               :dragging="false"
               style="width: 600px; height: 400px"
+              mapType="BMAP_SATELLITE_MAP"
               :center="form.itemMap.center"
+              :double-click-zoom="false"
               :scroll-wheel-zoom="false"
               :zoom="form.itemMap.zoom"
             >
               <BaiduScale anchor="BMAP_ANCHOR_BOTTOM_RIGHT"></BaiduScale>
               <BaiduMapType :map-types="['BMAP_NORMAL_MAP', 'BMAP_SATELLITE_MAP', 'BMAP_HYBRID_MAP']" anchor="BMAP_ANCHOR_TOP_LEFT"></BaiduMapType>
-              <BaiduPolygon :clicking="true" :path="form.itemMap.polygonPath" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="2" :editing="true"/>
+              <BaiduPolygon :clicking="true" :path="form.itemMap.polygonPath" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="2"/>
+              <BaiduCircle :center="form.itemMap.threeCirclePath.center" :radius="form.itemMap.threeCirclePath.radius" stroke-color="blue" :fillColor="''" :stroke-opacity="0.5" :stroke-weight="2"></BaiduCircle>
+              <BaiduCircle :center="form.itemMap.fiveCirclePath.center" :radius="form.itemMap.fiveCirclePath.radius" stroke-color="blue" :fillColor="''" :stroke-opacity="0.5" :stroke-weight="2"></BaiduCircle>
             </baidu-map>
           </a-col>
 
@@ -141,83 +150,95 @@
               <a-col>
                 <h2 style="font-weight: bolder">项目现状及四至信息：</h2>
 
-                <baidu-map
-                  v-if="mapVisible"
-                  :ak="ak"
-                  :dragging="false"
-                  style="width: 600px; height: 400px; display: inline-block"
-                  :center="form.streetMap.center"
-                  :scroll-wheel-zoom="false"
-                  :zoom="form.streetMap.zoom"
-                >
-                  <BaiduScale anchor="BMAP_ANCHOR_BOTTOM_RIGHT"></BaiduScale>
-                  <BaiduMapType :map-types="['BMAP_NORMAL_MAP', 'BMAP_SATELLITE_MAP', 'BMAP_HYBRID_MAP']" anchor="BMAP_ANCHOR_TOP_LEFT"></BaiduMapType>
-                  <BaiduPolygon :clicking="true" :path="form.streetMap.polygonPath" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="2" :editing="true"/>
-                </baidu-map>
+<!--                <baidu-map-->
+<!--                  v-if="mapVisible"-->
+<!--                  :ak="ak"-->
+<!--                  :dragging="false"-->
+<!--                  style="width: 600px; height: 400px; display: inline-block"-->
+<!--                  :center="form.streetMap.center"-->
+<!--                  :scroll-wheel-zoom="false"-->
+<!--                  :zoom="form.streetMap.zoom"-->
+<!--                >-->
+<!--                  <BaiduScale anchor="BMAP_ANCHOR_BOTTOM_RIGHT"></BaiduScale>-->
+<!--                  <BaiduMapType :map-types="['BMAP_NORMAL_MAP', 'BMAP_SATELLITE_MAP', 'BMAP_HYBRID_MAP']" anchor="BMAP_ANCHOR_TOP_LEFT"></BaiduMapType>-->
+<!--                  <BaiduPolygon :clicking="true" :path="form.streetMap.polygonPath" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="2" :editing="true"/>-->
+<!--                </baidu-map>-->
 
                 <div class="mt-20" style="display: inline-block; padding-left: 20px; vertical-align: top">
                   <a-col style="height: 200px" :span="12">
-                    <a-upload
-                      name="file"
-                      :file-list="form.landStatusPicList"
-                      :withCredentials="true"
-                      @preview="handlePreview"
-                      :disabled="true"
-                      class="file-uploader"
-                      list-type="picture-card"
-                    >
-                    </a-upload>
                     <p style="margin-left: 10px">
                       地块现状照片
                     </p>
+                    <div class="pic-block" v-for="(pic, index) of form.landStatusPicList" :key="'streetPicList' + index" @click="handlePreview(pic)">
+                      <div class="upload-add" style="display: flex; justify-content: center">
+                        <img style="max-width: 100px; max-height: 100px; padding: 8px" :src="pic.thumbUrl" />
+                      </div>
+                      <a-popover>
+                        <template slot="content">
+                          <p>{{ pic.description }}</p>
+                        </template>
+                        <p class="pic-desc">
+                          {{ pic.description }}
+                        </p>
+                      </a-popover>
+                    </div>
                   </a-col>
 
                   <a-col style="height: 200px" :span="12">
-                    <a-upload
-                      name="file"
-                      :file-list="form.streetPicList"
-                      :withCredentials="true"
-                      @preview="handlePreview"
-                      :disabled="true"
-                      class="file-uploader"
-                      list-type="picture-card"
-                    >
-                    </a-upload>
                     <p style="margin-left: 10px">
                       四至街道现状
                     </p>
+                    <div class="pic-block" v-for="(pic, index) of form.streetPicList" :key="'streetPicList' + index" @click="handlePreview(pic)">
+                      <div class="upload-add" style="display: flex; justify-content: center">
+                        <img style="max-width: 100px; max-height: 100px; padding: 8px" :src="pic.thumbUrl" />
+                      </div>
+                      <a-popover>
+                        <template slot="content">
+                          <p>{{ pic.description }}</p>
+                        </template>
+                        <p class="pic-desc">
+                          {{ pic.description }}
+                        </p>
+                      </a-popover>
+                    </div>
                   </a-col>
 
                   <a-col style="height: 200px" :span="12">
-                    <a-upload
-                      name="file"
-                      :file-list="form.effectPicList"
-                      :withCredentials="true"
-                      @preview="handlePreview"
-                      :disabled="true"
-                      class="file-uploader"
-                      list-type="picture-card"
-                    >
-                    </a-upload>
                     <p style="margin-left: 10px">
                       规划及方案效果图
                     </p>
+                    <div class="pic-block" v-for="(pic, index) of form.effectPicList" :key="'streetPicList' + index" @click="handlePreview(pic)">
+                      <div class="upload-add" style="display: flex; justify-content: center">
+                        <img style="max-width: 100px; max-height: 100px; padding: 8px" :src="pic.thumbUrl" />
+                      </div>
+                      <a-popover>
+                        <template slot="content">
+                          <p>{{ pic.description }}</p>
+                        </template>
+                        <p class="pic-desc">
+                          {{ pic.description }}
+                        </p>
+                      </a-popover>
+                    </div>
                   </a-col>
 
                   <a-col style="height: 200px" :span="12">
-                    <a-upload
-                      name="file"
-                      :file-list="form.facilityPicList"
-                      :withCredentials="true"
-                      @preview="handlePreview"
-                      :disabled="true"
-                      class="file-uploader"
-                      list-type="picture-card"
-                    >
-                    </a-upload>
                     <p style="margin-left: 10px">
                       周边配套设施
                     </p>
+                    <div class="pic-block" v-for="(pic, index) of form.facilityPicList" :key="'streetPicList' + index" @click="handlePreview(pic)">
+                      <div class="upload-add" style="display: flex; justify-content: center">
+                        <img style="max-width: 100px; max-height: 100px; padding: 8px" :src="pic.thumbUrl" />
+                      </div>
+                      <a-popover>
+                        <template slot="content">
+                          <p>{{ pic.description }}</p>
+                        </template>
+                        <p class="pic-desc">
+                          {{ pic.description }}
+                        </p>
+                      </a-popover>
+                    </div>
                   </a-col>
 
                   <a-modal width="80%" :visible="previewVisible" :footer="null" @cancel="previewVisible = false">
@@ -228,7 +249,7 @@
             </a-col>
 
             <a-row class="mt-20">
-            <h2 style="font-weight: bolder">项目当前进度信息录入:</h2>
+            <h2 style="font-weight: bolder">项目进度:</h2>
             <a-tabs type="card">
               <a-tab-pane key="1" tab="一级开发节点">
                 <div style="margin-bottom: 10px" v-for="progress of progressFirstSelected" :key="progress.name">
@@ -299,7 +320,7 @@ import BaiduMap from 'vue-baidu-map/components/map/Map.vue'
 import BaiduScale from 'vue-baidu-map/components/controls/Scale'
 import BaiduMapType from 'vue-baidu-map/components/controls/MapType'
 import BaiduPolygon from 'vue-baidu-map/components/overlays/Polygon'
-import utils from '@/utils/utils'
+import BaiduCircle from 'vue-baidu-map/components/overlays/Circle'
 
 export default {
   name: 'landResourceDetail',
@@ -307,7 +328,8 @@ export default {
     BaiduMap,
     BaiduScale,
     BaiduMapType,
-    BaiduPolygon
+    BaiduPolygon,
+    BaiduCircle
   },
   computed: {
     'progressFirstSelected': function () {
@@ -422,6 +444,7 @@ export default {
   },
   methods: {
     init () {
+      this.picBaseURL = process.env.API_ROOT + '/system/pics/temp/'
       api.getLandResource(this.$route.params.id).then((res) => {
         this.mapVisible = false
         this.form = JSON.parse(res.data.data.stringify)
@@ -429,6 +452,7 @@ export default {
         this.itemBaseInfo.title = res.data.data.landResource.title
         this.itemBaseInfo.recommendation = res.data.data.landResource.recommendation
         this.itemBaseInfo.itemType = res.data.data.landResource.itemType
+        this.itemBaseInfo.coverPicUuid = res.data.data.landResource.coverPicUuid
         if (!this.form.landStatusPicList.length) {
           this.form.landStatusPicList = [{
             uid: 'landStatusPicList',
@@ -461,7 +485,6 @@ export default {
           }]
         }
 
-        console.log(this.form)
         this.mapVisible = true
       })
     },
@@ -477,6 +500,19 @@ export default {
 .clickable-txt {
   margin-left: 30px;
   font-size: 16px;
+}
+
+.pic-desc {
+  width: 104px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  margin-top: 10px;
+}
+
+.pic-block {
+  display: inline-block;
+  width: 115px;
 }
 
 .selected {

@@ -2,7 +2,7 @@
   <a-config-provider :locale="zh_CN">
     <div id="app">
       <navigation></navigation>
-      <router-view/>
+      <router-view v-if="isRouterAlive"></router-view>
       <systemFooter></systemFooter>
     </div>
   </a-config-provider>
@@ -24,9 +24,23 @@ export default {
     navigation: navigation,
     systemFooter: systemFooter
   },
+  provide () {
+    return {
+      reload: this.reload
+    }
+  },
   data () {
     return {
-      zh_CN
+      zh_CN,
+      isRouterAlive: true
+    }
+  },
+  methods: {
+    reload () {
+      this.isRouterAlive = false
+      this.$nextTick(function () {
+        this.isRouterAlive = true
+      })
     }
   }
 }

@@ -18,47 +18,90 @@
             </div>
           </a-col>
           <a-col :span="7" class="mt-40">
-            <a-button style="float: right" @click="goToAdd" type="primary">发布土地信息</a-button>
+            <a-button style="float: right" :disabled="!userInfo.ID" @click="goToAdd" type="primary">发布土地信息</a-button>
           </a-col>
         </a-row>
 
-        <a-row class="mt-20">
-          <a-cascader style="width: 150px" v-model="place" :options="currentOptions" placeholder="项目位置"/>
-          <a-select @change="changeItemType" placeholder="用地性质" style="width: 150px">
-            <a-select-option :value="null" :key="0">
-              不选择
-            </a-select-option>
-            <a-select-option v-for="itemType in ITEM_TYPES" :value="itemType" :key="itemType">
-              {{ itemType }}
-            </a-select-option>
-          </a-select>
-          <a-select placeholder="项目现状" style="width: 150px">
-            <a-select-option value="jack">
-              Jack
-            </a-select-option>
-          </a-select>
-          <a-select @change="changeExchangeType" placeholder="交易方式" style="width: 150px">
-            <a-select-option v-for="exchangeType in EXCHANGE_TYPES" :value="exchangeType" :key="exchangeType">
-              {{ exchangeType }}
-            </a-select-option>
-          </a-select>
-          <div class="tag-desc can-not-select" style="display: inline-block; float: right">
-            排序：
+        <a-row class="mt-20 sub-gray-line">
 
+          <a-col class="mt-10">
+            省：
+            <span :class="!selectedProvince.value ? 'selected' : 'clickable-txt'" @click="selectedProvince = {children: []}" :key="0">
+              不选择
+            </span>
+            <span :class="selectedProvince === province ? 'selected' : 'clickable-txt'" @click="selectedProvince = province" v-for="province in options" :key="province.value">
+              {{ province.value }}
+            </span>
+          </a-col>
+
+          <a-col class="mt-10">
+            市：
+            <span :class="!selectedCity.value ? 'selected' : 'clickable-txt'" @click="selectedCity = {children: []}" :key="0">
+              不选择
+            </span>
+            <span :class="selectedCity === city ? 'selected' : 'clickable-txt'" @click="selectedCity = city" v-for="city in selectedProvince.children" :key="city.value">
+              {{ city.value }}
+            </span>
+          </a-col>
+
+          <a-col class="mt-10">
+            区：
+            <span :class="!selectedArea.value ? 'selected' : 'clickable-txt'" @click="selectedArea = {children: []}" :key="0">
+              不选择
+            </span>
+            <span :class="selectedArea === area ? 'selected' : 'clickable-txt'" @click="selectedArea = area" v-for="area in selectedCity.children" :key="area.value">
+              {{ area.value }}
+            </span>
+          </a-col>
+
+          <a-col class="mt-10">
+            用地性质：
+            <span :class="itemType === null ? 'selected' : 'clickable-txt'" @click="changeItemType(null)" :key="0">
+              不选择
+            </span>
+            <span :class="itemType === item ? 'selected' : 'clickable-txt'" @click="changeItemType(item)" v-for="item in ITEM_TYPES" :key="item">
+              {{ item }}
+            </span>
+          </a-col>
+
+          <a-col class="mt-10">
+            项目形态：
+            <span :class="itemFormation === null ? 'selected' : 'clickable-txt'" @click="changeItemFormation(null)" :key="0">
+              不选择
+            </span>
+            <span :class="itemFormation === item ? 'selected' : 'clickable-txt'" @click="changeItemFormation(item)" v-for="item in itemFormations" :key="item">
+              {{ item }}
+            </span>
+          </a-col>
+
+          <a-col class="mt-10">
+            交易方式：
+            <span :class="exchangeType === null ? 'selected' : 'clickable-txt'" @click="changeExchangeType(null)" :key="0">
+              不选择
+            </span>
+            <span :class="exchangeType === exchange ? 'selected' : 'clickable-txt'" @click="changeExchangeType(exchange)" v-for="exchange in EXCHANGE_TYPES" :key="exchange">
+              {{ exchange }}
+            </span>
+          </a-col>
+
+          <a-row class="mt-10">
+              排序：
             <span class="clickable-txt" @click="orderByUpdatedTime = 'ASC'" v-show="orderByUpdatedTime === ''">更新时间 </span>
-            <a @click="orderByUpdatedTime = 'DESC'" v-show="orderByUpdatedTime === 'ASC'">更新时间↓</a>
-            <a @click="orderByUpdatedTime = ''" v-show="orderByUpdatedTime === 'DESC'">更新时间↑</a>
+            <span class="selected" @click="orderByUpdatedTime = 'DESC'" v-show="orderByUpdatedTime === 'ASC'">更新时间↓</span>
+            <span class="selected" @click="orderByUpdatedTime = ''" v-show="orderByUpdatedTime === 'DESC'">更新时间↑</span>
 
             <span class="clickable-txt" @click="orderBySpace = 'ASC'" v-show="orderBySpace === ''">地上建筑面积 </span>
-            <a @click="orderBySpace = 'DESC'" v-show="orderBySpace === 'ASC'">地上建筑面积↓</a>
-            <a @click="orderBySpace = ''" v-show="orderBySpace === 'DESC'">地上建筑面积↑</a>
+            <span class="selected" @click="orderBySpace = 'DESC'" v-show="orderBySpace === 'ASC'">地上建筑面积↓</span>
+            <span class="selected" @click="orderBySpace = ''" v-show="orderBySpace === 'DESC'">地上建筑面积↑</span>
 
-            交易对价
+            <span class="clickable-txt" @click="orderByPrice = 'ASC'" v-show="orderByPrice === ''">交易对价 </span>
+            <span class="selected" @click="orderByPrice = 'DESC'" v-show="orderByPrice === 'ASC'">交易对价↓</span>
+            <span class="selected" @click="orderByPrice = ''" v-show="orderByPrice === 'DESC'">交易对价↑</span>
 
             <span class="clickable-txt" @click="orderByRecommendation = 'ASC'" v-show="orderByRecommendation === ''">推荐指数 </span>
-            <a @click="orderByRecommendation = 'DESC'" v-show="orderByRecommendation === 'ASC'">推荐指数↓</a>
-            <a @click="orderByRecommendation = ''" v-show="orderByRecommendation === 'DESC'">推荐指数↑</a>
-          </div>
+            <span class="selected" @click="orderByRecommendation = 'DESC'" v-show="orderByRecommendation === 'ASC'">推荐指数↓</span>
+            <span class="selected" @click="orderByRecommendation = ''" v-show="orderByRecommendation === 'DESC'">推荐指数↑</span>
+        </a-row>
         </a-row>
 
         <a-row class="mt-20" style="text-align: center" v-if="!itemList || (itemList.length === 0)">
@@ -69,7 +112,10 @@
         </a-row>
 
         <a-row v-for="item of itemList" :key="item.ID" class="mt-20" :gutter="20" style="height: 200px; cursor: pointer">
-          <a-col @click="goToDetail(item.ID)" :span="6" style="background-color: gray; height: 100%; max-width: 100%">123</a-col>
+          <a-col @click="goToDetail(item.ID)" :span="6" style="height: 100%; max-width: 100%; display: flex; justify-content: center">
+            <img v-if="item.coverPicUuid" style="max-width: 100%; max-height: 100%" :src="picBaseURL + item.coverPicUuid"/>
+            <img v-else style="width: 100%; height: 100%" src="static/imgs/default-img.jpeg"/>
+          </a-col>
           <a-col @click="goToDetail(item.ID)" :span="18" style="height: 100%;">
             <a-col>
               <h2>
@@ -86,7 +132,7 @@
                 </a-col>
                 <a-col>用地性质：{{ item.itemType }}</a-col>
                 <a-col>
-                  土地价格：969 万元/亩
+                  土地价格：{{ item.landPrice.toFixed(2) + (['在建工程','现房'].includes(item.itemFormation) ? ' 元/㎡' : ' 万元/亩') }}
                   <div class="info-desc-content" style="display: inline-block; float: right">更新时间：{{ item.updatedAt }} 300k</div>
                 </a-col>
               </a-col>
@@ -106,13 +152,22 @@
 import options from '@/utils/cities'
 import { ITEM_TYPES, EXCHANGE_TYPES } from '@/utils/constants'
 import api from '@system/api/landResource'
-import utils from '@/utils/utils'
+import {mapGetters} from 'vuex'
+
+const itemFormations = [
+  '土地使用权',
+  '在建工程',
+  '现房',
+  '一二级联动'
+]
 
 export default {
   name: 'landResource',
   data () {
     return {
-      place: [],
+      selectedProvince: {children: []},
+      selectedCity: {children: []},
+      selectedArea: {children: []},
       options: options,
       ITEM_TYPES: ITEM_TYPES,
       EXCHANGE_TYPES: EXCHANGE_TYPES,
@@ -120,15 +175,22 @@ export default {
       pageIndex: 1,
       count: 0,
       itemType: null,
+      itemFormation: null,
+      itemFormations: itemFormations,
       exchangeType: null,
       itemList: [],
       orderByRecommendation: '',
+      orderByPrice: '',
       orderByUpdatedTime: '',
       orderBySpace: '',
-      currentOptions: []
+      picBaseURL: ''
     }
   },
+  computed: {
+    ...mapGetters(['userInfo'])
+  },
   mounted () {
+    this.picBaseURL = process.env.API_ROOT + '/system/pics/temp/'
     this.init()
   },
   watch: {
@@ -150,30 +212,35 @@ export default {
     'exchangeType': function () {
       this.init()
     },
-    'place': function () {
+    'itemFormation': function () {
+      this.init()
+    },
+    'selectedProvince': function () {
+      this.init()
+    },
+    'selectedCity': function () {
+      this.init()
+    },
+    'selectedArea': function () {
       this.init()
     }
   },
   methods: {
     init () {
-      let a = utils.Copy(this.options)
-      this.currentOptions = [{
-        'code': '0',
-        'value': '',
-        'label': '不选择'
-      }].concat(a)
-
       api.getLandResources({
         pageSize: this.pageSize,
         pageIndex: this.pageIndex,
         owner: false,
         itemType: this.itemType,
         exchangeType: this.exchangeType,
+        itemFormation: this.itemFormation,
         visible: true,
         orderByRecommendation: this.orderByRecommendation,
         orderByUpdatedTime: this.orderByUpdatedTime,
         orderBySpace: this.orderBySpace,
-        place: this.place.join('/')
+        province: this.selectedProvince.value,
+        city: this.selectedCity.value,
+        area: this.selectedArea.value
       }).then(res => {
         this.count = res.data.data.count
         this.itemList = res.data.data.landResources
@@ -190,10 +257,16 @@ export default {
     },
     changeExchangeType (item) {
       this.exchangeType = item
+    },
+    changeItemFormation (item) {
+      this.itemFormation = item
     }
   }
 }
 </script>
 
 <style scoped>
+.selected{
+    color: #40a9ff;
+}
 </style>

@@ -16,13 +16,13 @@
             <a-form-model-item label="电话" prop="phone">
               <a-input :disabled="!editable" v-model="certificateForm.phone" />
             </a-form-model-item>
-            <a-form-model-item label="发布人身份" prop="identity">
-              <a-select :disabled="!editable" v-model="certificateForm.identity" style="width: 60%">
-                <a-select-option v-for="identity in identities" :value="identity" :key="identity">
-                  {{ identity }}
-                </a-select-option>
-              </a-select>
-            </a-form-model-item>
+<!--            <a-form-model-item label="发布人身份" prop="identity">-->
+<!--              <a-select :disabled="!editable" v-model="certificateForm.identity" style="width: 60%">-->
+<!--                <a-select-option v-for="identity in identities" :value="identity" :key="identity">-->
+<!--                  {{ identity }}-->
+<!--                </a-select-option>-->
+<!--              </a-select>-->
+<!--            </a-form-model-item>-->
             <a-form-model-item label="所属公司" prop="company">
               <a-input :disabled="!editable" v-model="certificateForm.company" />
             </a-form-model-item>
@@ -125,9 +125,9 @@ export default {
         company: [
           {required: true, message: '所属公司不能为空!', trigger: 'blur'}
         ],
-        identity: [
-          {required: true, message: '请选择发布人身份!', trigger: 'blur'}
-        ],
+        // identity: [
+        //   {required: true, message: '请选择发布人身份!', trigger: 'blur'}
+        // ],
         phone: [
           {required: true, message: '电话不能为空!', trigger: 'blur'},
           {validator: utils.MobileValid, message: '请输入正确的电话号码!', trigger: 'blur'}
