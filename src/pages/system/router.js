@@ -16,59 +16,59 @@ export default new Router({
     {
       path: '/',
       name: 'home',
-      component: () => import(/* webpackChunkName: "utils" */ '@system/views/general/home.vue')
+      component: () => import(/* webpackChunkName: "home" */ '@system/views/general/home.vue')
     },
     {
       path: '/tax',
       name: 'tax',
-      component: () => import(/* webpackChunkName: "utils" */ '@system/views/utils/tax.vue')
+      component: () => import(/* webpackChunkName: "tax" */ '@system/views/utils/tax.vue')
     },
     {
       path: '/land_resource',
       name: 'landResource',
-      component: () => import(/* webpackChunkName: "utils" */ '@system/views/resourceBase/landResource.vue')
+      component: () => import(/* webpackChunkName: "land_resource" */ '@system/views/resourceBase/landResource.vue')
     },
     {
       path: '/land_resource/:id',
       name: 'landResourceDetail',
-      component: () => import(/* webpackChunkName: "utils" */ '@system/views/resourceBase/landResourceDetail.vue')
+      component: () => import(/* webpackChunkName: "land_resource" */ '@system/views/resourceBase/landResourceDetail.vue')
     },
     {
       path: '/user_center',
       name: 'userCenter',
-      component: () => import(/* webpackChunkName: "utils" */ '@system/views/userCenter/userCenter.vue'),
+      component: () => import(/* webpackChunkName: "user_center" */ '@system/views/userCenter/userCenter.vue'),
       children: [
         {
           path: 'user_info',
           name: 'userInfo',
-          component: () => import(/* webpackChunkName: "utils" */ '@system/views/userCenter/userInfo/userInfo.vue')
+          component: () => import(/* webpackChunkName: "user_center" */ '@system/views/userCenter/userInfo/userInfo.vue')
         },
         {
           path: 'land_resource',
           name: 'userCenterLandResource',
-          component: () => import(/* webpackChunkName: "utils" */ '@system/views/userCenter/landResource/landResource.vue')
+          component: () => import(/* webpackChunkName: "user_center" */ '@system/views/userCenter/landResource/landResource.vue')
         },
         {
           path: 'user_list',
           name: 'userManage',
-          component: () => import(/* webpackChunkName: "utils" */ '@system/views/userCenter/users/users.vue')
+          component: () => import(/* webpackChunkName: "user_center" */ '@system/views/userCenter/users/users.vue')
         },
         {
           path: 'publish_land_resource/:id',
           name: 'editLandResource',
-          component: () => import(/* webpackChunkName: "utils" */ '@system/views/userCenter/landResource/publishLandResource.vue')
+          component: () => import(/* webpackChunkName: "user_center" */ '@system/views/userCenter/landResource/publishLandResource.vue')
         },
         {
           path: 'publish_land_resource',
           name: 'publishLandResource',
-          component: () => import(/* webpackChunkName: "utils" */ '@system/views/userCenter/landResource/publishLandResource.vue')
+          component: () => import(/* webpackChunkName: "user_center" */ '@system/views/userCenter/landResource/publishLandResource.vue')
         }
       ]
     },
     {
       path: '/confirmation',
       name: 'confirmation',
-      component: () => import(/* webpackChunkName: "utils" */ '@system/views/utils/confirmation.vue')
+      component: () => import(/* webpackChunkName: "confirmation" */ '@system/views/utils/confirmation.vue')
     }
   ]
 })

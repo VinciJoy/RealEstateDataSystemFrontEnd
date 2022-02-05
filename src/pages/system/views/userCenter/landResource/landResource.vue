@@ -5,6 +5,7 @@
       :data-source="landResources"
       :row-key="record => record.ID"
       :pagination="false"
+      :loading="loading"
     >
       <span slot="recommendation" slot-scope="text, record">
         <a-select style="width: 70px" v-model="record.recommendation" @change="changeRecommendation(record)">
@@ -76,6 +77,7 @@ export default {
   name: 'landResource',
   data () {
     return {
+      loading: false,
       utils: utils,
       columns: columns,
       landResources: [],
@@ -105,6 +107,7 @@ export default {
       })
     },
     init () {
+      this.loading = true
       if (utils.IsAdmin(this.userInfo.role)) {
         api.getLandResources({
           pageSize: this.pageSize,
@@ -113,6 +116,7 @@ export default {
         }).then(res => {
           this.count = res.data.data.count
           this.landResources = res.data.data.landResources
+          this.loading = false
         })
         return
       }
@@ -123,6 +127,7 @@ export default {
       }).then(res => {
         this.count = res.data.data.count
         this.landResources = res.data.data.landResources
+        this.loading = false
       })
     },
     changeRecommendation (record) {

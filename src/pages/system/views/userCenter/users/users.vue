@@ -61,6 +61,7 @@
       :data-source="users"
       :row-key="record => record.ID"
       :pagination="false"
+      :loading="loading"
     >
       <span slot="role" slot-scope="text, record">
         {{ record | role2CN }}
@@ -150,6 +151,7 @@ export default {
   },
   data () {
     return {
+      loading: false,
       keywords: '',
       currentCertificateForm: {
         certificatePicList: []
@@ -201,9 +203,11 @@ export default {
   },
   methods: {
     init () {
+      this.loading = true
       api.getUsers(this.pageSize, this.pageIndex, this.keywords).then(res => {
         this.count = res.data.data.count
         this.users = res.data.data.users
+        this.loading = false
       })
     },
     showCertificateModal (record) {

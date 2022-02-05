@@ -104,7 +104,11 @@
         </a-row>
         </a-row>
 
-        <a-row class="mt-20" style="text-align: center" v-if="!itemList || (itemList.length === 0)">
+        <a-row class="mt-40" size="large" style="text-align: center" v-if="loading">
+          <a-spin />
+        </a-row>
+
+        <a-row class="mt-20" style="text-align: center" v-if="!loading && (!itemList || (itemList.length === 0))">
           <a-icon type="exclamation-circle" style="font-size: 50px"/>
           <p class="mt-10" style="font-size: 25px">
             抱歉，该筛选条件下没有土地 / 资产信息！
@@ -165,6 +169,7 @@ export default {
   name: 'landResource',
   data () {
     return {
+      loading: false,
       selectedProvince: {children: []},
       selectedCity: {children: []},
       selectedArea: {children: []},
@@ -227,6 +232,7 @@ export default {
   },
   methods: {
     init () {
+      this.loading = true
       api.getLandResources({
         pageSize: this.pageSize,
         pageIndex: this.pageIndex,
@@ -244,6 +250,7 @@ export default {
       }).then(res => {
         this.count = res.data.data.count
         this.itemList = res.data.data.landResources
+        this.loading = false
       })
     },
     goToDetail (id) {
