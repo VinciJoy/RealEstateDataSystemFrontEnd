@@ -51,7 +51,12 @@
       </a-form-model>
     </a-modal>
 
+    <div style="text-align: right">
+      <a-input v-model="keywords" style="width: 200px" placeholder="搜索姓名、单位、电话" size="small"></a-input>
+    </div>
+
     <a-table
+      class="mt-10"
       :columns="columns"
       :data-source="users"
       :row-key="record => record.ID"
@@ -62,6 +67,15 @@
       </span>
       <span slot="verify" @click="showCertificateModal(record)" slot-scope="text, record">
         <a>{{ text.certificationVerified | verified2CN }}</a>
+      </span>
+      <span slot="phone" slot-scope="text, record">
+        <span>{{ text.certificate.phone ? text.certificate.phone : '/' }}</span>
+      </span>
+      <span slot="name" slot-scope="text, record">
+        <span>{{ text.certificate.name ? text.certificate.name : '/' }}</span>
+      </span>
+      <span slot="company" slot-scope="text, record">
+        <span>{{ text.certificate.company ? text.certificate.company : '/' }}</span>
       </span>
       <span slot="action" slot-scope="text, record">
         <a @click="goToEdit(record)">编辑</a>
@@ -90,6 +104,18 @@ const columns = [
     title: '用户名',
     dataIndex: 'user_name',
     key: 'user_name'
+  },
+  {
+    title: '姓名',
+    scopedSlots: {customRender: 'name'}
+  },
+  {
+    title: '电话',
+    scopedSlots: {customRender: 'phone'}
+  },
+  {
+    title: '单位',
+    scopedSlots: {customRender: 'company'}
   },
   {
     title: '角色',
@@ -124,6 +150,7 @@ export default {
   },
   data () {
     return {
+      keywords: '',
       currentCertificateForm: {
         certificatePicList: []
       },
@@ -147,6 +174,9 @@ export default {
     },
     'count' () {
       if ((this.pageIndex - 1) * this.pageSize === this.count) this.pageIndex -= 1
+    },
+    'keywords' () {
+      this.init()
     }
   },
   filters: {
@@ -171,7 +201,7 @@ export default {
   },
   methods: {
     init () {
-      api.getUsers(this.pageSize, this.pageIndex, true).then(res => {
+      api.getUsers(this.pageSize, this.pageIndex, this.keywords).then(res => {
         this.count = res.data.data.count
         this.users = res.data.data.users
       })

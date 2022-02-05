@@ -74,75 +74,126 @@
           </a-col>
 
             <a-col class="mt-20">
-            <a-col>
               <h2 style="font-weight: bolder">项目指标信息：</h2>
-            </a-col>
 
-            <a-row class="cell border-right">
-            <span class="table-title">项目基本面录入(必填)</span>
-          </a-row>
-          <a-row>
-            <a-col :span="6" class="cell">经营占地面积(m²)</a-col>
-            <a-col :span="6" class="cell">{{ form.itemBaseInfoForm.space | filterUndefined }}</a-col>
-            <a-col :span="6" class="cell">综合容积率</a-col>
-            <a-col :span="6" class="cell border-right">{{ form.itemBaseInfoForm.comprehensiveFAR | filterUndefined }}</a-col>
-          </a-row>
-          <a-row>
-            <a-col :span="6" class="cell">其中——住宅占地面积(m²)</a-col>
-            <a-col :span="6" class="cell">{{ form.itemBaseInfoForm.apartmentSpace | filterUndefined }}</a-col>
-            <a-col :span="6" class="cell">住宅容积率</a-col>
-            <a-col :span="6" class="cell border-right">{{ form.itemBaseInfoForm.apartmentFAR | filterUndefined }}</a-col>
-          </a-row>
-          <a-row>
-            <a-col :span="6" class="cell">其中——商业占地面积(m²)</a-col>
-            <a-col :span="6" class="cell">{{ form.itemBaseInfoForm.businessSpace | filterUndefined }}</a-col>
-            <a-col :span="6" class="cell">商业容积率</a-col>
-            <a-col :span="6" class="cell border-right">{{ form.itemBaseInfoForm.businessFAR | filterUndefined }}</a-col>
-          </a-row>
-          <a-row>
-            <a-col :span="6" class="cell">其中——办公占地面积(m²)</a-col>
-            <a-col :span="6" class="cell">{{ form.itemBaseInfoForm.officeSpace | filterUndefined }}</a-col>
-            <a-col :span="6" class="cell">办公容积率</a-col>
-            <a-col :span="6" class="cell border-right">{{ form.itemBaseInfoForm.officeFAR | filterUndefined }}</a-col>
-          </a-row>
-          <a-row type="flex">
-            <a-col :span="6" class="cell">其中——其他类占地面积(m²)，内容细项可继续增加，增加细项名称自定义，但合计等于其他类。</a-col>
-            <a-col :span="6" class="cell">{{ form.itemBaseInfoForm.otherSpace | filterUndefined }}</a-col>
-            <a-col :span="6" class="cell">其中容积率</a-col>
-            <a-col :span="6" class="cell border-right">{{ form.itemBaseInfoForm.otherFAR | filterUndefined }}</a-col>
-          </a-row>
-          <a-row class="cell border-right">
-            <span class="table-title">地上各业态录入(选填)</span>
-          </a-row>
-          <a-row>
-            <a-col :span="6" class="cell">业态选择类型</a-col>
-            <a-col :span="6" class="cell">具体产品</a-col>
-            <a-col :span="6" class="cell">建筑面积(m²)</a-col>
-            <a-col :span="6" class="cell border-right">可售率</a-col>
-          </a-row>
-          <a-row v-for="(item, index) of form.itemBaseInfoForm.aboveGround" :key="'aboveGround' + index">
-            <a-col :span="6" class="cell">{{ item.type }}</a-col>
-            <a-col :span="6" class="cell">{{ item.product }}</a-col>
-            <a-col :span="6" class="cell">{{ item.space }}</a-col>
-            <a-col :span="6" class="cell border-right">{{ item.percent }}</a-col>
-          </a-row>
-          <a-row class="cell border-right">
-            <span class="table-title">地下各业态录入(选填)</span>
-          </a-row>
-          <a-row>
-            <a-col :span="6" class="cell">业态选择类型</a-col>
-            <a-col :span="6" class="cell">具体产品</a-col>
-            <a-col :span="6" class="cell">建筑面积(m²)</a-col>
-            <a-col :span="6" class="cell border-right">可售率</a-col>
-          </a-row>
-          <a-row class="border-bottom">
-            <div v-for="(item, index) of form.itemBaseInfoForm.underGround" :key="'underGround' + index">
-              <a-col :span="6" class="cell">{{ item.type }}</a-col>
-              <a-col :span="6" class="cell">{{ item.product }}</a-col>
-              <a-col :span="6" class="cell">{{ item.space }}</a-col>
-              <a-col :span="6" class="cell border-right">{{ item.percent }}</a-col>
-            </div>
-          </a-row>
+              <table class="mt-10" style="width: 100%" bordercolor="#e8e8e8" border="2">
+              <tr>
+                <th :rowspan="form.itemBaseInfoForm.itemBaseMode === 'occupy' ? 7 : 6">地上指标</th>
+                <th>{{ form.itemBaseInfoForm.itemBaseMode === 'occupy' ? '地上建筑面积（m²）' : '经营占地面积（m²）'}}</th>
+                <td style="background-color: #fafafa; cursor:auto">
+                  <span>
+                    {{ spaceComputed | filterUndefined }}
+                  </span>
+                </td>
+                <th>综合容积率</th>
+                <td>
+                  <span>
+                    {{ form.itemBaseInfoForm.comprehensiveFAR | filterUndefined }}
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <th>{{ form.itemBaseInfoForm.itemBaseMode === 'occupy' ? '其中——住宅建筑面积（m²）' : '其中——住宅占地面积（m²）'}}</th>
+                <td>
+                  <span>
+                    {{ form.itemBaseInfoForm.apartmentSpace | filterUndefined }}
+                  </span>
+                </td>
+                <th>住宅容积率</th>
+                <td>
+                  <span>
+                    {{ form.itemBaseInfoForm.apartmentFAR | filterUndefined }}
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <th>{{ form.itemBaseInfoForm.itemBaseMode === 'occupy' ? '其中——商业建筑面积（m²）' : '其中——商业占地面积（m²）'}}</th>
+                <td>
+                  <span>
+                    {{ form.itemBaseInfoForm.businessSpace | filterUndefined }}
+                  </span>
+                </td>
+                <th>商业容积率</th>
+                <td>
+                  <span>
+                    {{ form.itemBaseInfoForm.businessFAR | filterUndefined }}
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <th>{{ form.itemBaseInfoForm.itemBaseMode === 'occupy' ? '其中——办公建筑面积（m²）' : '其中——办公占地面积（m²）'}}</th>
+                <td>
+                  <span>
+                    {{ form.itemBaseInfoForm.officeSpace | filterUndefined }}
+                  </span>
+                </td>
+                <th>办公容积率</th>
+                <td>
+                  <span>
+                    {{ form.itemBaseInfoForm.officeFAR | filterUndefined }}
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <th>{{ form.itemBaseInfoForm.itemBaseMode === 'occupy' ? '其中——其他建筑面积（m²）' : '其中——其他占地面积（m²）'}}</th>
+                <td>
+                  <span>
+                    {{ form.itemBaseInfoForm.otherSpace | filterUndefined }}
+                  </span>
+                </td>
+                <th>其他容积率</th>
+                <td>
+                  <span>
+                    {{ form.itemBaseInfoForm.otherFAR | filterUndefined }}
+                  </span>
+                </td>
+              </tr>
+              <tr v-if="form.itemBaseInfoForm.itemBaseMode === 'use'">
+                <th>地上建筑面积合计（m²）</th>
+                <td style="background-color: #fafafa; cursor:auto" colspan="3">
+                  <span>
+                    {{ (spaceComputed * form.itemBaseInfoForm.comprehensiveFAR ) | filterUndefined }}
+                  </span>
+                </td>
+              </tr>
+              <tr v-if="form.itemBaseInfoForm.itemBaseMode === 'occupy'">
+                <th>经营占地面积（m²）</th>
+                <td style="background-color: #fafafa; cursor:auto" colspan="3">
+                  <span>
+                    {{ (spaceComputed / form.itemBaseInfoForm.comprehensiveFAR ) | filterUndefined }}
+                  </span>
+                </td>
+              </tr>
+              <tr v-if="form.itemBaseInfoForm.itemBaseMode === 'occupy'">
+                <th>经营占地面积（亩）</th>
+                <td style="background-color: #fafafa; cursor:auto" colspan="3">
+                  <span>
+                    {{ (spaceComputed / form.itemBaseInfoForm.comprehensiveFAR * 0.0015 ) | filterUndefined }}
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <th>地下指标</th>
+                <th>地下建筑面积合计（m²）</th>
+                <td colspan="3">
+                  <span>
+                    {{ form.itemBaseInfoForm.underGroundSpace | filterUndefined }}
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <th>总指标</th>
+                <th>总建筑面积（m²）</th>
+                <td style="background-color: #fafafa; cursor:auto" colspan="3">
+                  <span v-if="form.itemBaseInfoForm.itemBaseMode === 'use'">
+                    {{ (form.itemBaseInfoForm.underGroundSpace - '' + spaceComputed * form.itemBaseInfoForm.comprehensiveFAR) | filterUndefined }}
+                  </span>
+                  <span v-else>
+                    {{ (form.itemBaseInfoForm.underGroundSpace - '' + spaceComputed) | filterUndefined }}
+                  </span>
+                </td>
+              </tr>
+            </table>
 
           </a-col>
 
@@ -281,7 +332,7 @@
             <a-row class="mt-20">
               <h2 style="font-weight: bolder">项目股东信息:</h2>
               <a-col style="font-size: 14px" v-for="(shareHolder, index) of form.itemBaseInfoForm.shareHolders" :key="'股东' + (index + 1) + '名称'" :span="8">
-                {{ shareHolder.name + ' ' + shareHolder.percent + '%' }}
+                {{ shareHolder.name }}
               </a-col>
               <a-col style="font-size: 14px" v-if="form.itemBaseInfoForm.shareHolders.length === 0">
                 暂无股东信息
@@ -291,6 +342,7 @@
             <a-row class="mt-20">
               <h4 style="font-weight: bolder; display: inline-block">交易中对价金额: {{ form.totalTransactionAmount }} 万元</h4>
               <h4 style="font-weight: bolder; display: inline-block; margin-left: 100px">已投入有票成本费: {{ form.investAmount }} 万元</h4>
+              <h4 style="font-weight: bolder; display: inline-block; margin-left: 100px">其中，土地成本合计: {{ form.landAmount }} 万元</h4>
               <h4 style="font-weight: bolder">土地成本合计: <span class="blue-number">{{ computedTotalFee }}</span> 万元</h4>
             </a-row>
 
@@ -352,6 +404,24 @@ export default {
         if (this.form.progressForm.others[key].status) temp.push(this.form.progressForm.others[key])
       }
       return temp
+    },
+    spaceComputed: {
+      get: function () {
+        let res = 0
+        if (this.form.itemBaseInfoForm.apartmentSpace) {
+          res += this.form.itemBaseInfoForm.apartmentSpace - ''
+        }
+        if (this.form.itemBaseInfoForm.businessSpace) {
+          res += this.form.itemBaseInfoForm.businessSpace - ''
+        }
+        if (this.form.itemBaseInfoForm.officeSpace) {
+          res += this.form.itemBaseInfoForm.officeSpace - ''
+        }
+        if (this.form.itemBaseInfoForm.otherSpace) {
+          res += this.form.itemBaseInfoForm.otherSpace - ''
+        }
+        return res
+      }
     },
     computedTotalFee: {
       get: function () {
@@ -518,4 +588,14 @@ export default {
 .selected {
   color: #40a9ff;
 }
+
+th {
+  padding: 10px;
+  background-color: #fafafa;
+}
+
+td {
+  padding: 10px;
+}
+
 </style>

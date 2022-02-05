@@ -13,12 +13,16 @@ export default {
   getUserInfo () {
     return ajax(rootApi, 'get')
   },
-  getUsers (pageSize = 20, pageIndex = 1) {
+  getUsers (pageSize = 20, pageIndex = 1, keywords) {
+    let params = {
+      pageSize: pageSize,
+      pageIndex: pageIndex
+    }
+    if (keywords) {
+      params['keywords'] = keywords
+    }
     return ajax(rootApi + 'list/', 'get', {
-      params: {
-        pageSize: pageSize,
-        pageIndex: pageIndex
-      }
+      params
     })
   },
   deleteUser (userID) {

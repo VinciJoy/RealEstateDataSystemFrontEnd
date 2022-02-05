@@ -275,74 +275,176 @@
             </table>
           </a-row>
 
-<!--          <a-row class="cell border-right">-->
-<!--            <span class="table-title">项目基本面录入(必填)</span>-->
-<!--            <span class="table-edit" @click="showItemBaseInfoModal">编辑</span>-->
-<!--          </a-row>-->
-<!--          <a-row>-->
-<!--            <a-col :span="6" class="cell">经营占地面积(m²)</a-col>-->
-<!--            <a-col :span="6" class="cell">{{ form.itemBaseInfoForm.space | filterUndefined }}</a-col>-->
-<!--            <a-col :span="6" class="cell">综合容积率</a-col>-->
-<!--            <a-col :span="6" class="cell border-right">{{ form.itemBaseInfoForm.comprehensiveFAR | filterUndefined }}</a-col>-->
-<!--          </a-row>-->
-<!--          <a-row>-->
-<!--            <a-col :span="6" class="cell">其中——住宅占地面积(m²)</a-col>-->
-<!--            <a-col :span="6" class="cell">{{ form.itemBaseInfoForm.apartmentSpace | filterUndefined }}</a-col>-->
-<!--            <a-col :span="6" class="cell">住宅容积率</a-col>-->
-<!--            <a-col :span="6" class="cell border-right">{{ form.itemBaseInfoForm.apartmentFAR | filterUndefined }}</a-col>-->
-<!--          </a-row>-->
-<!--          <a-row>-->
-<!--            <a-col :span="6" class="cell">其中——商业占地面积(m²)</a-col>-->
-<!--            <a-col :span="6" class="cell">{{ form.itemBaseInfoForm.businessSpace | filterUndefined }}</a-col>-->
-<!--            <a-col :span="6" class="cell">商业容积率</a-col>-->
-<!--            <a-col :span="6" class="cell border-right">{{ form.itemBaseInfoForm.businessFAR | filterUndefined }}</a-col>-->
-<!--          </a-row>-->
-<!--          <a-row>-->
-<!--            <a-col :span="6" class="cell">其中——办公占地面积(m²)</a-col>-->
-<!--            <a-col :span="6" class="cell">{{ form.itemBaseInfoForm.officeSpace | filterUndefined }}</a-col>-->
-<!--            <a-col :span="6" class="cell">办公容积率</a-col>-->
-<!--            <a-col :span="6" class="cell border-right">{{ form.itemBaseInfoForm.officeFAR | filterUndefined }}</a-col>-->
-<!--          </a-row>-->
-<!--          <a-row type="flex">-->
-<!--            <a-col :span="6" class="cell">其中——其他类占地面积(m²)，内容细项可继续增加，增加细项名称自定义，但合计等于其他类。</a-col>-->
-<!--            <a-col :span="6" class="cell">{{ form.itemBaseInfoForm.otherSpace | filterUndefined }}</a-col>-->
-<!--            <a-col :span="6" class="cell">其中容积率</a-col>-->
-<!--            <a-col :span="6" class="cell border-right">{{ form.itemBaseInfoForm.otherFAR | filterUndefined }}</a-col>-->
-<!--          </a-row>-->
-<!--          <a-row class="cell border-right">-->
-<!--            <span class="table-title">地上各业态录入(选填)</span>-->
-<!--            <span class="table-edit" @click="showAboveGroundModal">添加</span>-->
-<!--          </a-row>-->
-<!--          <a-row>-->
-<!--            <a-col :span="6" class="cell">业态选择类型</a-col>-->
-<!--            <a-col :span="6" class="cell">具体产品</a-col>-->
-<!--            <a-col :span="6" class="cell">建筑面积(m²)</a-col>-->
-<!--            <a-col :span="6" class="cell border-right">可售率</a-col>-->
-<!--          </a-row>-->
-<!--          <a-row v-for="(item, index) of form.itemBaseInfoForm.aboveGround" :key="'aboveGround' + index">-->
-<!--            <a-col :span="6" class="cell">{{ item.type }}</a-col>-->
-<!--            <a-col :span="6" class="cell">{{ item.product }}</a-col>-->
-<!--            <a-col :span="6" class="cell">{{ item.space }}</a-col>-->
-<!--            <a-col :span="6" class="cell border-right">{{ item.percent }}</a-col>-->
-<!--          </a-row>-->
-<!--          <a-row class="cell border-right">-->
-<!--            <span class="table-title">地下各业态录入(选填)</span>-->
-<!--            <span class="table-edit" @click="showUnderGroundModal">添加</span>-->
-<!--          </a-row>-->
-<!--          <a-row>-->
-<!--            <a-col :span="6" class="cell">业态选择类型</a-col>-->
-<!--            <a-col :span="6" class="cell">具体产品</a-col>-->
-<!--            <a-col :span="6" class="cell">建筑面积(m²)</a-col>-->
-<!--            <a-col :span="6" class="cell border-right">可售率</a-col>-->
-<!--          </a-row>-->
-<!--          <a-row class="border-bottom">-->
-<!--            <div v-for="(item, index) of form.itemBaseInfoForm.underGround" :key="'underGround' + index">-->
-<!--              <a-col :span="6" class="cell">{{ item.type }}</a-col>-->
-<!--              <a-col :span="6" class="cell">{{ item.product }}</a-col>-->
-<!--              <a-col :span="6" class="cell">{{ item.space }}</a-col>-->
-<!--              <a-col :span="6" class="cell border-right">{{ item.percent }}</a-col>-->
-<!--            </div>-->
-<!--          </a-row>-->
+          <a-row class="mt-20">
+            <p class="input-tag">地上业态产品详细指标填写(选填)</p>
+
+            <table class="mt-10" style="width: 100%" bordercolor="#e8e8e8" border="2">
+              <tr>
+                <th>指标分类</th>
+                <th>业态选择</th>
+                <th>具体产品</th>
+                <th>建筑面积（m²）</th>
+              </tr>
+              <tr>
+                <th rowspan="100">
+                  地上业态
+                </th>
+              </tr>
+
+              <template v-for="(item, index) of form.itemBaseInfoForm.aboveGround">
+                  <tr>
+                    <th :rowspan="item.products.length  > 1 ? (item.products.length + 2) : 2">
+                      <span class="clickable-txt" @click="editAboveGroundTypeIndex = index" v-if="editAboveGroundTypeIndex !== index">
+                        {{ item.type ? item.type : '请点击选择业态' }}
+                      </span>
+                      <span v-else>
+                        <a-select :default-open="true" @blur="editAboveGroundTypeIndex = ''" default-value="请点击选择业态" v-model="item.type" style="width: 200px">
+                          <a-select-option v-for="op in aboveGroundTypes" :key="op" :value="op">
+                            {{ op }}
+                          </a-select-option>
+                        </a-select>
+                      </span>
+                      <span @click="removeAboveGroundItem(index)" class="clickable-txt">
+                        <a-icon type="minus" /> 删除
+                      </span>
+                    </th>
+
+                    <template v-if="item.products.length === 1">
+                      <th>
+                        <span class="clickable-txt" @click="editAboveGroundProductIndex = 'aboveGround' + index + 'product' + 0" v-if="editAboveGroundProductIndex !== 'aboveGround' + index + 'product' + 0">
+                          {{ item.products[0].name ? item.products[0].name : '请点击选择具体产品' }}
+                        </span>
+                        <span v-else>
+                          <a-select :default-open="true" @blur="editAboveGroundProductIndex = ''" default-value="请点击选择具体产品" v-model="item.products[0].name" style="width: 200px">
+                            <a-select-option v-for="op in aboveGroundProducts[item.type]" :key="op" :value="op">
+                              {{ op }}
+                            </a-select-option>
+                          </a-select>
+                        </span>
+                        <span @click="removeAboveGroundProduct(index, 0)" class="clickable-txt">
+                          <a-icon type="minus" /> 删除
+                        </span>
+                      </th>
+                      <td>
+                        <div @click="editAboveGroundProductSpaceIndex = 'aboveGround' + index + 'product' + 0" v-if="editAboveGroundProductSpaceIndex !== 'aboveGround' + index + 'product' + 0">
+                          {{ item.products[0].space }}
+                        </div>
+                        <a-input v-else @blur="editAboveGroundProductSpaceIndex = ''" type="number" v-model="item.products[0].space"></a-input>
+                      </td>
+                    </template>
+
+                      <tr v-if="item.products.length > 1" v-for="(product, i) of item.products" :key="'aboveGround' + index + 'product' + i">
+                        <th>
+                          <span class="clickable-txt" @click="editAboveGroundProductIndex = 'aboveGround' + index + 'product' + i" v-if="editAboveGroundProductIndex !== 'aboveGround' + index + 'product' + i">
+                            {{ item.products[i].name ? item.products[i].name : '请点击选择具体产品' }}
+                          </span>
+                          <span v-else>
+                            <a-select :default-open="true" @blur="editAboveGroundProductIndex = ''" default-value="请点击选择具体产品" v-model="item.products[i].name" style="width: 200px">
+                              <a-select-option v-for="op in aboveGroundProducts[item.type]" :key="op" :value="op">
+                                {{ op }}
+                              </a-select-option>
+                            </a-select>
+                          </span>
+                          <span @click="removeAboveGroundProduct(index, i)" class="clickable-txt">
+                            <a-icon type="minus" /> 删除
+                          </span>
+                        </th>
+                        <td>
+                        <div @click="editAboveGroundProductSpaceIndex = 'aboveGround' + index + 'product' + i" v-if="editAboveGroundProductSpaceIndex !== 'aboveGround' + index + 'product' + i">
+                          {{ product.space }}
+                        </div>
+                        <a-input v-else @blur="editAboveGroundProductSpaceIndex = ''" type="number" v-model="product.space"></a-input>
+                      </td>
+                      </tr>
+
+                <template>
+                      <th @click="item.products.push({
+                        name: null,
+                        space: 0
+                        })" class="clickable-txt"
+                          style="text-align: center"
+                          colspan="2"><a-icon type="plus" /> 添加产品</th>
+                    </template>
+                  </tr>
+                </template>
+
+              <template>
+                <tr>
+                  <th @click="form.itemBaseInfoForm.aboveGround.push({
+                  type: null,
+                  products: []
+                  })" class="clickable-txt" style="text-align: center" colspan="3">
+                    <a-icon type="plus" /> 添加地上业态
+                  </th>
+                </tr>
+              </template>
+
+              <tr>
+                <th colspan="2">地上业态指标面积合计（m²）</th>
+                <td> {{ computedAboveSpace }} </td>
+              </tr>
+            </table>
+          </a-row>
+
+          <a-row class="mt-20">
+            <p class="input-tag">地下业态产品详细指标填写(选填)</p>
+
+            <table class="mt-10" style="width: 100%" bordercolor="#e8e8e8" border="2">
+              <tr>
+                <th>指标分类</th>
+                <th>具体产品</th>
+                <th>建筑面积（m²）</th>
+              </tr>
+              <tr>
+                <th rowspan="100">
+                  地下业态
+                </th>
+              </tr>
+
+
+              <template v-for="(item, index) of form.itemBaseInfoForm.underGround[0].products">
+                <tr>
+                  <th>
+                    <span class="clickable-txt" @click="editUnderGroundTypeIndex = index" v-if="editUnderGroundTypeIndex !== index">
+                      {{ item.name ? item.name : '请点击选择具体产品' }}
+                    </span>
+                    <span v-else>
+                      <a-select :default-open="true" @blur="editUnderGroundTypeIndex = ''" default-value="请点击选择业态" v-model="item.name" style="width: 200px">
+                        <a-select-option v-for="op in underGroundTypes" :key="op" :value="op">
+                          {{ op }}
+                        </a-select-option>
+                      </a-select>
+                    </span>
+                    <span @click="removeAboveGroundItem(index)" class="clickable-txt">
+                      <a-icon type="minus" /> 删除
+                    </span>
+                  </th>
+                  <td>
+                    <div @click="editUnderGroundProductSpaceIndex = 'underGround' + 0 + 'product' + index" v-if="editUnderGroundProductSpaceIndex !== 'underGround' + 0 + 'product' + index">
+                      {{ item.space }}
+                    </div>
+                    <a-input v-else @blur="editUnderGroundProductSpaceIndex = ''" type="number" v-model="item.space"></a-input>
+                  </td>
+                </tr>
+              </template>
+
+              <template>
+                <tr>
+                  <th @click="form.itemBaseInfoForm.underGround[0].products.push({
+                    name: null,
+                    space: 0
+                  })" class="clickable-txt" style="text-align: center" colspan="2">
+                    <a-icon type="plus" /> 添加地下业态
+                  </th>
+                </tr>
+              </template>
+
+              <tr>
+                <th>地下业态指标面积合计（m²）</th>
+                <td> {{ computedUnderSpace }} </td>
+              </tr>
+            </table>
+          </a-row>
 
           <a-row class="mt-20">
             <p class="input-tag">项目现状: </p>
@@ -526,53 +628,22 @@
             </a-modal>
           </a-row>
 
-          <a-row>
-            <p class="input-tag">项目关键审查信息录入(选填)</p>
-            <a-row>
-              <a-col :span="8" class="cell table-title">项目关键审查信息类型</a-col>
-              <a-col :span="8" class="cell table-title">具体内容举例</a-col>
-              <a-col :span="8" class="cell table-title border-right">本项目情况</a-col>
-            </a-row>
-            <a-row>
-              <a-col :span="8" class="cell">资产抵押</a-col>
-              <a-col :span="8" class="cell">本地块目前是抵押状态</a-col>
-              <a-col :span="8" class="cell border-right">
-                <a-radio-group v-model="form.itemBaseInfoForm.assetMortgage">
-                  <a-radio :value="true">
-                    是
-                  </a-radio>
-                  <a-radio :value="false">
-                    否
-                  </a-radio>
-                </a-radio-group>
-              </a-col>
-            </a-row>
-            <a-row class="border-bottom">
-              <a-col :span="8" class="cell">股权质押</a-col>
-              <a-col :span="8" class="cell">地块所属项目公司股权被质押</a-col>
-              <a-col :span="8" class="cell border-right">
-                <a-radio-group v-model="form.itemBaseInfoForm.stockMortgage">
-                  <a-radio :value="true">
-                    是
-                  </a-radio>
-                  <a-radio :value="false">
-                    否
-                  </a-radio>
-                </a-radio-group>
-              </a-col>
-            </a-row>
-          </a-row>
+
 
           <a-row class="mt-20">
             <p class="input-tag">项目进度:</p>
-            <a-tabs type="card">
-              <a-tab-pane v-if="nodeVisible" key="1" tab="一级开发节点">
+            <a-radio-group v-model="form.showNodeIndex">
+              <a-radio class="mt-20" style="display: block" :value="1">按一级开发节点</a-radio>
+              <a-radio class="mt-20" style="display: block" :value="2">按二级开发节点</a-radio>
+              <a-radio class="mt-20" style="display: block" :value="3">其他类项目节点</a-radio>
+            </a-radio-group>
+              <div v-if="nodeVisible && (form.showNodeIndex === 1)">
                 <div class="mt-20" v-for="node in firstNode" :key="node.index">
                   <a-radio @click.prevent="changeStatus('first', node.index)" v-model="form.progressForm.first[node.index].status">{{ node.name }}</a-radio>
                   <a-button v-if="form.progressForm.first[node.index].status" @click="showUploadModal('first', node.index)" type="primary" style="float: right; width: 100px" size="small">上传证照</a-button>
                 </div>
-              </a-tab-pane>
-              <a-tab-pane key="2" tab="二级开发节点">
+              </div>
+              <div v-if="nodeVisible && (form.showNodeIndex === 2)">
                 <a-radio-group v-model="secondNodeStatus">
                   <a-radio class="mt-20" style="display: block" :value="1">未出让</a-radio>
                   <a-radio class="mt-20" style="display: block" :value="2">已出让</a-radio>
@@ -581,8 +652,8 @@
                   <a-radio @click.prevent="changeStatus('second', node.index)" v-model="form.progressForm.second[node.index].status">{{ node.name }}</a-radio>
                   <a-button v-if="form.progressForm.second[node.index].status" @click="showUploadModal('second', node.index)" type="primary" style="float: right; width: 100px" size="small">上传证照</a-button>
                 </div>
-              </a-tab-pane>
-              <a-tab-pane key="3" tab="其他类项目节点">
+              </div>
+              <div v-if="nodeVisible && (form.showNodeIndex === 3)">
                 <a-form-model
                   ref="form.progressForm.others"
                   :model="form.progressForm.others"
@@ -618,8 +689,7 @@
                     </a-button>
                   </a-form-model-item>
                 </a-form-model>
-              </a-tab-pane>
-            </a-tabs>
+              </div>
 
             <a-modal width="80%" :visible="uploadVisible" :footer="null" @cancel="uploadVisible = false">
               <a-upload
@@ -639,65 +709,28 @@
             </a-modal>
           </a-row>
 
+
+
           <a-row class="mt-20">
-            <p class="input-tag">项目股东信息录入:</p>
-            <a-form-model
-              ref="form.itemBaseInfoForm"
-              :model="form.itemBaseInfoForm"
-              :label-col="{ span: 6 }"
-              :wrapper-col="{ span: 15 }"
-            >
-              <div v-for="(shareHolder, index) in form.itemBaseInfoForm.shareHolders" :key="shareHolder.key">
-                <a-form-model-item
-                  style="width: 40%; display: inline-block"
-                  :label="'股东' + (index + 1) + '名称'"
-                  :prop="'shareHolders.' + index + '.name'"
-                  :rules="{
-                    required: true,
-                    message: '股东名称不能为空！',
-                    trigger: 'blur',
-                  }"
-                >
-                  <a-input
-                    v-model="shareHolder.name"
-                  />
-                </a-form-model-item>
-
-                <a-form-model-item
-                  style="width: 40%; display: inline-block"
-                  :label="'股东' + (index + 1) + '股权占比'"
-                  :prop="'shareHolders.' + index + '.percent'"
-                  :rules="{
-                    required: true,
-                    message: '股东股权占比不能为空！',
-                    trigger: 'blur',
-                  }"
-                >
-                  <a-input
-                    v-model="shareHolder.percent"
-                  />
-                </a-form-model-item>
-                <a-icon
-                  v-if="form.itemBaseInfoForm.shareHolders.length > 0"
-                    class="dynamic-delete-button"
-                  type="minus-circle-o"
-                  @click="removeShareHolder(shareHolder)"
-                />
-              </div>
-              <a-form-model-item style="margin-left: 20%">
-                <a-button type="dashed" style="width: 100%" @click="addShareHolder">
-                  <a-icon type="plus" /> 增 加 股 东
-                </a-button>
-              </a-form-model-item>
-            </a-form-model>
-          </a-row>
-
-          <a-row>
             <p class="input-tag">项目交易价格:</p>
             <a-col>
               交易总对价金额
               <a-input style="width: 200px; margin-left: 20px;margin-right: 20px" type="number" v-model="form.totalTransactionAmount"></a-input>
               万元
+            </a-col>
+            <a-col>
+              <div class="mt-20">
+                已投入有票成本费
+                <a-input style="width: 200px; margin-left: 20px;margin-right: 20px" type="number" v-model="form.investAmount"></a-input>
+                万元
+              </div>
+            </a-col>
+            <a-col>
+              <div class="mt-20">
+                其中，土地成本合计
+                <a-input style="width: 200px; margin-left: 20px;margin-right: 20px" type="number" v-model="form.landAmount"></a-input>
+                万元
+              </div>
             </a-col>
             <a-col class="mt-10">
               <h3>土地成本合计</h3>
@@ -721,11 +754,6 @@
               <a-col :span="6"><span class="table-edit" style="float: none; padding-left: 5px" @click="showLandCostModal">编辑</span><div style="float: right">合计： <span class="blue-number">
                 {{ computedTotalFee }}
               </span> 万元</div></a-col>
-            </a-col>
-            <a-col :span="24" class="mt-20">
-              已投入有票成本费
-              <a-input style="width: 200px; margin-left: 20px;margin-right: 20px" type="number" v-model="form.investAmount"></a-input>
-              万元
             </a-col>
           </a-row>
 
@@ -819,6 +847,120 @@
           </a-row>
 
           <a-row class="mt-20">
+            <a-upload-dragger
+              name="file"
+              :file-list="form.fileList"
+              :multiple="true"
+              :withCredentials="true"
+              :action="uploadFileURL"
+              @change="handleChange($event, 'form','fileList', 'file')"
+            >
+              <p class="ant-upload-drag-icon">
+                <a-icon type="inbox" />
+              </p>
+              <p class="ant-upload-text">
+                上传项目相关说明及文档
+              </p>
+            </a-upload-dragger>
+          </a-row>
+
+          <a-row class="mt-20">
+            <p class="input-tag">项目公司名称:</p>
+            <a-form-model
+              ref="form.itemBaseInfoForm"
+              :model="form.itemBaseInfoForm"
+              :label-col="{ span: 6 }"
+              :wrapper-col="{ span: 15 }"
+            >
+              <div v-for="(shareHolder, index) in form.itemBaseInfoForm.shareHolders" :key="shareHolder.key">
+                <a-form-model-item
+                  style="width: 40%; display: inline-block"
+                  :label="'股东' + (index + 1) + '名称'"
+                  :prop="'shareHolders.' + index + '.name'"
+                  :rules="{
+                    required: true,
+                    message: '股东名称不能为空！',
+                    trigger: 'blur',
+                  }"
+                >
+                  <a-input
+                    v-model="shareHolder.name"
+                  />
+                </a-form-model-item>
+
+<!--                <a-form-model-item-->
+<!--                  style="width: 40%; display: inline-block"-->
+<!--                  :label="'股东' + (index + 1) + '股权占比'"-->
+<!--                  :prop="'shareHolders.' + index + '.percent'"-->
+<!--                  :rules="{-->
+<!--                    required: true,-->
+<!--                    message: '股东股权占比不能为空！',-->
+<!--                    trigger: 'blur',-->
+<!--                  }"-->
+<!--                >-->
+<!--                  <a-input-->
+<!--                    v-model="shareHolder.percent"-->
+<!--                  />-->
+<!--                </a-form-model-item>-->
+                <a-icon
+                  v-if="form.itemBaseInfoForm.shareHolders.length > 0"
+                    class="dynamic-delete-button"
+                  type="minus-circle-o"
+                  @click="removeShareHolder(shareHolder)"
+                />
+              </div>
+              <a-form-model-item style="margin-left: 20%">
+                <a-button type="dashed" style="width: 100%" @click="addShareHolder">
+                  <a-icon type="plus" /> 增 加 股 东
+                </a-button>
+              </a-form-model-item>
+            </a-form-model>
+          </a-row>
+
+          <a-row class="mt-20">
+            <p class="input-tag">项目抵押情况(选填)</p>
+            <a-row>
+              <a-col :span="8" class="cell table-title">项目关键审查信息类型</a-col>
+              <a-col :span="8" class="cell table-title">具体内容举例</a-col>
+              <a-col :span="8" class="cell table-title border-right">本项目情况</a-col>
+            </a-row>
+            <a-row>
+              <a-col :span="8" class="cell">资产抵押</a-col>
+              <a-col :span="8" class="cell">本地块目前是抵押状态</a-col>
+              <a-col :span="8" class="cell border-right">
+                <a-radio-group v-model="form.itemBaseInfoForm.assetMortgage">
+                  <a-radio :value="true">
+                    是
+                  </a-radio>
+                  <a-radio :value="false">
+                    否
+                  </a-radio>
+                  <a-radio :value="null">
+                    未选择
+                  </a-radio>
+                </a-radio-group>
+              </a-col>
+            </a-row>
+            <a-row class="border-bottom">
+              <a-col :span="8" class="cell">股权质押</a-col>
+              <a-col :span="8" class="cell">地块所属项目公司股权被质押</a-col>
+              <a-col :span="8" class="cell border-right">
+                <a-radio-group v-model="form.itemBaseInfoForm.stockMortgage">
+                  <a-radio :value="true">
+                    是
+                  </a-radio>
+                  <a-radio :value="false">
+                    否
+                  </a-radio>
+                  <a-radio :value="null">
+                    未选择
+                  </a-radio>
+                </a-radio-group>
+              </a-col>
+            </a-row>
+          </a-row>
+
+          <a-row class="mt-20">
             <a-button v-if="mode === 'create'" :disabled="!userInfo.ID" @click="showSubmitModal" type="primary">提 交 项 目 信 息</a-button>
             <a-button v-if="mode === 'edit'" :disabled="!userInfo.ID" @click="showSubmitModal" type="primary">修 改 项 目 信 息</a-button>
 
@@ -840,13 +982,16 @@
             </a-modal>
 
             <div style="margin-left: 20px; display: inline-block">
-              需要资金匹配：
-              <a-radio-group v-model="form.itemBaseInfoForm.assetMortgage">
+              资金匹配需求：(若本项目为开放股权、代建类项目，是否有资金匹配需求？)
+              <a-radio-group v-model="form.itemBaseInfoForm.financialMatch">
                 <a-radio :value="true">
                   是
                 </a-radio>
                 <a-radio :value="false">
                   否
+                </a-radio>
+                <a-radio :value="null">
+                  未选择
                 </a-radio>
               </a-radio-group>
             </div>
@@ -958,114 +1103,6 @@
         </div>
       </a-form-model>
     </a-modal>
-
-    <a-modal
-      width="80%"
-      :visible="aboveGroundModalVisible"
-      :closable="false"
-      :maskClosable="false"
-      @cancel="aboveGroundModalVisible=false"
-      @ok="addAboveGround"
-    >
-      <a-form-model
-        ref="tempAboveGroundForm"
-        :model="tempAboveGroundForm"
-        :label-col="{ span: 9 }"
-        :wrapper-col="{ span: 15 }"
-        :rules="aboveGroundRules"
-      >
-        <div class="modal-form-item-50-percent">
-          <a-form-model-item ref="type" label="业态选择类型" prop="type">
-            <a-select
-              v-model="tempAboveGroundForm.type"
-            >
-              <a-select-option @blur="itemTypeValid" v-for="aboveGroundType in aboveGroundTypes" :value="aboveGroundType" :key="aboveGroundType">
-                {{ aboveGroundType }}
-              </a-select-option>
-            </a-select>
-          </a-form-model-item>
-        </div>
-        <div class="modal-form-item-50-percent">
-          <a-form-model-item ref="product" label="具体产品" prop="product">
-            <a-input
-              v-model="tempAboveGroundForm.product"
-              type="number"
-            />
-          </a-form-model-item>
-        </div>
-
-        <div class="modal-form-item-50-percent">
-          <a-form-model-item ref="space" label="建筑面积(m²)" prop="space">
-            <a-input
-              v-model="tempAboveGroundForm.space"
-              type="number"
-            />
-          </a-form-model-item>
-        </div>
-        <div class="modal-form-item-50-percent">
-          <a-form-model-item ref="percent" label="可售率" prop="percent">
-            <a-input
-              v-model="tempAboveGroundForm.percent"
-              type="number"
-            />
-          </a-form-model-item>
-        </div>
-      </a-form-model>
-    </a-modal>
-
-    <a-modal
-      width="80%"
-      :visible="underGroundModalVisible"
-      :closable="false"
-      :maskClosable="false"
-      @cancel="underGroundModalVisible=false"
-      @ok="addUnderGround"
-    >
-      <a-form-model
-        ref="tempUnderGroundForm"
-        :model="tempUnderGroundForm"
-        :label-col="{ span: 9 }"
-        :wrapper-col="{ span: 15 }"
-        :rules="underGroundRules"
-      >
-        <div class="modal-form-item-50-percent">
-          <a-form-model-item ref="type" label="业态选择类型" prop="type">
-            <a-select
-              v-model="tempUnderGroundForm.type"
-            >
-              <a-select-option @blur="itemTypeValid" v-for="underGroundType in underGroundTypes" :value="underGroundType" :key="underGroundType">
-                {{ underGroundType }}
-              </a-select-option>
-            </a-select>
-          </a-form-model-item>
-        </div>
-        <div class="modal-form-item-50-percent">
-          <a-form-model-item ref="product" label="具体产品" prop="product">
-            <a-input
-              v-model="tempUnderGroundForm.product"
-              type="number"
-            />
-          </a-form-model-item>
-        </div>
-
-        <div class="modal-form-item-50-percent">
-          <a-form-model-item ref="space" label="建筑面积(m²)" prop="space">
-            <a-input
-              v-model="tempUnderGroundForm.space"
-              type="number"
-            />
-          </a-form-model-item>
-        </div>
-        <div class="modal-form-item-50-percent">
-          <a-form-model-item ref="percent" label="可售率" prop="percent">
-            <a-input
-              v-model="tempUnderGroundForm.percent"
-              type="number"
-            />
-          </a-form-model-item>
-        </div>
-      </a-form-model>
-    </a-modal>
 <!--    modal end-->
   </div>
 </template>
@@ -1087,8 +1124,11 @@ import {mapActions, mapGetters} from 'vuex'
 import userVerify from '../../components/userVerify'
 
 const underGroundTypes = [
-  '地下计容',
-  '地下不计容'
+  '非人防车位',
+  '人防车位',
+  '地下储藏室',
+  '地下设备用房',
+  '地下商业'
 ]
 
 const identities = [
@@ -1098,18 +1138,70 @@ const identities = [
   '项目介绍方'
 ]
 
+const aboveGroundProducts = {
+  '住宅-别墅类产品': [
+    '独栋别墅',
+    '双拼别墅',
+    '联排别墅',
+    '叠拼别墅',
+    '合院别墅'
+  ],
+  '住宅-多层类产品': [
+    '花园洋房（6-7F）',
+    '普通多层'
+  ],
+  '住宅-高层类产品': [
+    '小高层（7-11F）',
+    '中高层（12-18F）',
+    '高层（19-33F）',
+    '超高层（>34F）'
+  ],
+  '类住宅类产品': [
+    '酒店式公寓',
+    'LOFT 公寓'
+  ],
+  '商业类产品': [
+    '裙房类商业/展厅',
+    '商业街',
+    'MALL',
+    '商业独栋'
+  ],
+  '酒店类产品': [
+    '五星级酒店及以上',
+    '四星级酒店',
+    '其他酒店'
+  ],
+  '办公类产品': [
+    '办公会所/商务独栋',
+    '写字楼',
+    '公寓式办公/SOHO'
+  ],
+  '自持类产品': [
+    '自持住宅',
+    '自持商业',
+    '自持办公',
+    '自持酒店',
+    '其他自持'
+  ],
+  '配套配建类产品': [
+    '社区用房',
+    '物业用房',
+    '教育配建',
+    '市政共用',
+    '其他配建'
+  ]
+}
+
 const aboveGroundTypes = [
-  '地上计容—别墅类',
-  '地上计容—洋房',
-  '地上计容—小高层',
-  '地上计容-高层',
-  '地上计容-回迁住宅',
-  '地上计容—公寓类',
-  '地上计容—商业类',
-  '地上计容—办公楼',
-  '地上计容—酒店',
-  '地上计容—其他',
-  '地上不计容'
+  '住宅-别墅类产品',
+  '住宅-多层类产品',
+  '住宅-高层类产品',
+  '类住宅类产品',
+  '商业类产品',
+  '酒店类产品',
+  '办公类产品',
+  '自持类产品',
+  '配套配建类产品'
 ]
 
 const firstNode = [
@@ -1271,6 +1363,26 @@ export default {
         this.form.itemType = '自定义/' + val.trim()
       }
     },
+    computedAboveSpace: {
+      get: function () {
+        let res = 0
+        for (let item of this.form.itemBaseInfoForm.aboveGround) {
+          for (let product of item.products) {
+            res += product.space - ''
+          }
+        }
+        return res
+      }
+    },
+    computedUnderSpace: {
+      get: function () {
+        let res = 0
+        for (let item of this.form.itemBaseInfoForm.underGround[0].products) {
+          res += item.space - ''
+        }
+        return res
+      }
+    },
     spaceComputed: {
       get: function () {
         let res = 0
@@ -1314,6 +1426,12 @@ export default {
   },
   data () {
     return {
+      aboveGroundProducts: aboveGroundProducts,
+      editAboveGroundTypeIndex: '',
+      editUnderGroundTypeIndex: '',
+      editAboveGroundProductIndex: '',
+      editAboveGroundProductSpaceIndex: '',
+      editUnderGroundProductSpaceIndex: '',
       certificateForm: {
         certificatePicList: []
       },
@@ -1336,8 +1454,10 @@ export default {
       underGroundTypes: underGroundTypes,
       ITEM_TYPES: ITEM_TYPES,
       form: {
+        showNodeIndex: 0,
         totalTransactionAmount: 0,
         investAmount: 0,
+        landAmount: 0,
         place: [],
         spaceType: 'aboveGround',
         space: 0,
@@ -1379,13 +1499,20 @@ export default {
         itemBaseInfoForm: {
           itemBaseMode: 'use',
           aboveGround: [],
-          underGround: [],
-          assetMortgage: false,
-          stockMortgage: false,
+          underGround: [
+            {
+              type: null,
+              products: []
+            }
+          ],
+          assetMortgage: null,
+          financialMatch: null,
+          stockMortgage: null,
           shareHolders: []
         },
         landCostForm: {},
         landStatusPicList: [],
+        fileList: [],
         facilityPicList: [],
         coverPicList: [],
         effectPicList: [],
@@ -1402,6 +1529,7 @@ export default {
         }
       },
       uploadPicURL: '',
+      uploadFileURL: '',
       loading: false,
       previewVisible: false,
       previewImage: '',
@@ -1451,29 +1579,13 @@ export default {
           {required: true, message: '请输入可售率!', trigger: 'blur'}
         ]
       },
-      aboveGroundRules: {
-        type: [
-          {required: true, message: '请选择业态选择类型!', trigger: 'blur'}
-        ],
-        product: [
-          {required: true, message: '请输入具体产品', trigger: 'blur'}
-        ],
-        space: [
-          {required: true, message: '请输入建筑面积!', trigger: 'blur'}
-        ],
-        percent: [
-          {required: true, message: '请输入可售率!', trigger: 'blur'}
-        ]
-      },
       tempAboveGroundForm: {},
       tempUnderGroundForm: {},
       tempItemBaseInfoForm: {
       },
       tempLandCostForm: {},
       options: options,
-      aboveGroundModalVisible: false,
       itemBaseInfoModalVisible: false,
-      underGroundModalVisible: false,
       landCostModalVisible: false,
       submitModalVisible: false,
       countDown: 5,
@@ -1483,9 +1595,16 @@ export default {
   created () {
     this.init()
     this.uploadPicURL = process.env.API_ROOT + '/system/pics/'
+    this.uploadFileURL = process.env.API_ROOT + '/system/files/'
   },
   methods: {
     ...mapActions(['getUserInfo']),
+    removeAboveGroundProduct (itemIndex, productIndex) {
+      this.form.itemBaseInfoForm.aboveGround[itemIndex].products.splice(productIndex, 1)
+    },
+    removeAboveGroundItem (itemIndex) {
+      this.form.itemBaseInfoForm.aboveGround.splice(itemIndex, 1)
+    },
     init () {
       this.certificateForm = this.userInfo.certificate
       for (let node of this.firstNode) {
@@ -1530,6 +1649,14 @@ export default {
           }
           if (!temp.itemBaseInfoForm.itemBaseMode) {
             temp.itemBaseInfoForm.itemBaseMode = 'use'
+          }
+          if (!temp.itemBaseInfoForm.underGround || !temp.itemBaseInfoForm.underGround.length) {
+            temp.itemBaseInfoForm.underGround = [
+              {
+                type: null,
+                products: []
+              }
+            ]
           }
           temp.streetMap.keyword = ''
           if (!temp.coverPicList) {
@@ -1691,13 +1818,13 @@ export default {
 
       this.form.progressForm[node][index].picList = info.fileList
     },
-    async handleChange (info, form, list) {
+    async handleChange (info, form, list, type = 'pic') {
       if (info.fileList.length === 0) {
         this[form][list] = []
         return
       }
 
-      if (!info.fileList[info.fileList.length - 1].thumbUrl) {
+      if (type === 'pic' && !info.fileList[info.fileList.length - 1].thumbUrl) {
         info.fileList[info.fileList.length - 1].thumbUrl = await utils.getBase64(info.file.originFileObj)
       }
 
@@ -1723,30 +1850,6 @@ export default {
       }
       this.previewImage = (process.env.API_ROOT + '/system/pics/temp/' + file.uuid + '/') || file.preview
       this.previewVisible = true
-    },
-    showAboveGroundModal () {
-      this.tempAboveGroundForm = {}
-      this.aboveGroundModalVisible = true
-    },
-    showUnderGroundModal () {
-      this.tempUnderGroundForm = {}
-      this.underGroundModalVisible = true
-    },
-    addAboveGround () {
-      this.$refs.tempAboveGroundForm.validate(valid => {
-        if (valid) {
-          this.form.itemBaseInfoForm.aboveGround.push(utils.Copy(this.tempAboveGroundForm))
-          this.aboveGroundModalVisible = false
-        }
-      })
-    },
-    addUnderGround () {
-      this.$refs.tempUnderGroundForm.validate(valid => {
-        if (valid) {
-          this.form.itemBaseInfoForm.underGround.push(utils.Copy(this.tempUnderGroundForm))
-          this.underGroundModalVisible = false
-        }
-      })
     },
     saveItemBaseInfo () {
       this.$refs.tempItemBaseInfoForm.validate(valid => {
