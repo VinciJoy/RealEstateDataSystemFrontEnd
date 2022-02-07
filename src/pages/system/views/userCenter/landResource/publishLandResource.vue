@@ -117,12 +117,12 @@
               <a-row class="mt-20">
                 <a-button @click="removePolygonPoint('itemMap')" :disabled="form.itemMap.polygonPath.length === 0" type="primary">清 除 标 记</a-button>
               </a-row>
-              <a-row class="mt-20">
-                <a-button @click="addThreeCircle('itemMap')" :disabled="form.itemMap.polygonPath.length === 0" type="primary">周 边 三 公 里</a-button>
-              </a-row>
-              <a-row class="mt-20">
-                <a-button @click="addFiveCircle('itemMap')" :disabled="form.itemMap.polygonPath.length === 0" type="primary">周 边 五 公 里</a-button>
-              </a-row>
+<!--              <a-row class="mt-20">-->
+<!--                <a-button @click="addThreeCircle('itemMap')" :disabled="form.itemMap.polygonPath.length === 0" type="primary">周 边 三 公 里</a-button>-->
+<!--              </a-row>-->
+<!--              <a-row class="mt-20">-->
+<!--                <a-button @click="addFiveCircle('itemMap')" :disabled="form.itemMap.polygonPath.length === 0" type="primary">周 边 五 公 里</a-button>-->
+<!--              </a-row>-->
             </div>
           </a-row>
         </div>
@@ -294,11 +294,11 @@
               <template v-for="(item, index) of form.itemBaseInfoForm.aboveGround">
                   <tr>
                     <th :rowspan="item.products.length  > 1 ? (item.products.length + 2) : 2">
-                      <span class="clickable-txt" @click="editAboveGroundTypeIndex = index" v-if="editAboveGroundTypeIndex !== index">
+                      <span class="clickable-txt" @click="editAboveGroundType(index)" v-if="editAboveGroundTypeIndex !== index">
                         {{ item.type ? item.type : '请点击选择业态' }}
                       </span>
                       <span v-else>
-                        <a-select :default-open="true" @blur="editAboveGroundTypeIndex = ''" default-value="请点击选择业态" v-model="item.type" style="width: 200px">
+                        <a-select :ref="'editAboveGroundTypeIndex' + index" :default-open="true" @blur="editAboveGroundTypeIndex = ''" default-value="请点击选择业态" v-model="item.type" style="width: 200px">
                           <a-select-option v-for="op in aboveGroundTypes" :key="op" :value="op">
                             {{ op }}
                           </a-select-option>
@@ -311,11 +311,11 @@
 
                     <template v-if="item.products.length === 1">
                       <th>
-                        <span class="clickable-txt" @click="editAboveGroundProductIndex = 'aboveGround' + index + 'product' + 0" v-if="editAboveGroundProductIndex !== 'aboveGround' + index + 'product' + 0">
+                        <span class="clickable-txt" @click="editAboveGroundProduct('aboveGround' + index + 'product' + 0)" v-if="editAboveGroundProductIndex !== 'aboveGround' + index + 'product' + 0">
                           {{ item.products[0].name ? item.products[0].name : '请点击选择具体产品' }}
                         </span>
                         <span v-else>
-                          <a-select :default-open="true" @blur="editAboveGroundProductIndex = ''" default-value="请点击选择具体产品" v-model="item.products[0].name" style="width: 200px">
+                          <a-select :ref="'aboveGround' + index + 'product' + 0" :default-open="true" @blur="editAboveGroundProductIndex = ''" default-value="请点击选择具体产品" v-model="item.products[0].name" style="width: 200px">
                             <a-select-option v-for="op in aboveGroundProducts[item.type]" :key="op" :value="op">
                               {{ op }}
                             </a-select-option>
@@ -326,20 +326,20 @@
                         </span>
                       </th>
                       <td>
-                        <div @click="editAboveGroundProductSpaceIndex = 'aboveGround' + index + 'product' + 0" v-if="editAboveGroundProductSpaceIndex !== 'aboveGround' + index + 'product' + 0">
+                        <div @click="editAboveGroundProductSpace('aboveGround' + index + 'product' + 0)" v-if="editAboveGroundProductSpaceIndex !== 'aboveGround' + index + 'product' + 0">
                           {{ item.products[0].space }}
                         </div>
-                        <a-input v-else @blur="editAboveGroundProductSpaceIndex = ''" type="number" v-model="item.products[0].space"></a-input>
+                        <a-input :ref="'aboveGround' + index + 'product' + 0" v-else @blur="editAboveGroundProductSpaceIndex = ''" type="number" v-model="item.products[0].space"></a-input>
                       </td>
                     </template>
 
                       <tr v-if="item.products.length > 1" v-for="(product, i) of item.products" :key="'aboveGround' + index + 'product' + i">
                         <th>
-                          <span class="clickable-txt" @click="editAboveGroundProductIndex = 'aboveGround' + index + 'product' + i" v-if="editAboveGroundProductIndex !== 'aboveGround' + index + 'product' + i">
+                          <span class="clickable-txt" @click="editAboveGroundProduct('aboveGround' + index + 'product' + i)" v-if="editAboveGroundProductIndex !== 'aboveGround' + index + 'product' + i">
                             {{ item.products[i].name ? item.products[i].name : '请点击选择具体产品' }}
                           </span>
                           <span v-else>
-                            <a-select :default-open="true" @blur="editAboveGroundProductIndex = ''" default-value="请点击选择具体产品" v-model="item.products[i].name" style="width: 200px">
+                            <a-select :ref="'aboveGround' + index + 'product' + i" :default-open="true" @blur="editAboveGroundProductIndex = ''" default-value="请点击选择具体产品" v-model="item.products[i].name" style="width: 200px">
                               <a-select-option v-for="op in aboveGroundProducts[item.type]" :key="op" :value="op">
                                 {{ op }}
                               </a-select-option>
@@ -350,10 +350,10 @@
                           </span>
                         </th>
                         <td>
-                        <div @click="editAboveGroundProductSpaceIndex = 'aboveGround' + index + 'product' + i" v-if="editAboveGroundProductSpaceIndex !== 'aboveGround' + index + 'product' + i">
+                        <div @click="editAboveGroundProductSpace('aboveGround' + index + 'product' + i)" v-if="editAboveGroundProductSpaceIndex !== 'aboveGround' + index + 'product' + i">
                           {{ product.space }}
                         </div>
-                        <a-input v-else @blur="editAboveGroundProductSpaceIndex = ''" type="number" v-model="product.space"></a-input>
+                        <a-input :ref="'aboveGround' + index + 'product' + i" v-else @blur="editAboveGroundProductSpaceIndex = ''" type="number" v-model="product.space"></a-input>
                       </td>
                       </tr>
 
@@ -381,7 +381,7 @@
 
               <tr>
                 <th colspan="2">地上业态指标面积合计（m²）</th>
-                <td> {{ computedAboveSpace }} </td>
+                <th> {{ computedAboveSpace }} </th>
               </tr>
             </table>
           </a-row>
@@ -405,25 +405,25 @@
               <template v-for="(item, index) of form.itemBaseInfoForm.underGround[0].products">
                 <tr>
                   <th>
-                    <span class="clickable-txt" @click="editUnderGroundTypeIndex = index" v-if="editUnderGroundTypeIndex !== index">
+                    <span class="clickable-txt" @click="editUnderGroundType(index)" v-if="editUnderGroundTypeIndex !== index">
                       {{ item.name ? item.name : '请点击选择具体产品' }}
                     </span>
                     <span v-else>
-                      <a-select :default-open="true" @blur="editUnderGroundTypeIndex = ''" default-value="请点击选择业态" v-model="item.name" style="width: 200px">
+                      <a-select :ref="'editUnderGroundTypeIndex' + index" :default-open="true" @blur="editUnderGroundTypeIndex = ''" default-value="请点击选择业态" v-model="item.name" style="width: 200px">
                         <a-select-option v-for="op in underGroundTypes" :key="op" :value="op">
                           {{ op }}
                         </a-select-option>
                       </a-select>
                     </span>
-                    <span @click="removeAboveGroundItem(index)" class="clickable-txt">
+                    <span @click="removeUnderGroundItem(index)" class="clickable-txt">
                       <a-icon type="minus" /> 删除
                     </span>
                   </th>
                   <td>
-                    <div @click="editUnderGroundProductSpaceIndex = 'underGround' + 0 + 'product' + index" v-if="editUnderGroundProductSpaceIndex !== 'underGround' + 0 + 'product' + index">
+                    <div @click="editUnderGroundProductSpace('underGround' + 0 + 'product' + index)" v-if="editUnderGroundProductSpaceIndex !== 'underGround' + 0 + 'product' + index">
                       {{ item.space }}
                     </div>
-                    <a-input v-else @blur="editUnderGroundProductSpaceIndex = ''" type="number" v-model="item.space"></a-input>
+                    <a-input :ref="'underGround' + 0 + 'product' + index" v-else @blur="editUnderGroundProductSpaceIndex = ''" type="number" v-model="item.space"></a-input>
                   </td>
                 </tr>
               </template>
@@ -441,7 +441,7 @@
 
               <tr>
                 <th>地下业态指标面积合计（m²）</th>
-                <td> {{ computedUnderSpace }} </td>
+                <th> {{ computedUnderSpace }} </th>
               </tr>
             </table>
           </a-row>
@@ -709,8 +709,6 @@
             </a-modal>
           </a-row>
 
-
-
           <a-row class="mt-20">
             <p class="input-tag">项目交易价格:</p>
             <a-col>
@@ -734,112 +732,82 @@
             </a-col>
             <a-col class="mt-10">
               <h3>土地成本合计</h3>
+
               <a-col :span="18">
-                <a-col :span="8" class="cell table-title">土地成本细项</a-col>
-                <a-col :span="8" class="cell table-title">总金额(万元)</a-col>
-                <a-col :span="8" class="cell table-title border-right">已支付金额(万元)</a-col>
-                <a-col :span="8" class="cell">土地出让金</a-col>
-                <a-col :span="8" class="cell">{{ form.landCostForm.landTransferFeeTotal | filterUndefined }}</a-col>
-                <a-col :span="8" class="cell border-right">{{ form.landCostForm.landTransferFeePaid | filterUndefined }}</a-col>
-                <a-col :span="8" class="cell">拆迁补偿款(前期成本)</a-col>
-                <a-col :span="8" class="cell">{{ form.landCostForm.compensationTotal | filterUndefined }}</a-col>
-                <a-col :span="8" class="cell border-right">{{ form.landCostForm.compensationPaid | filterUndefined }}</a-col>
-                <a-col :span="8" class="cell">契税、印花税</a-col>
-                <a-col :span="8" class="cell">{{ form.landCostForm.deedTaxTotal | filterUndefined }}</a-col>
-                <a-col :span="8" class="cell border-right">{{ form.landCostForm.deedTaxPaid | filterUndefined }}</a-col>
-                <a-col :span="8" class="cell border-bottom">市政配套费</a-col>
-                <a-col :span="8" class="cell border-bottom">{{ form.landCostForm.municipalSupportingFeeTotal | filterUndefined }}</a-col>
-                <a-col :span="8" class="cell border-bottom border-right">{{ form.landCostForm.municipalSupportingFeePaid | filterUndefined }}</a-col>
+                <table style="width: 100%" bordercolor="#e8e8e8" border="2">
+                <tr>
+                  <th>土地成本细项</th>
+                  <th>总金额(万元)</th>
+                  <th>已支付金额(万元)</th>
+                </tr>
+                  <tr>
+                    <th>土地出让金</th>
+                    <td>
+                      <div @click="editLandCostForm('landTransferFeeTotal')" v-if="editLandCostFormIndex !== 'landTransferFeeTotal'">
+                        {{ form.landCostForm.landTransferFeeTotal | filterUndefined }}
+                      </div>
+                      <a-input ref="landTransferFeeTotal" v-else @blur="editLandCostFormIndex = ''" type="number" v-model="form.landCostForm.landTransferFeeTotal"></a-input>
+                    </td>
+                    <td>
+                      <div @click="editLandCostForm('landTransferFeePaid')" v-if="editLandCostFormIndex !== 'landTransferFeePaid'">
+                        {{ form.landCostForm.landTransferFeePaid | filterUndefined }}
+                      </div>
+                      <a-input ref="landTransferFeePaid" v-else @blur="editLandCostFormIndex = ''" type="number" v-model="form.landCostForm.landTransferFeePaid"></a-input>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>拆迁补偿款(前期成本)</th>
+                    <td>
+                      <div @click="editLandCostForm('compensationTotal')" v-if="editLandCostFormIndex !== 'compensationTotal'">
+                        {{ form.landCostForm.compensationTotal | filterUndefined }}
+                      </div>
+                      <a-input ref="compensationTotal" v-else @blur="editLandCostFormIndex = ''" type="number" v-model="form.landCostForm.compensationTotal"></a-input>
+                    </td>
+                    <td>
+                      <div @click="editLandCostForm('compensationPaid')" v-if="editLandCostFormIndex !== 'compensationPaid'">
+                        {{ form.landCostForm.compensationPaid | filterUndefined }}
+                      </div>
+                      <a-input ref="compensationPaid" v-else @blur="editLandCostFormIndex = ''" type="number" v-model="form.landCostForm.compensationPaid"></a-input>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>契税、印花税</th>
+                    <td>
+                      <div @click="editLandCostForm('deedTaxTotal')" v-if="editLandCostFormIndex !== 'deedTaxTotal'">
+                        {{ form.landCostForm.deedTaxTotal | filterUndefined }}
+                      </div>
+                      <a-input ref="deedTaxTotal" v-else @blur="editLandCostFormIndex = ''" type="number" v-model="form.landCostForm.deedTaxTotal"></a-input>
+                    </td>
+                    <td>
+                      <div @click="editLandCostForm('deedTaxPaid')" v-if="editLandCostFormIndex !== 'deedTaxPaid'">
+                        {{ form.landCostForm.deedTaxPaid | filterUndefined }}
+                      </div>
+                      <a-input ref="deedTaxPaid" v-else @blur="editLandCostFormIndex = ''" type="number" v-model="form.landCostForm.deedTaxPaid"></a-input>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>市政配套费</th>
+                    <td>
+                      <div @click="editLandCostForm('municipalSupportingFeeTotal')" v-if="editLandCostFormIndex !== 'municipalSupportingFeeTotal'">
+                        {{ form.landCostForm.municipalSupportingFeeTotal | filterUndefined }}
+                      </div>
+                      <a-input ref="municipalSupportingFeeTotal" v-else @blur="editLandCostFormIndex = ''" type="number" v-model="form.landCostForm.municipalSupportingFeeTotal"></a-input>
+                    </td>
+                    <td>
+                      <div @click="editLandCostForm('municipalSupportingFeePaid')" v-if="editLandCostFormIndex !== 'municipalSupportingFeePaid'">
+                        {{ form.landCostForm.municipalSupportingFeePaid | filterUndefined }}
+                      </div>
+                      <a-input ref="municipalSupportingFeePaid" v-else @blur="editLandCostFormIndex = ''" type="number" v-model="form.landCostForm.municipalSupportingFeePaid"></a-input>
+                    </td>
+                  </tr>
+              </table>
               </a-col>
-              <a-col :span="6"><span class="table-edit" style="float: none; padding-left: 5px" @click="showLandCostModal">编辑</span><div style="float: right">合计： <span class="blue-number">
+
+              <a-col :span="6"><div style="float: right">合计： <span class="blue-number">
                 {{ computedTotalFee }}
               </span> 万元</div></a-col>
             </a-col>
           </a-row>
-
-          <a-modal
-            width="80%"
-            :visible="landCostModalVisible"
-            :closable="false"
-            :maskClosable="false"
-            @cancel="landCostModalVisible=false"
-            @ok="saveLandCostInfo"
-          >
-            <a-form-model
-              ref="tempLandCostForm"
-              :model="tempLandCostForm"
-              :label-col="{ span: 9 }"
-              :wrapper-col="{ span: 15 }"
-            >
-              <div class="modal-form-item-50-percent">
-                <a-form-model-item ref="space" label="土地出让金总金额(万元)" prop="landTransferFeeTotal">
-                  <a-input
-                    v-model="tempLandCostForm.landTransferFeeTotal"
-                    type="number"
-                  />
-                </a-form-model-item>
-              </div>
-              <div class="modal-form-item-50-percent">
-                <a-form-model-item ref="space" label="土地出让金已支付金额(万元)" prop="landTransferFeePaid">
-                  <a-input
-                    v-model="tempLandCostForm.landTransferFeePaid"
-                    type="number"
-                  />
-                </a-form-model-item>
-              </div>
-
-              <div class="modal-form-item-50-percent">
-                <a-form-model-item ref="space" label="拆迁补偿款(前期成本)总金额(万元)" prop="compensationTotal">
-                  <a-input
-                    v-model="tempLandCostForm.compensationTotal"
-                    type="number"
-                  />
-                </a-form-model-item>
-              </div>
-              <div class="modal-form-item-50-percent">
-                <a-form-model-item ref="space" label="拆迁补偿款(前期成本)已支付金额(万元)" prop="compensationPaid">
-                  <a-input
-                    v-model="tempLandCostForm.compensationPaid"
-                    type="number"
-                  />
-                </a-form-model-item>
-              </div>
-
-              <div class="modal-form-item-50-percent">
-                <a-form-model-item ref="space" label="契税、印花税总金额(万元)" prop="deedTaxTotal">
-                  <a-input
-                    v-model="tempLandCostForm.deedTaxTotal"
-                    type="number"
-                  />
-                </a-form-model-item>
-              </div>
-              <div class="modal-form-item-50-percent">
-                <a-form-model-item ref="space" label="契税、印花税已支付金额(万元)" prop="deedTaxPaid">
-                  <a-input
-                    v-model="tempLandCostForm.deedTaxPaid"
-                    type="number"
-                  />
-                </a-form-model-item>
-              </div>
-
-              <div class="modal-form-item-50-percent">
-                <a-form-model-item ref="space" label="市政配套费总金额(万元)" prop="municipalSupportingFeeTotal">
-                  <a-input
-                    v-model="tempLandCostForm.municipalSupportingFeeTotal"
-                    type="number"
-                  />
-                </a-form-model-item>
-              </div>
-              <div class="modal-form-item-50-percent">
-                <a-form-model-item ref="space" label="市政配套费已支付金额(万元)" prop="municipalSupportingFeePaid">
-                  <a-input
-                    v-model="tempLandCostForm.municipalSupportingFeePaid"
-                    type="number"
-                  />
-                </a-form-model-item>
-              </div>
-            </a-form-model>
-          </a-modal>
 
           <a-row>
             <p class="input-tag mt-20">项目优势自荐(选填):</p>
@@ -875,11 +843,11 @@
               <div v-for="(shareHolder, index) in form.itemBaseInfoForm.shareHolders" :key="shareHolder.key">
                 <a-form-model-item
                   style="width: 40%; display: inline-block"
-                  :label="'股东' + (index + 1) + '名称'"
+                  :label="'项目公司' + (index + 1) + '名称'"
                   :prop="'shareHolders.' + index + '.name'"
                   :rules="{
                     required: true,
-                    message: '股东名称不能为空！',
+                    message: '项目公司名称不能为空！',
                     trigger: 'blur',
                   }"
                 >
@@ -888,20 +856,6 @@
                   />
                 </a-form-model-item>
 
-<!--                <a-form-model-item-->
-<!--                  style="width: 40%; display: inline-block"-->
-<!--                  :label="'股东' + (index + 1) + '股权占比'"-->
-<!--                  :prop="'shareHolders.' + index + '.percent'"-->
-<!--                  :rules="{-->
-<!--                    required: true,-->
-<!--                    message: '股东股权占比不能为空！',-->
-<!--                    trigger: 'blur',-->
-<!--                  }"-->
-<!--                >-->
-<!--                  <a-input-->
-<!--                    v-model="shareHolder.percent"-->
-<!--                  />-->
-<!--                </a-form-model-item>-->
                 <a-icon
                   v-if="form.itemBaseInfoForm.shareHolders.length > 0"
                     class="dynamic-delete-button"
@@ -911,7 +865,7 @@
               </div>
               <a-form-model-item style="margin-left: 20%">
                 <a-button type="dashed" style="width: 100%" @click="addShareHolder">
-                  <a-icon type="plus" /> 增 加 股 东
+                  <a-icon type="plus" /> 增 加 项 目 公 司
                 </a-button>
               </a-form-model-item>
             </a-form-model>
@@ -1329,10 +1283,10 @@ export default {
   filters: {
     filterUndefined (data) {
       if (data === undefined) {
-        return '\\'
+        return '请输入数据'
       }
       if (data + '' === 'NaN') {
-        return '\\'
+        return '请输入数据'
       }
       return (data - '').toFixed(2)
     }
@@ -1426,6 +1380,7 @@ export default {
   },
   data () {
     return {
+      editLandCostFormIndex: '',
       aboveGroundProducts: aboveGroundProducts,
       editAboveGroundTypeIndex: '',
       editUnderGroundTypeIndex: '',
@@ -1455,7 +1410,7 @@ export default {
       ITEM_TYPES: ITEM_TYPES,
       form: {
         showNodeIndex: 0,
-        totalTransactionAmount: 0,
+        totalTransactionAmount: '0',
         investAmount: 0,
         landAmount: 0,
         place: [],
@@ -1599,11 +1554,34 @@ export default {
   },
   methods: {
     ...mapActions(['getUserInfo']),
+    editLandCostForm (index) {
+      this.editLandCostFormIndex = index
+      this.$nextTick(() => this.$refs[index].focus())
+    },
+    editUnderGroundProductSpace (index) {
+      this.editUnderGroundProductSpaceIndex = index
+      this.$nextTick(() => this.$refs[index][0].focus())
+    },
+    editAboveGroundProduct (index) {
+      this.editAboveGroundProductIndex = index
+      this.$nextTick(() => this.$refs[index][0].focus())
+    },
+    editAboveGroundType (index) {
+      this.editAboveGroundTypeIndex = index
+      this.$nextTick(() => this.$refs['editAboveGroundTypeIndex' + index][0].focus())
+    },
+    editAboveGroundProductSpace (index) {
+      this.editAboveGroundProductSpaceIndex = index
+      this.$nextTick(() => this.$refs[index][0].focus())
+    },
     removeAboveGroundProduct (itemIndex, productIndex) {
       this.form.itemBaseInfoForm.aboveGround[itemIndex].products.splice(productIndex, 1)
     },
     removeAboveGroundItem (itemIndex) {
       this.form.itemBaseInfoForm.aboveGround.splice(itemIndex, 1)
+    },
+    removeUnderGroundItem (itemIndex) {
+      this.form.itemBaseInfoForm.underGround[0].products.splice(itemIndex, 1)
     },
     init () {
       this.certificateForm = this.userInfo.certificate
@@ -1766,6 +1744,10 @@ export default {
         return false
       }
       return true
+    },
+    editUnderGroundType (index) {
+      this.editUnderGroundTypeIndex = index
+      this.$nextTick(() => this.$refs['editUnderGroundTypeIndex' + index][0].focus())
     },
     changeSpaceType (type) {
       this.form.spaceType = type

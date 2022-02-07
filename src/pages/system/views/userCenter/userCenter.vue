@@ -18,6 +18,12 @@
             <span>土地资源</span>
           </router-link>
         </a-menu-item>
+        <a-menu-item key="userCenterCapitalResource">
+          <router-link :to="{ name: 'userCenterCapitalResource'}">
+            <a-icon type="pie-chart" />
+            <span>资金资源</span>
+          </router-link>
+        </a-menu-item>
         <a-menu-item v-if="utils.IsAdmin(userInfo.role)" key="userManage">
           <router-link :to="{ name: 'userManage'}">
             <a-icon type="team" />
@@ -46,6 +52,11 @@ const MenuList = {
     'userCenterLandResource',
     'editLandResource',
     'publishLandResource'
+  ],
+  userCenterCapitalResource: [
+    'userCenterCapitalResource',
+    'editCapitalResource',
+    'publishCapitalResource'
   ],
   userInfo: [
     'userInfo'

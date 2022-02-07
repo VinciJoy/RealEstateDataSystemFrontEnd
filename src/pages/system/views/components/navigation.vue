@@ -28,7 +28,9 @@
           </router-link>
         </a-menu-item>
         <a-menu-item key="analyse:2">
-          analyse 2
+          <router-link :to="{ name: 'capitalResource'}">
+            <span>资金资源</span>
+          </router-link>
         </a-menu-item>
       </a-sub-menu>
       <a-menu-item key="mobeiStudy">

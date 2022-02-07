@@ -57,20 +57,28 @@
             <baidu-map
               v-if="mapVisible"
               :ak="ak"
-              :dragging="false"
-              style="width: 600px; height: 400px"
+              style="width: 600px; height: 400px; display: inline-block"
               mapType="BMAP_SATELLITE_MAP"
+              :scroll-wheel-zoom="true"
               :center="form.itemMap.center"
-              :double-click-zoom="false"
-              :scroll-wheel-zoom="false"
               :zoom="form.itemMap.zoom"
             >
+              <BaiduNavigation anchor="BMAP_ANCHOR_TOP_RIGHT"></BaiduNavigation>
               <BaiduScale anchor="BMAP_ANCHOR_BOTTOM_RIGHT"></BaiduScale>
               <BaiduMapType :map-types="['BMAP_NORMAL_MAP', 'BMAP_SATELLITE_MAP', 'BMAP_HYBRID_MAP']" anchor="BMAP_ANCHOR_TOP_LEFT"></BaiduMapType>
               <BaiduPolygon :clicking="true" :path="form.itemMap.polygonPath" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="2"/>
               <BaiduCircle v-if="form.itemMap.threeCirclePath" :center="form.itemMap.threeCirclePath.center" :radius="form.itemMap.threeCirclePath.radius" stroke-color="blue" :fillColor="''" :stroke-opacity="0.5" :stroke-weight="2"></BaiduCircle>
               <BaiduCircle v-if="form.itemMap.fiveCirclePath" :center="form.itemMap.fiveCirclePath.center" :radius="form.itemMap.fiveCirclePath.radius" stroke-color="blue" :fillColor="''" :stroke-opacity="0.5" :stroke-weight="2"></BaiduCircle>
             </baidu-map>
+
+            <div style="display: inline-block; padding-left: 20px; vertical-align: top">
+              <a-row class="mt-20">
+                <a-button @click="addThreeCircle('itemMap')" :disabled="form.itemMap.polygonPath.length === 0" type="primary">周 边 三 公 里</a-button>
+              </a-row>
+              <a-row class="mt-20">
+                <a-button @click="addFiveCircle('itemMap')" :disabled="form.itemMap.polygonPath.length === 0" type="primary">周 边 五 公 里</a-button>
+              </a-row>
+            </div>
           </a-col>
 
             <a-col class="mt-20">
@@ -330,12 +338,12 @@
           </a-row>
 
             <a-row class="mt-20">
-              <h2 style="font-weight: bolder">项目股东信息:</h2>
-              <a-col style="font-size: 14px" v-for="(shareHolder, index) of form.itemBaseInfoForm.shareHolders" :key="'股东' + (index + 1) + '名称'" :span="8">
+              <h2 style="font-weight: bolder">项目公司名称:</h2>
+              <a-col style="font-size: 14px" v-for="(shareHolder, index) of form.itemBaseInfoForm.shareHolders" :key="'项目公司' + (index + 1) + '名称'" :span="8">
                 {{ shareHolder.name }}
               </a-col>
               <a-col style="font-size: 14px" v-if="form.itemBaseInfoForm.shareHolders.length === 0">
-                暂无股东信息
+                暂无项目公司信息
               </a-col>
             </a-row>
 
@@ -373,6 +381,7 @@ import BaiduScale from 'vue-baidu-map/components/controls/Scale'
 import BaiduMapType from 'vue-baidu-map/components/controls/MapType'
 import BaiduPolygon from 'vue-baidu-map/components/overlays/Polygon'
 import BaiduCircle from 'vue-baidu-map/components/overlays/Circle'
+import BaiduNavigation from 'vue-baidu-map/components/controls/Navigation'
 
 export default {
   name: 'landResourceDetail',
@@ -381,7 +390,8 @@ export default {
     BaiduScale,
     BaiduMapType,
     BaiduPolygon,
-    BaiduCircle
+    BaiduCircle,
+    BaiduNavigation
   },
   computed: {
     'progressFirstSelected': function () {
@@ -557,6 +567,44 @@ export default {
 
         this.mapVisible = true
       })
+    },
+    addThreeCircle (map) {
+
+      if (this.form[map].threeCirclePath.radius) {
+        this.form[map].threeCirclePath.radius = 0
+        return
+      }
+
+      let lng = 0
+      let lat = 0
+      for (let point of this.form[map].polygonPath) {
+        lng += point.lng
+        lat += point.lat
+      }
+      this.form[map].threeCirclePath.center = {
+        lng: lng / this.form[map].polygonPath.length,
+        lat: lat / this.form[map].polygonPath.length
+      }
+      this.form[map].threeCirclePath.radius = 3000
+    },
+    addFiveCircle (map) {
+
+      if (this.form[map].fiveCirclePath.radius) {
+        this.form[map].fiveCirclePath.radius = 0
+        return
+      }
+
+      let lng = 0
+      let lat = 0
+      for (let point of this.form[map].polygonPath) {
+        lng += point.lng
+        lat += point.lat
+      }
+      this.form[map].fiveCirclePath.center = {
+        lng: lng / this.form[map].polygonPath.length,
+        lat: lat / this.form[map].polygonPath.length
+      }
+      this.form[map].fiveCirclePath.radius = 5000
     },
     async handlePreview (file) {
       this.previewImage = (process.env.API_ROOT + '/system/pics/temp/' + file.uuid + '/') || file.preview
