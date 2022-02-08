@@ -6,7 +6,7 @@
 
 <script>
 export default {
-  name: 'capitalResource'
+name: "industryResource"
 }
 </script>
 

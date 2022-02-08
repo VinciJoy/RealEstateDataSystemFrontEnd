@@ -1,2 +1,0 @@
-webpackJsonp([5],{Jzpk:function(e,t,n){"use strict";Object.defineProperty(t,"__esModule",{value:!0});var r={render:function(){var e=this.$createElement;return(this._self._c||e)("div",[this._v("\n  123\n")])},staticRenderFns:[]};var c=n("VU/8")({name:"capitalResource"},r,!1,function(e){n("zR9r")},"data-v-dccbc7ee",null);t.default=c.exports},zR9r:function(e,t){}});
-//# sourceMappingURL=5.b449e47c312423865445.js.map

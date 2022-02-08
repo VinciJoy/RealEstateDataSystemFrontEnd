@@ -17,6 +17,22 @@ Vue.prototype.$message.config({
   top: 250
 })
 
+// eslint-disable-next-line no-extend-native
+Array.prototype.indexOf = function (val) {
+  for (var i = 0; i < this.length; i++) {
+    if (this[i] === val) return i
+  }
+  return -1
+}
+
+// eslint-disable-next-line no-extend-native
+Array.prototype.remove = function (val) {
+  let index = this.indexOf(val)
+  if (index > -1) {
+    this.splice(index, 1)
+  }
+}
+
 Vue.prototype.$error = (s) => Vue.prototype.$message.error(s)
 Vue.prototype.$info = (s) => Vue.prototype.$message.info(s)
 Vue.prototype.$success = (s) => Vue.prototype.$message.success(s)

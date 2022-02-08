@@ -43,7 +43,7 @@
             <a-col :span="8">
               <a-col :span="form.itemType.includes('自定义') ? 11 : 24">
                 <span class="input-tag">类型: </span>
-                <a-select v-model="form.itemType" style="width: 60%">
+                <a-select placeholder="请选择项目类型" v-model="form.itemType" style="width: 60%">
                   <a-select-option @blur="itemTypeValid" v-for="itemType in ITEM_TYPES" :value="itemType" :key="itemType">
                     {{ itemType }}
                   </a-select-option>
@@ -55,7 +55,7 @@
             </a-col>
             <a-col :span="8">
               <span class="input-tag">形态: </span>
-              <a-select v-model="form.itemFormation" style="width: 60%">
+              <a-select placeholder="请选择项目形态" v-model="form.itemFormation" style="width: 60%">
                 <a-select-option v-for="itemFormation in itemFormations" :value="itemFormation" :key="itemFormation">
                     {{ itemFormation }}
                   </a-select-option>
@@ -64,7 +64,7 @@
             <a-col :span="8">
               <a-col :span="form.exchangeType.includes('自定义') ? 13 : 24">
                 <span class="input-tag">交易形式: </span>
-                <a-select v-model="form.exchangeType" style="width: 45%">
+                <a-select placeholder="请选择项目交易形式" v-model="form.exchangeType" style="width: 45%">
                   <a-select-option @blur="exchangeTypeValid" v-for="exchangeType in EXCHANGE_TYPES" :value="exchangeType" :key="exchangeType">
                       {{ exchangeType }}
                     </a-select-option>
@@ -627,8 +627,6 @@
                 <img style="width: 100%" :src="previewImage" />
             </a-modal>
           </a-row>
-
-
 
           <a-row class="mt-20">
             <p class="input-tag">项目进度:</p>
@@ -1416,9 +1414,9 @@ export default {
         place: [],
         spaceType: 'aboveGround',
         space: 0,
-        itemType: '',
-        itemFormation: '',
-        exchangeType: '',
+        itemType: [],
+        itemFormation: [],
+        exchangeType: [],
         itemMap: {
           center: {
             lng: 116.404,
@@ -1661,7 +1659,113 @@ export default {
       this.currentNode = node
     },
     showSubmitModal () {
-      // todo: 数据合法性鉴定
+      // 数据合法性鉴定
+      if (!this.form.place || !this.form.place.length) {
+        this.$error('请选择项目所在地区！')
+        return
+      }
+
+      if (!this.form.space || this.form.place.space <= 0) {
+        this.$error('请输入正确的项目面积！')
+        return
+      }
+
+      if (!this.form.identity || !this.form.identity.length) {
+        this.$error('请选择发布人身份！')
+        return
+      }
+
+      if (!this.itemTypeValid()) {
+        return
+      }
+
+      if (!this.form.itemFormation || !this.form.itemFormation.length) {
+        this.$error('请选择项目形态！')
+        return
+      }
+
+      if (!this.exchangeTypeValid()) {
+        return
+      }
+
+      if (!this.form.itemBaseInfoForm.comprehensiveFAR || this.form.itemBaseInfoForm.comprehensiveFAR <= 0) {
+        this.$error('请输入正确的综合容积率！')
+        return
+      }
+
+      if (!this.form.itemBaseInfoForm.apartmentSpace || this.form.itemBaseInfoForm.apartmentSpace <= 0) {
+        if (this.form.itemBaseInfoForm.itemBaseMode !== 'occupy') {
+          this.$error('请输入正确的住宅占地面积！')
+        } else {
+          this.$error('请输入正确的住宅建筑面积！')
+        }
+        return
+      }
+
+      if (!this.form.itemBaseInfoForm.apartmentFAR || this.form.itemBaseInfoForm.apartmentFAR <= 0) {
+        this.$error('请输入正确的住宅容积率！')
+        return
+      }
+
+      if (!this.form.itemBaseInfoForm.businessSpace || this.form.itemBaseInfoForm.businessSpace <= 0) {
+        if (this.form.itemBaseInfoForm.itemBaseMode !== 'occupy') {
+          this.$error('请输入正确的商业占地面积！')
+        } else {
+          this.$error('请输入正确的商业建筑面积！')
+        }
+        return
+      }
+
+      if (!this.form.itemBaseInfoForm.businessFAR || this.form.itemBaseInfoForm.businessFAR <= 0) {
+        this.$error('请输入正确的商业容积率！')
+        return
+      }
+
+      if (!this.form.itemBaseInfoForm.officeSpace || this.form.itemBaseInfoForm.officeSpace <= 0) {
+        if (this.form.itemBaseInfoForm.itemBaseMode !== 'occupy') {
+          this.$error('请输入正确的办公占地面积！')
+        } else {
+          this.$error('请输入正确的办公建筑面积！')
+        }
+        return
+      }
+
+      if (!this.form.itemBaseInfoForm.officeFAR || this.form.itemBaseInfoForm.officeFAR <= 0) {
+        this.$error('请输入正确的办公容积率！')
+        return
+      }
+
+      if (!this.form.itemBaseInfoForm.otherSpace || this.form.itemBaseInfoForm.otherSpace <= 0) {
+        if (this.form.itemBaseInfoForm.itemBaseMode !== 'occupy') {
+          this.$error('请输入正确的其他占地面积！')
+        } else {
+          this.$error('请输入正确的其他建筑面积！')
+        }
+        return
+      }
+
+      if (!this.form.itemBaseInfoForm.otherFAR || this.form.itemBaseInfoForm.otherFAR <= 0) {
+        this.$error('请输入正确的其他容积率！')
+        return
+      }
+
+      if (!this.form.itemBaseInfoForm.underGroundSpace || this.form.itemBaseInfoForm.underGroundSpace <= 0) {
+        this.$error('请输入正确的地下建筑面积！')
+        return
+      }
+
+      // 身份认证检测
+      if (!this.userInfo.certificationVerified && this.userInfo.certificate.ID === 0) {
+        this.$error('请先完成实名认证！')
+        this.certificateModalVisible = true
+        return
+      }
+
+      if (!this.userInfo.certificationVerified && this.userInfo.certificate.ID !== 0) {
+        this.$error('请等待管理员确认实名认证！')
+        return
+      }
+
       this.submitModalVisible = true
 
       // 获取封面的uuid
@@ -1724,7 +1828,7 @@ export default {
       return true
     },
     itemTypeValid () {
-      if (!this.form.itemType) {
+      if (!this.form.itemType || !this.form.itemType.length) {
         this.$error('请选择项目类型！')
         return false
       }
@@ -1735,7 +1839,7 @@ export default {
       return true
     },
     exchangeTypeValid () {
-      if (!this.form.exchangeType) {
+      if (!this.form.exchangeType || !this.form.exchangeType.length) {
         this.$error('请选择项目类型！')
         return false
       }

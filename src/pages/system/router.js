@@ -29,14 +29,14 @@ export default new Router({
       component: () => import(/* webpackChunkName: "land_resource" */ '@system/views/resourceBase/landResource.vue')
     },
     {
+      path: '/industry_resource',
+      name: 'industryResource',
+      component: () => import(/* webpackChunkName: "industry_resource" */ '@system/views/resourceBase/industryResource.vue')
+    },
+    {
       path: '/land_resource/:id',
       name: 'landResourceDetail',
       component: () => import(/* webpackChunkName: "land_resource" */ '@system/views/resourceBase/landResourceDetail.vue')
-    },
-    {
-      path: '/capital_resource',
-      name: 'capitalResource',
-      component: () => import(/* webpackChunkName: "capital_resource" */ '@system/views/resourceBase/capitalResource.vue')
     },
     {
       path: '/user_center',
@@ -51,37 +51,37 @@ export default new Router({
         {
           path: 'land_resource',
           name: 'userCenterLandResource',
-          component: () => import(/* webpackChunkName: "user_center" */ '@system/views/userCenter/landResource/landResource.vue')
+          component: () => import(/* webpackChunkName: "land_resource" */ '@system/views/userCenter/landResource/landResource.vue')
         },
         {
-          path: 'capital_resource',
-          name: 'userCenterCapitalResource',
-          component: () => import(/* webpackChunkName: "user_center" */ '@system/views/userCenter/capitalResource/capitalResource.vue')
+          path: 'publish_land_resource/:id',
+          name: 'editLandResource',
+          component: () => import(/* webpackChunkName: "land_resource" */ '@system/views/userCenter/landResource/publishLandResource.vue')
+        },
+        {
+          path: 'publish_land_resource',
+          name: 'publishLandResource',
+          component: () => import(/* webpackChunkName: "land_resource" */ '@system/views/userCenter/landResource/publishLandResource.vue')
+        },
+        {
+          path: 'industry_resource',
+          name: 'userCenterIndustryResource',
+          component: () => import(/* webpackChunkName: "industry_resource" */ '@system/views/userCenter/industryResource/industryResource.vue')
+        },
+        {
+          path: 'publish_industry_resource/:id',
+          name: 'editIndustryResource',
+          component: () => import(/* webpackChunkName: "industry_resource" */ '@system/views/userCenter/industryResource/publishIndustryResource.vue')
+        },
+        {
+          path: 'publish_industry_resource',
+          name: 'publishIndustryResource',
+          component: () => import(/* webpackChunkName: "industry_resource" */ '@system/views/userCenter/industryResource/publishIndustryResource.vue')
         },
         {
           path: 'user_list',
           name: 'userManage',
           component: () => import(/* webpackChunkName: "user_center" */ '@system/views/userCenter/users/users.vue')
-        },
-        {
-          path: 'publish_land_resource/:id',
-          name: 'editLandResource',
-          component: () => import(/* webpackChunkName: "user_center" */ '@system/views/userCenter/landResource/publishLandResource.vue')
-        },
-        {
-          path: 'publish_land_resource',
-          name: 'publishLandResource',
-          component: () => import(/* webpackChunkName: "user_center" */ '@system/views/userCenter/landResource/publishLandResource.vue')
-        },
-        {
-          path: 'publish_capital_resource/:id',
-          name: 'editCapitalResource',
-          component: () => import(/* webpackChunkName: "user_center" */ '@system/views/userCenter/capitalResource/publishCapitalResource.vue')
-        },
-        {
-          path: 'publish_capital_resource',
-          name: 'publishCapitalResource',
-          component: () => import(/* webpackChunkName: "user_center" */ '@system/views/userCenter/capitalResource/publishCapitalResource.vue')
         }
       ]
     },

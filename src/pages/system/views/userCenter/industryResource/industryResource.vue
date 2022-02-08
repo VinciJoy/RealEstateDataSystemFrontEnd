@@ -25,17 +25,24 @@
 <!--    </a-table>-->
     <a-row class="mt-20">
       <a-button style="display: inline-block" type="primary" @click="goToAdd()"><a-icon type="plus" />新建</a-button>
-<!--      <a-pagination style="display: inline-block; float: right;" :page-size="pageSize" v-model="pageIndex" :total="count" />-->
+      <a-pagination style="display: inline-block; float: right;" :page-size="pageSize" v-model="pageIndex" :total="count" />
     </a-row>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'capitalResource',
+  name: 'industryResource',
+  data () {
+    return {
+      pageSize: 0,
+      pageIndex: 1,
+      count: 0
+    }
+  },
   methods: {
     goToAdd () {
-      this.$router.push('publish_capital_resource/')
+      this.$router.push('publish_industry_resource/')
     }
   }
 }
