@@ -118,7 +118,7 @@
                   @preview="handlePreview"
                   class="file-uploader"
                   list-type="picture-card"
-                  @change="handleChange($event, 'form','brandLogoList')"
+                  @change="handleChange($event, ['form'],'brandLogoList')"
                 >
                   <div v-if="form.brandLogoList.length < 1">
                     <a-icon :type="loading ? 'loading' : 'plus'" />
@@ -126,11 +126,11 @@
                 </a-upload>
               </a-col>
             </a-col>
-            <a-col>
+            <a-col :span="24">
               公司及资源项目操作经验介绍：
               <a-textarea v-model="form.operationExperienceIntroduction" class="mt-10"></a-textarea>
             </a-col>
-            <a-col class="mt-20 mb-20">
+            <a-col class="mt-20 mb-20" :span="24">
               电子版介绍上传：
               <a-upload-dragger
                 name="file"
@@ -138,7 +138,7 @@
                 :multiple="true"
                 :withCredentials="true"
                 :action="uploadFileURL"
-                @change="handleChange($event, 'form','introductionFileList', 'file')"
+                @change="handleChange($event, ['form'],'introductionFileList', 'file')"
               >
                 <p class="ant-upload-drag-icon">
                   <a-icon type="inbox" />
@@ -152,15 +152,171 @@
         </div>
 
         <div class="mt-20 sub-gray-line">
-          <a-radio @click.prevent="changeStatus('operationCase')" v-model="form.operationCase.status">本项目已有已投入运营的案例</a-radio>
-          <div class="gray-board" style="padding: 10px 20px; border-bottom-left-radius: 0; border-bottom-right-radius: 0">
-            <span v-if="form.operationCase.cases.length === 0" class="gray-font" style="font-size: 20px; font-weight: normal">暂无案例</span>
-            <span v-for="(_, index) of form.operationCase.cases" :key="'operationCase' + index" class="clickable-txt" style="font-size: 20px">案例{{ index + 1 }} </span>
-            <span class="clickable-txt" @click="addOperationCase" style="font-size: 20px; float: right"><a-icon type="plus"/>增加更多案例</span>
+
+<!--          operation case begin-->
+
+          <div>
+
+            <a-radio @click.prevent="changeStatus('operationCase')" v-model="form.operationCase.status">本项目已有已投入运营的案例</a-radio>
+
+            <div v-show="form.operationCase.status" class="gray-board" style="padding: 10px 20px; border-bottom-left-radius: 0; border-bottom-right-radius: 0">
+              <span v-if="form.operationCase.cases.length === 0" class="gray-font" style="font-size: 15px; font-weight: normal">暂无案例</span>
+              <span v-for="(_, index) of form.operationCase.cases" :key="'operationCase' + index" style="font-size: 15px; margin-right: 20px">
+                <span @click="showCase(index)" :class="showCaseIndex === index ? 'blue' : 'clickable-txt'">案例{{ index + 1 }} </span>
+                <span @click="deleteCase(index)" class="clickable-txt">[删除]</span>
+              </span>
+              <span class="clickable-txt" @click="addOperationCase" style="font-size: 15px; float: right"><a-icon type="plus"/>增加更多案例</span>
+            </div>
+
+            <div v-show="form.operationCase.status" v-if="showCaseIndex !== null" style="border: solid 1px #e8e8e8; border-bottom-left-radius: 5px; border-bottom-right-radius: 5px; padding: 10px 20px">
+              <h2 style="font-weight: bolder">产业落地案例项目介绍</h2>
+
+              <a-row>
+                <span class="input-tag">地区: </span>
+                <a-cascader style="width: 30%" v-model="form.operationCase.cases[showCaseIndex].location" :options="locationOptions" placeholder="请选择所在地区"/>
+              </a-row>
+
+              <a-row class="mt-20">
+                <span class="input-tag">面积: </span>
+                <a-radio v-model="form.operationCase.cases[showCaseIndex].spaceType === 'aboveGround'" @click="form.operationCase.cases[showCaseIndex].spaceType = 'aboveGround'">地上 </a-radio>
+                <a-radio v-model="form.operationCase.cases[showCaseIndex].spaceType === 'underGround'" @click="form.operationCase.cases[showCaseIndex].spaceType = 'underGround'">占地 </a-radio>
+                <a-input v-model="form.operationCase.cases[showCaseIndex].space" type="number" style="width: 200px"></a-input>
+                <span v-if="form.operationCase.cases[showCaseIndex].spaceType === 'aboveGround'"> 万 m² </span><span v-else> 亩 </span>
+              </a-row>
+
+              <a-row class="mt-20">
+                <span class="input-tag">项目类型: </span>
+                <a-checkbox-group v-model="form.operationCase.cases[showCaseIndex].itemTypeList" :options="itemTypeOptions" />
+                <a-input v-show="form.operationCase.cases[showCaseIndex].itemTypeList.includes('自定义')" v-model="form.operationCase.cases[showCaseIndex].customItemType" style="width: 200px" size="small"></a-input>
+              </a-row>
+
+              <a-row class="mt-10">
+                <h2 style="font-weight: bolder">项目简介：</h2>
+                <a-textarea v-model="form.operationCase.cases[showCaseIndex].introduction"></a-textarea>
+                <span class="gray-font" style="font-weight: normal; font-size: 14px">
+                  提示：介绍项目包含的具体内容、运营情况，及开业时间、客流量、带来就业人口、税收、取得社会效益等。
+                </span>
+              </a-row>
+
+              <a-row class="mt-10">
+                <h2 style="font-weight: bolder">封面图片：</h2>
+                <a-col :span="12">
+                  <a-upload
+                    :action="uploadPicURL"
+                    name="file"
+                    :file-list="form.operationCase.cases[showCaseIndex].coverPicList"
+                    :withCredentials="true"
+                    @preview="handlePreview"
+                    class="file-uploader"
+                    list-type="picture-card"
+                    @change="handleChange($event, ['form', 'operationCase', 'cases', showCaseIndex],'coverPicList')"
+                  >
+                    <div v-if="form.operationCase.cases[showCaseIndex].coverPicList.length < 1">
+                      <a-icon :type="loading ? 'loading' : 'plus'" />
+                    </div>
+                  </a-upload>
+                </a-col>
+              </a-row>
+
+              <a-row class="mt-10">
+                <h2 style="font-weight: bolder">照片/资料：</h2>
+                <a-col :span="12">
+                  <div style="display: inline-block" v-for="(pic, index) of form.operationCase.cases[showCaseIndex].otherPicList" :key="'otherPicList' + index">
+                    <div @click="handlePreview(pic)" class="upload-add" style="display: flex; justify-content: center">
+                      <img style="max-width: 100px; max-height: 100px; padding: 8px" :src="pic.thumbUrl" />
+                    </div>
+                    <div>
+                      <a-input v-model="pic.description" placeholder="描述" style="width: 104px; margin-top: 10px"></a-input>
+                    </div>
+                  </div>
+                  <a-upload
+                    :action="uploadPicURL"
+                    name="file"
+                    :file-list="form.operationCase.cases[showCaseIndex].otherPicList"
+                    :withCredentials="true"
+                    @preview="handlePreview"
+                    style="vertical-align: top"
+                    class="file-uploader"
+                    list-type="text"
+                    @change="handleChange($event, ['form', 'operationCase', 'cases', showCaseIndex],'otherPicList')"
+                  >
+                    <div class="upload-add" v-if="form.operationCase.cases[showCaseIndex].otherPicList.length < 4">
+                      <a-icon  class="upload-add-icon" :type="loading ? 'loading' : 'plus'" />
+                    </div>
+                  </a-upload>
+                </a-col>
+              </a-row>
+            </div>
+
           </div>
-          <div style="border: solid 1px #e8e8e8; border-bottom-left-radius: 5px; border-bottom-right-radius: 5px; padding: 10px 20px">
-            <h2 style="font-weight: bolder">产业落地案例项目介绍</h2>
+<!--          operation case end-->
+
+<!--          规划方案 begin-->
+          <div class="mt-10">
+            <a-radio @click.prevent="changeStatus('plan')" v-model="form.plan.status">本项目有规划方案</a-radio>
+
+            <div v-show="form.plan.status">
+              <a-row class="mt-10">
+                <h2 style="font-weight: bolder">项目规划方案简介：</h2>
+                <a-textarea v-model="form.plan.description"></a-textarea>
+                <span class="gray-font" style="font-size: 14px; font-weight: normal">
+                  提示：介绍项目规划中包含的具体内容、预期取得社会效益等。
+                </span>
+              </a-row>
+
+              <a-row class="mt-10">
+                <h2 style="font-weight: bolder">封面图片：</h2>
+                <a-col :span="12">
+                  <a-upload
+                    :action="uploadPicURL"
+                    name="file"
+                    :file-list="form.plan.coverPicList"
+                    :withCredentials="true"
+                    @preview="handlePreview"
+                    class="file-uploader"
+                    list-type="picture-card"
+                    @change="handleChange($event, ['form', 'plan'],'coverPicList')"
+                  >
+                    <div v-if="form.plan.coverPicList.length < 1">
+                      <a-icon :type="loading ? 'loading' : 'plus'" />
+                    </div>
+                  </a-upload>
+                </a-col>
+              </a-row>
+
+              <a-row class="mt-10">
+                <h2 style="font-weight: bolder">照片/资料：</h2>
+                <a-col :span="12">
+                  <div style="display: inline-block" v-for="(pic, index) of form.plan.otherPicList" :key="'otherPicList' + index">
+                    <div @click="handlePreview(pic)" class="upload-add" style="display: flex; justify-content: center">
+                      <img style="max-width: 100px; max-height: 100px; padding: 8px" :src="pic.thumbUrl" />
+                    </div>
+                    <div>
+                      <a-input v-model="pic.description" placeholder="描述" style="width: 104px; margin-top: 10px"></a-input>
+                    </div>
+                  </div>
+                  <a-upload
+                    :action="uploadPicURL"
+                    name="file"
+                    :file-list="form.plan.otherPicList"
+                    :withCredentials="true"
+                    @preview="handlePreview"
+                    style="vertical-align: top"
+                    class="file-uploader"
+                    list-type="text"
+                    @change="handleChange($event, ['form', 'plan'],'otherPicList')"
+                  >
+                    <div class="upload-add" v-if="form.plan.otherPicList.length < 4">
+                      <a-icon  class="upload-add-icon" :type="loading ? 'loading' : 'plus'" />
+                    </div>
+                  </a-upload>
+                </a-col>
+              </a-row>
+            </div>
           </div>
+
+<!--          规划方案 end-->
+
         </div>
       </a-col>
 
@@ -177,6 +333,7 @@ import {mapActions, mapGetters} from 'vuex'
 import userVerify from '../../components/userVerify'
 import utils from '@/utils/utils'
 import { HTTP } from '@/utils/constants'
+import options from '@/utils/cities'
 
 const industrialParkOptions = [
   '新能源',
@@ -321,6 +478,12 @@ export default {
           status: false,
           cases: []
         },
+        plan: {
+          status: false,
+          introduction: '',
+          coverPicList: [],
+          otherPicList: []
+        },
         itemTypeList: [],
         cooperationFormList: [],
         brandLogoList: [],
@@ -337,6 +500,7 @@ export default {
       uploadPicURL: '',
       uploadFileURL: '',
       previewImage: '',
+      locationOptions: options,
       industrialParkOptions: industrialParkOptions,
       headquarterOptions: headquarterOptions,
       itemTypeOptions: itemTypeOptions,
@@ -348,7 +512,8 @@ export default {
       travelOptions: travelOptions,
       cooperationFormOptions: cooperationFormOptions,
       certificateForm: {},
-      certificateModalVisible: false
+      certificateModalVisible: false,
+      showCaseIndex: null
     }
   },
   mounted () {
@@ -368,19 +533,56 @@ export default {
       this.previewImage = (process.env.API_ROOT + '/system/pics/temp/' + file.uuid + '/') || file.preview
       this.previewVisible = true
     },
+    deleteCase (index) {
+      this.form.operationCase.cases.splice(index, 1)
+
+      if (index <= this.showCaseIndex) {
+        this.showCaseIndex -= 1
+      }
+
+      if (this.showCaseIndex < 0) {
+        if (this.form.operationCase.cases.length) {
+          this.showCaseIndex = 0
+        } else {
+          this.showCaseIndex = null
+        }
+      }
+    },
+    showCase (index) {
+      this.showCaseIndex = index
+    },
     addOperationCase () {
       if (this.form.operationCase.cases.length > 9) {
         this.$info('运营案例不能大于十个！')
         return
       }
-      this.form.operationCase.cases.push({})
+
+      // mark1
+      this.form.operationCase.cases.push({
+        location: [],
+        spaceType: 'aboveGround',
+        space: 0,
+        itemTypeList: [],
+        coverPicList: [],
+        otherPicList: [],
+        customItemType: '',
+        introduction: ''
+      })
+
+      this.showCaseIndex = this.form.operationCase.cases.length - 1
     },
     changeStatus (index) {
       this.form[index].status = !this.form[index].status
     },
-    async handleChange (info, form, list, type = 'pic') {
+    async handleChange (info, forms, list, type = 'pic') {
+      let form = this
+
+      for (let temp of forms) {
+        form = form[temp]
+      }
+
       if (info.fileList.length === 0) {
-        this[form][list] = []
+        form[list] = []
         return
       }
 
@@ -402,7 +604,7 @@ export default {
         info.fileList[info.fileList.length - 1].uuid = info.file.response.data.uuid
       }
 
-      this[form][list] = info.fileList
+      form[list] = info.fileList
     },
     switchFunctionOrClass (item) {
       if (this.form.functionOrClassList.includes(item)) {

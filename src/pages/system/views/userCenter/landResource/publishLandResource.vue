@@ -499,7 +499,7 @@
                   @change="handleChange($event, 'form','coverPicList')"
                 >
                   <div v-if="form.coverPicList.length < 1">
-                    <a-icon :type="loading ? 'loading' : 'plus'" />
+                    <a-icon style="font-size: 14px; color: #2c3e50" :type="loading ? 'loading' : 'plus'" />
                   </div>
                 </a-upload>
             </a-col>
@@ -1910,22 +1910,26 @@ export default {
         return
       }
 
-      if (type === 'pic' && !info.fileList[info.fileList.length - 1].thumbUrl) {
-        info.fileList[info.fileList.length - 1].thumbUrl = await utils.getBase64(info.file.originFileObj)
-      }
-
       this.loading = true
 
       if (!info.file.response) {
         info.fileList[info.fileList.length - 1].status = 'uploading'
       } else if (info.file.response.code !== HTTP.SUCCESS) {
+        if (type === 'pic' && !info.fileList[info.fileList.length - 1].thumbUrl) {
+          info.fileList[info.fileList.length - 1].thumbUrl = await utils.getBase64(info.file.originFileObj)
+        }
         info.fileList[info.fileList.length - 1].status = 'error'
+        delete info.fileList[info.fileList.length - 1].originFileObj
         this.loading = false
       } else {
         // Get this url from response in real world.
-        this.loading = false
+        if (type === 'pic' && !info.fileList[info.fileList.length - 1].thumbUrl) {
+          info.fileList[info.fileList.length - 1].thumbUrl = await utils.getBase64(info.file.originFileObj)
+        }
         info.fileList[info.fileList.length - 1].status = 'done'
         info.fileList[info.fileList.length - 1].uuid = info.file.response.data.uuid
+        delete info.fileList[info.fileList.length - 1].originFileObj
+        this.loading = false
       }
 
       this[form][list] = info.fileList
@@ -2061,12 +2065,6 @@ export default {
 .upload-pictures > img {
   width: 100%;
   margin: 10px;
-}
-
-.upload-add-icon {
-  font-size: 32px;
-  color: #999;
-  padding: 34px;
 }
 
 th {
