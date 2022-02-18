@@ -6,7 +6,7 @@
       <a-row class="mt-20 sub-gray-line" :gutter="20" style="height: 200px;">
         <a-col :span="6" style="height: 100%; max-width: 100%; display: flex; justify-content: center">
           <img v-if="itemBaseInfo.coverPicUuid" style="max-width: 100%; max-height: 100%" :src="picBaseURL + itemBaseInfo.coverPicUuid"/>
-          <img v-else style="width: 100%; height: 100%" src="static/imgs/default-img.jpeg"/>
+          <img v-else style="width: 100%; height: 100%" src="../../../../../static/imgs/default-img.jpeg"/>
         </a-col>
         <a-col :span="18" style="height: 100%;">
           <a-col>

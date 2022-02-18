@@ -1803,13 +1803,13 @@ export default {
     performSubmit () {
       api.publishLandResource(this.form).then(() => {
         this.$success('发布成功!')
-        this.$router.push({name: 'landResource'})
+        this.$router.push({name: 'userCenterLandResource'})
       })
     },
     edit () {
       api.editLandResource(this.$route.params.id, this.form).then(() => {
         this.$success('修改成功!')
-        this.$router.push({name: 'landResource'})
+        this.$router.push({name: 'userCenterLandResource'})
       })
     },
     changeStatus (tag, index) {

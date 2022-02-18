@@ -4,10 +4,10 @@
       <a-col style="border: 1px solid transparent" :span="2"></a-col>
       <a-col :span="20">
         <a-row class="sub-gray-line">
-          <a-col style="height: 100%" :span="2">
+          <div style="height: 100px; width: 125px; display: inline-block">
             <img class="tag-icon can-not-select" src="../../../../../static/imgs/home-icon.png"/>
-          </a-col>
-          <a-col :span="15" class="mt-20">
+          </div>
+          <div class="mt-20" style="width: 500px;display: inline-block">
             <div style="display: inline-block">
               <span class="tag-title can-not-select">土地 / 资产信息</span>
               <br>
@@ -16,70 +16,70 @@
             <div style="display: inline-block;width: 40%;margin-left: 20px">
               <a-input-search></a-input-search>
             </div>
-          </a-col>
-          <a-col :span="7" class="mt-40">
+          </div>
+          <div style="display: inline-block; float: right" class="mt-40">
             <a-button style="float: right" :disabled="!userInfo.ID" @click="goToAdd" type="primary">发布土地信息</a-button>
-          </a-col>
+          </div>
         </a-row>
 
         <a-row class="mt-20 sub-gray-line">
 
           <a-col class="mt-10">
             省：
-            <span :class="!selectedProvince.value ? 'selected' : 'clickable-txt'" @click="selectedProvince = {children: []}" :key="0">
+            <span style="cursor: pointer" :class="!selectedProvince.value ? 'blue' : 'clickable-txt'" @click="selectedProvince = {children: []}" :key="0">
               不选择
             </span>
-            <span :class="selectedProvince === province ? 'selected' : 'clickable-txt'" @click="selectedProvince = province" v-for="province in options" :key="province.value">
+            <span style="cursor: pointer" :class="selectedProvince === province ? 'blue' : 'clickable-txt'" @click="selectedProvince = province" v-for="province in options" :key="province.value">
               {{ province.value }}
             </span>
           </a-col>
 
           <a-col class="mt-10">
             市：
-            <span :class="!selectedCity.value ? 'selected' : 'clickable-txt'" @click="selectedCity = {children: []}" :key="0">
+            <span style="cursor: pointer" :class="!selectedCity.value ? 'blue' : 'clickable-txt'" @click="selectedCity = {children: []}" :key="0">
               不选择
             </span>
-            <span :class="selectedCity === city ? 'selected' : 'clickable-txt'" @click="selectedCity = city" v-for="city in selectedProvince.children" :key="city.value">
+            <span style="cursor: pointer" :class="selectedCity === city ? 'blue' : 'clickable-txt'" @click="selectedCity = city" v-for="city in selectedProvince.children" :key="city.value">
               {{ city.value }}
             </span>
           </a-col>
 
           <a-col class="mt-10">
             区：
-            <span :class="!selectedArea.value ? 'selected' : 'clickable-txt'" @click="selectedArea = {children: []}" :key="0">
+            <span style="cursor: pointer" :class="!selectedArea.value ? 'blue' : 'clickable-txt'" @click="selectedArea = {children: []}" :key="0">
               不选择
             </span>
-            <span :class="selectedArea === area ? 'selected' : 'clickable-txt'" @click="selectedArea = area" v-for="area in selectedCity.children" :key="area.value">
+            <span style="cursor: pointer" :class="selectedArea === area ? 'blue' : 'clickable-txt'" @click="selectedArea = area" v-for="area in selectedCity.children" :key="area.value">
               {{ area.value }}
             </span>
           </a-col>
 
           <a-col class="mt-10">
             用地性质：
-            <span :class="itemType === null ? 'selected' : 'clickable-txt'" @click="changeItemType(null)" :key="0">
+            <span style="cursor: pointer" :class="itemType === null ? 'blue' : 'clickable-txt'" @click="changeItemType(null)" :key="0">
               不选择
             </span>
-            <span :class="itemType === item ? 'selected' : 'clickable-txt'" @click="changeItemType(item)" v-for="item in ITEM_TYPES" :key="item">
+            <span style="cursor: pointer" :class="itemType === item ? 'blue' : 'clickable-txt'" @click="changeItemType(item)" v-for="item in ITEM_TYPES" :key="item">
               {{ item }}
             </span>
           </a-col>
 
           <a-col class="mt-10">
             项目形态：
-            <span :class="itemFormation === null ? 'selected' : 'clickable-txt'" @click="changeItemFormation(null)" :key="0">
+            <span style="cursor: pointer" :class="itemFormation === null ? 'blue' : 'clickable-txt'" @click="changeItemFormation(null)" :key="0">
               不选择
             </span>
-            <span :class="itemFormation === item ? 'selected' : 'clickable-txt'" @click="changeItemFormation(item)" v-for="item in itemFormations" :key="item">
+            <span style="cursor: pointer" :class="itemFormation === item ? 'blue' : 'clickable-txt'" @click="changeItemFormation(item)" v-for="item in itemFormations" :key="item">
               {{ item }}
             </span>
           </a-col>
 
           <a-col class="mt-10">
             交易方式：
-            <span :class="exchangeType === null ? 'selected' : 'clickable-txt'" @click="changeExchangeType(null)" :key="0">
+            <span style="cursor: pointer" :class="exchangeType === null ? 'blue' : 'clickable-txt'" @click="changeExchangeType(null)" :key="0">
               不选择
             </span>
-            <span :class="exchangeType === exchange ? 'selected' : 'clickable-txt'" @click="changeExchangeType(exchange)" v-for="exchange in EXCHANGE_TYPES" :key="exchange">
+            <span style="cursor: pointer" :class="exchangeType === exchange ? 'blue' : 'clickable-txt'" @click="changeExchangeType(exchange)" v-for="exchange in EXCHANGE_TYPES" :key="exchange">
               {{ exchange }}
             </span>
           </a-col>
@@ -87,20 +87,20 @@
           <a-row class="mt-10">
               排序：
             <span class="clickable-txt" @click="orderByUpdatedTime = 'ASC'" v-show="orderByUpdatedTime === ''">更新时间 </span>
-            <span class="selected" @click="orderByUpdatedTime = 'DESC'" v-show="orderByUpdatedTime === 'ASC'">更新时间↓</span>
-            <span class="selected" @click="orderByUpdatedTime = ''" v-show="orderByUpdatedTime === 'DESC'">更新时间↑</span>
+            <span style="cursor: pointer" class="blue" @click="orderByUpdatedTime = 'DESC'" v-show="orderByUpdatedTime === 'ASC'">更新时间↓</span>
+            <span style="cursor: pointer" class="blue" @click="orderByUpdatedTime = ''" v-show="orderByUpdatedTime === 'DESC'">更新时间↑</span>
 
             <span class="clickable-txt" @click="orderBySpace = 'ASC'" v-show="orderBySpace === ''">地上建筑面积 </span>
-            <span class="selected" @click="orderBySpace = 'DESC'" v-show="orderBySpace === 'ASC'">地上建筑面积↓</span>
-            <span class="selected" @click="orderBySpace = ''" v-show="orderBySpace === 'DESC'">地上建筑面积↑</span>
+            <span style="cursor: pointer" class="blue" @click="orderBySpace = 'DESC'" v-show="orderBySpace === 'ASC'">地上建筑面积↓</span>
+            <span style="cursor: pointer" class="blue" @click="orderBySpace = ''" v-show="orderBySpace === 'DESC'">地上建筑面积↑</span>
 
             <span class="clickable-txt" @click="orderByPrice = 'ASC'" v-show="orderByPrice === ''">交易对价 </span>
-            <span class="selected" @click="orderByPrice = 'DESC'" v-show="orderByPrice === 'ASC'">交易对价↓</span>
-            <span class="selected" @click="orderByPrice = ''" v-show="orderByPrice === 'DESC'">交易对价↑</span>
+            <span style="cursor: pointer" class="blue" @click="orderByPrice = 'DESC'" v-show="orderByPrice === 'ASC'">交易对价↓</span>
+            <span style="cursor: pointer" class="blue" @click="orderByPrice = ''" v-show="orderByPrice === 'DESC'">交易对价↑</span>
 
             <span class="clickable-txt" @click="orderByRecommendation = 'ASC'" v-show="orderByRecommendation === ''">推荐指数 </span>
-            <span class="selected" @click="orderByRecommendation = 'DESC'" v-show="orderByRecommendation === 'ASC'">推荐指数↓</span>
-            <span class="selected" @click="orderByRecommendation = ''" v-show="orderByRecommendation === 'DESC'">推荐指数↑</span>
+            <span style="cursor: pointer" class="blue" @click="orderByRecommendation = 'DESC'" v-show="orderByRecommendation === 'ASC'">推荐指数↓</span>
+            <span style="cursor: pointer" class="blue" @click="orderByRecommendation = ''" v-show="orderByRecommendation === 'DESC'">推荐指数↑</span>
         </a-row>
         </a-row>
 

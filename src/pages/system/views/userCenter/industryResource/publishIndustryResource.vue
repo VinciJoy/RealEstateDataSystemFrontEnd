@@ -21,7 +21,7 @@
 
           <a-row class="mt-10">
             <h2 style="font-weight: bolder">名称</h2>
-            <a-input size="small" style="width: 600px" v-model="form.title"></a-input>
+            <a-input size="small" style="width: 600px" v-model="form.name"></a-input>
           </a-row>
 
           <a-row class="mt-10">
@@ -37,61 +37,81 @@
           </a-row>
 
           <a-row class="mt-10">
-            <h2 style="font-weight: bolder">请选择产业项目的详细功能或形式分类：</h2>
+            <h2 style="font-weight: bolder">请选择产业项目的详细功能或形式分类</h2>
             <a-col>
               文<span style="margin-left: 28px">化</span>：
-              <span v-for="item of cultureOptions" @click="switchFunctionOrClass(item)" :class="(form.functionOrClassList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :key="item">
+              <span v-for="item of cultureOptions" style="cursor: pointer" @click="switchFunctionOrClass(item)" :class="(form.functionOrClassList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :key="item">
                 {{ item }}
               </span>
             </a-col>
 
              <a-col class="mt-10">
                旅<span style="margin-left: 28px">游</span>：
-              <span v-for="item of travelOptions" @click="switchFunctionOrClass(item)" :class="(form.functionOrClassList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :key="item">
+              <span v-for="item of travelOptions" style="cursor: pointer" @click="switchFunctionOrClass(item)" :class="(form.functionOrClassList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :key="item">
                 {{ item }}
               </span>
             </a-col>
 
              <a-col class="mt-10">
                教<span style="margin-left: 28px">育</span>：
-              <span v-for="item of educationOptions" @click="switchFunctionOrClass(item)" :class="(form.functionOrClassList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :key="item">
+              <span v-for="item of educationOptions" style="cursor: pointer" @click="switchFunctionOrClass(item)" :class="(form.functionOrClassList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :key="item">
                 {{ item }}
               </span>
             </a-col>
 
             <a-col class="mt-10">
               医<span style="margin-left: 28px">养</span>：
-              <span v-for="item of hospitalOptions" @click="switchFunctionOrClass(item)" :class="(form.functionOrClassList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :key="item">
+              <span v-for="item of hospitalOptions" style="cursor: pointer" @click="switchFunctionOrClass(item)" :class="(form.functionOrClassList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :key="item">
                 {{ item }}
               </span>
             </a-col>
 
             <a-col class="mt-10">
               体<span style="margin-left: 28px">育</span>：
-              <span v-for="item of physicalOptions" @click="switchFunctionOrClass(item)" :class="(form.functionOrClassList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :key="item">
+              <span v-for="item of physicalOptions" style="cursor: pointer" @click="switchFunctionOrClass(item)" :class="(form.functionOrClassList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :key="item">
                 {{ item }}
               </span>
             </a-col>
 
             <a-col class="mt-10">
               商<span style="margin-left: 28px">业</span>：
-              <span v-for="item of businessOptions" @click="switchFunctionOrClass(item)" :class="(form.functionOrClassList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :key="item">
+              <span v-for="item of businessOptions" style="cursor: pointer" @click="switchFunctionOrClass(item)" :class="(form.functionOrClassList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :key="item">
                 {{ item }}
               </span>
             </a-col>
 
             <a-col class="mt-10">
               总部经济：
-              <span v-for="item of headquarterOptions" @click="switchFunctionOrClass(item)" :class="(form.functionOrClassList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :key="item">
+              <span v-for="item of headquarterOptions" style="cursor: pointer" @click="switchFunctionOrClass(item)" :class="(form.functionOrClassList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :key="item">
                 {{ item }}
               </span>
             </a-col>
 
             <a-col class="mt-10">
               产业园区：
-              <span v-for="item of industrialParkOptions" @click="switchFunctionOrClass(item)" :class="(form.functionOrClassList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :key="item">
+              <span v-for="item of industrialParkOptions" style="cursor: pointer" @click="switchFunctionOrClass(item)" :class="(form.functionOrClassList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :key="item">
                 {{ item }}
               </span>
+            </a-col>
+          </a-row>
+
+          <a-row class="mt-10">
+            <h2 style="font-weight: bolder">项目封面图片：</h2>
+            <a-col :span="12">
+                <a-upload
+                  :action="uploadPicURL"
+                  name="file"
+                  :file-list="form.coverPicList"
+                  :withCredentials="true"
+                  @preview="handlePreview"
+                  class="file-uploader"
+                  list-type="picture-card"
+                  @change="handleChange($event, ['form'],'coverPicList')"
+                >
+                  <div v-if="form.coverPicList.length < 1">
+                    <a-icon style="font-size: 14px; color: #2c3e50" :type="loading ? 'loading' : 'plus'" />
+                  </div>
+                </a-upload>
             </a-col>
           </a-row>
 
@@ -191,7 +211,7 @@
               </a-row>
 
               <a-row class="mt-10">
-                <h2 style="font-weight: bolder">项目简介：</h2>
+                <h2 style="font-weight: bolder">项目简介</h2>
                 <a-textarea v-model="form.operationCase.cases[showCaseIndex].introduction"></a-textarea>
                 <span class="gray-font" style="font-weight: normal; font-size: 14px">
                   提示：介绍项目包含的具体内容、运营情况，及开业时间、客流量、带来就业人口、税收、取得社会效益等。
@@ -199,7 +219,7 @@
               </a-row>
 
               <a-row class="mt-10">
-                <h2 style="font-weight: bolder">封面图片：</h2>
+                <h2 style="font-weight: bolder">封面图片</h2>
                 <a-col :span="12">
                   <a-upload
                     :action="uploadPicURL"
@@ -219,7 +239,7 @@
               </a-row>
 
               <a-row class="mt-10">
-                <h2 style="font-weight: bolder">照片/资料：</h2>
+                <h2 style="font-weight: bolder">照片/资料</h2>
                 <a-col :span="12">
                   <div style="display: inline-block" v-for="(pic, index) of form.operationCase.cases[showCaseIndex].otherPicList" :key="'otherPicList' + index">
                     <div @click="handlePreview(pic)" class="upload-add" style="display: flex; justify-content: center">
@@ -257,7 +277,7 @@
 
             <div v-show="form.plan.status">
               <a-row class="mt-10">
-                <h2 style="font-weight: bolder">项目规划方案简介：</h2>
+                <h2 style="font-weight: bolder">项目规划方案简介</h2>
                 <a-textarea v-model="form.plan.description"></a-textarea>
                 <span class="gray-font" style="font-size: 14px; font-weight: normal">
                   提示：介绍项目规划中包含的具体内容、预期取得社会效益等。
@@ -265,7 +285,7 @@
               </a-row>
 
               <a-row class="mt-10">
-                <h2 style="font-weight: bolder">封面图片：</h2>
+                <h2 style="font-weight: bolder">封面图片</h2>
                 <a-col :span="12">
                   <a-upload
                     :action="uploadPicURL"
@@ -285,7 +305,7 @@
               </a-row>
 
               <a-row class="mt-10">
-                <h2 style="font-weight: bolder">照片/资料：</h2>
+                <h2 style="font-weight: bolder">照片/资料</h2>
                 <a-col :span="12">
                   <div style="display: inline-block" v-for="(pic, index) of form.plan.otherPicList" :key="'otherPicList' + index">
                     <div @click="handlePreview(pic)" class="upload-add" style="display: flex; justify-content: center">
@@ -317,12 +337,108 @@
 
 <!--          规划方案 end-->
 
+<!--          暂无案例及规划方案 begin-->
+          <div class="mt-10">
+            <a-radio v-model="noPlanNoOperationCase">本项目暂无案例及规划方案</a-radio>
+          </div>
+<!--          暂无案例及规划方案 end-->
+
+        </div>
+
+        <div class="mt-20 sub-gray-line">
+          <h2 style="font-weight: bolder">匹配项目建设要求</h2>
+          按选址区域：
+          <div class="mt-10">
+            按<span style="margin-left: 22px">地</span><span style="margin-left: 22px">域</span>：
+            <span v-for="item of areaOptions" style="cursor: pointer" @click="switchAreaRequirement(item)" :class="(form.matchRequirement.areaList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :key="item">
+              {{ item }}
+            </span>
+          </div>
+          <div class="mt-10">
+            按 城 市 能 级：
+            <span v-for="item of cityClassOptions" style="cursor: pointer" @click="switchAreaRequirement(item)" :class="(form.matchRequirement.areaList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :key="item">
+              {{ item }}
+            </span>
+          </div>
+          <div class="mt-10">
+            按城市功能区：
+            <span v-for="item of cityFunctionOptions" style="cursor: pointer" @click="switchAreaRequirement(item)" :class="(form.matchRequirement.areaList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :key="item">
+              {{ item }}
+            </span>
+          </div>
+
+          <div class="mt-10">
+            项目选址的其他特殊要求：
+            <a-textarea class="mt-10" v-model="form.matchRequirement.specialRequirement"></a-textarea>
+          </div>
+
+          <h2 style="font-weight: bolder" class="mt-20">占地面积</h2>
+          <div>
+            本项目预计占地面积 <a-input type="number" style="width: 80px" size="small" v-model="form.smallSpace"></a-input> 平方米 —— <a-input style="width: 80px" type="number" size="small" v-model="form.largeSpace"></a-input> 平方米
+          </div>
+
+          <h2 style="font-weight: bolder" class="mt-20">投资金额</h2>
+          <div>
+            本项目预计投资金额 <a-input type="number" style="width: 80px" size="small" v-model="form.lessInvestment"></a-input> 万元 —— <a-input style="width: 80px" type="number" size="small" v-model="form.largeInvestment"></a-input> 万元
+          </div>
+
+          <h2 style="font-weight: bolder" class="mt-20">项目优势自荐</h2>
+          <a-textarea v-model="form.advantage"></a-textarea>
+          <span class="gray-font" style="font-size: 14px; font-weight: normal">
+            提示：可介绍包括项目能给区域带来的人流、对区域配套设施的完善、提高地产项目售价、提升去化速度等各种利好，带动就业人口、亩均纳税，以及项目的稀缺性、项目运营特色等各方面优势。
+          </span>
+
+          <h2 style="font-weight: bolder" class="mt-20">合作模式要求</h2>
+          <div>
+            <div>
+              合作投资需求：
+              <a-radio-group class="mt-10" v-model="form.cooperationRequirement">
+                <a-radio v-for="item of cooperationRequirementOptions" :key="item" :value="item">
+                  {{ item }}
+                </a-radio>
+              </a-radio-group>
+            </div>
+            <div class="mt-10">
+              产业方收益需求：
+              <a-radio-group class="mt-10" v-model="form.benefitRequirement">
+                <a-radio v-for="item of benefitRequirementOptions" :key="item" :value="item">
+                  {{ item }}
+                </a-radio>
+              </a-radio-group>
+            </div>
+            <div class="mt-10">
+              其他合作要求：
+              <a-textarea class="mt-10" v-model="form.otherCooperationRequirement"></a-textarea>
+              <span class="gray-font" style="font-size: 14px; font-weight: normal">
+                提示：可详细介绍本方对产业项目投资和收益的具体要求。
+              </span>
+            </div>
+          </div>
+
+          <a-button class="mt-20" type="primary" @click="showSubmitModal">提 交 资 方 信 息</a-button>
         </div>
       </a-col>
 
       <!--      modal begin-->
       <a-modal width="80%" :visible="previewVisible" :footer="null" @cancel="previewVisible = false">
         <img style="width: 100%" :src="previewImage" />
+      </a-modal>
+
+      <a-modal v-model="submitModalVisible" width="50%" :footer="null" @close="submitModalVisible = false">
+        <div slot="title" style="text-align: center">
+          信息真实承诺及发布须知
+        </div>
+        <a-row>
+          1、本人承诺所录入信息及上传资料均属真实可靠，允许提交后由摩贝云系统项目工作人员进行真实性审查并与发布者进行相关核实工作。
+        </a-row>
+        <a-row class="mt-10">
+          2、本人已知晓项目通过平台推送后，发布人所属项目方与平台所推荐意向购买人达成合作并签署合作协议的，
+          平台将会向该项目方收取相应服务费(本项目未达成合作则不收取任何费用)。本人同意由摩贝云系统工作人员与本人联系，告知并签署相应协议。
+        </a-row>
+        <a-row style="text-align: center" class="mt-10">
+          <a-button :disabled="true" v-if="countDown > 0" style="margin-left:40px;width: 130px">{{ '还需阅读' + countDown + '秒' }}</a-button>
+          <a-button type="primary" v-else style="margin-left:40px;width: 20%" @click="submit">提 交</a-button>
+        </a-row>
       </a-modal>
       <!--      modal end-->
     </a-row>
@@ -332,8 +448,22 @@
 import {mapActions, mapGetters} from 'vuex'
 import userVerify from '../../components/userVerify'
 import utils from '@/utils/utils'
-import { HTTP } from '@/utils/constants'
+import {HTTP} from '@/utils/constants'
 import options from '@/utils/cities'
+import api from '@system/api/industryResource'
+
+const cooperationRequirementOptions = [
+  '产业投资由产业方负责',
+  '要求合作方承担部分产业投资',
+  '要求合作方承担全部产业投资',
+  '要求合作方承担全部产业投资并支付额外费用'
+]
+
+const benefitRequirementOptions = [
+  '产业方获取产业资源运营权',
+  '产业方获取产业资源所有权及运营权',
+  '产业方获取产业资源所有权、运营权并需分享其他收益'
+]
 
 const industrialParkOptions = [
   '新能源',
@@ -352,6 +482,35 @@ const headquarterOptions = [
   '互联网+',
   '创客中心',
   '其他领域'
+]
+
+const cityFunctionOptions = [
+  '城市核心区',
+  '城市建成区',
+  '城市发展新区',
+  '城市近远郊区',
+  '特殊自然资源区域'
+]
+
+const cityClassOptions = [
+  '一线城市',
+  '二线城市',
+  '三/四线城市',
+  '旅游城市',
+  '工业城市',
+  '县城'
+]
+
+const areaOptions = [
+  '全国',
+  '华北区域',
+  '华东区域',
+  '华中区域',
+  '东北区域',
+  '西北区域',
+  '华南区域',
+  '西南区域',
+  '港澳台及海外'
 ]
 
 const cooperationFormOptions = [
@@ -440,6 +599,17 @@ export default {
   },
   computed: {
     ...mapGetters(['userInfo']),
+    noPlanNoOperationCase: {
+      get: function () {
+        return !this.form.plan.status && !this.form.operationCase.status
+      },
+      set: function (val) {
+        if (val) {
+          this.form.plan.status = false
+          this.form.operationCase.status = false
+        }
+      }
+    },
     'itemTitle' () {
       let res = ''
       if (this.form.itemTypeList.length) {
@@ -454,8 +624,8 @@ export default {
         res += '】 '
       }
 
-      if (this.form.title) {
-        res += this.form.title + ' '
+      if (this.form.name) {
+        res += this.form.name + ' '
       }
 
       if (this.form.cooperationFormList.length) {
@@ -467,13 +637,31 @@ export default {
         }
       }
 
-      if (!res) return '暂无'
+      if (!res) res = '暂无'
+
+      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+      this.form.title = res
+
       return res
     }
   },
   data () {
     return {
+      mode: 'create',
       form: {
+        areaList: [],
+        coverPicList: [],
+        title: '',
+        coverPicUuid: '',
+        smallSpace: 0,
+        largeSpace: 0,
+        advantage: '',
+        industryClasses: [],
+        cooperationRequirement: [],
+        benefitRequirement: [],
+        otherCooperationRequirement: '',
+        lessInvestment: 0,
+        largeInvestment: 0,
         operationCase: {
           status: false,
           cases: []
@@ -484,6 +672,10 @@ export default {
           coverPicList: [],
           otherPicList: []
         },
+        matchRequirement: {
+          areaList: [],
+          specialRequirement: ''
+        },
         itemTypeList: [],
         cooperationFormList: [],
         brandLogoList: [],
@@ -491,7 +683,7 @@ export default {
         functionOrClassList: [],
         customItemType: '',
         fullName: '',
-        title: '',
+        name: '',
         operationExperienceIntroduction: '',
         brand: ''
       },
@@ -501,7 +693,12 @@ export default {
       uploadFileURL: '',
       previewImage: '',
       locationOptions: options,
+      cityFunctionOptions: cityFunctionOptions,
+      cooperationRequirementOptions: cooperationRequirementOptions,
+      benefitRequirementOptions: benefitRequirementOptions,
       industrialParkOptions: industrialParkOptions,
+      cityClassOptions: cityClassOptions,
+      areaOptions: areaOptions,
       headquarterOptions: headquarterOptions,
       itemTypeOptions: itemTypeOptions,
       businessOptions: businessOptions,
@@ -513,15 +710,83 @@ export default {
       cooperationFormOptions: cooperationFormOptions,
       certificateForm: {},
       certificateModalVisible: false,
+      submitModalVisible: false,
+      countDown: 5,
       showCaseIndex: null
     }
   },
   mounted () {
     this.uploadPicURL = process.env.API_ROOT + '/system/pics/'
     this.uploadFileURL = process.env.API_ROOT + '/system/files/'
+    this.init()
   },
   methods: {
     ...mapActions(['getUserInfo']),
+    init () {
+      // 如果有 id 说明是编辑模式
+      if (this.$route.params.id) {
+        this.mode = 'edit'
+        api.getIndustryResource(this.$route.params.id).then((res) => {
+          this.form = JSON.parse(res.data.data.stringify)
+        })
+      }
+    },
+    showSubmitModal () {
+      // todo: 数据合法性鉴定
+
+      // 身份认证检测
+      if (!this.userInfo.certificationVerified && this.userInfo.certificate.ID === 0) {
+        this.$error('请先完成实名认证！')
+        this.certificateModalVisible = true
+        return
+      }
+
+      if (!this.userInfo.certificationVerified && this.userInfo.certificate.ID !== 0) {
+        this.$error('请等待管理员确认实名认证！')
+        return
+      }
+
+      this.submitModalVisible = true
+
+      this.form.areaList = this.form.matchRequirement.areaList
+      this.form.caseNum = this.form.operationCase.cases.length
+      this.form.planNum = 0
+      if (this.form.plan.status) {
+        this.form.planNum = 1
+      }
+
+      if (this.form.coverPicList.length) {
+        this.form.coverPicUuid = this.form.coverPicList[0].uuid
+      }
+
+      this.countDown = 5
+      let interval = setInterval(() => {
+        if (this.countDown > 0) {
+          this.countDown -= 1
+        } else {
+          clearInterval(interval)
+        }
+      }, 1000)
+    },
+    submit () {
+      if (this.mode === 'create') {
+        this.performSubmit()
+      } else {
+        this.edit()
+      }
+    },
+    performSubmit () {
+      api.publishIndustryResource(this.form).then(() => {
+        this.$success('发布成功!')
+        this.$router.push({name: 'userCenterIndustryResource'})
+      })
+    },
+    edit () {
+      api.editIndustryResource(this.$route.params.id, this.form).then(() => {
+        this.$success('修改成功!')
+        this.$router.push({name: 'userCenterIndustryResource'})
+      })
+    },
     async certificateChange () {
       await this.getUserInfo()
       this.certificateForm = this.userInfo.certificate
@@ -586,25 +851,36 @@ export default {
         return
       }
 
-      if (type === 'pic' && !info.fileList[info.fileList.length - 1].thumbUrl) {
-        info.fileList[info.fileList.length - 1].thumbUrl = await utils.getBase64(info.file.originFileObj)
-      }
-
       this.loading = true
 
       if (!info.file.response) {
         info.fileList[info.fileList.length - 1].status = 'uploading'
       } else if (info.file.response.code !== HTTP.SUCCESS) {
+        if (type === 'pic' && !info.fileList[info.fileList.length - 1].thumbUrl) {
+          info.fileList[info.fileList.length - 1].thumbUrl = await utils.getBase64(info.file.originFileObj)
+        }
         info.fileList[info.fileList.length - 1].status = 'error'
+        delete info.fileList[info.fileList.length - 1].originFileObj
         this.loading = false
       } else {
         // Get this url from response in real world.
-        this.loading = false
+        if (type === 'pic' && !info.fileList[info.fileList.length - 1].thumbUrl) {
+          info.fileList[info.fileList.length - 1].thumbUrl = await utils.getBase64(info.file.originFileObj)
+        }
         info.fileList[info.fileList.length - 1].status = 'done'
         info.fileList[info.fileList.length - 1].uuid = info.file.response.data.uuid
+        delete info.fileList[info.fileList.length - 1].originFileObj
+        this.loading = false
       }
 
       form[list] = info.fileList
+    },
+    switchAreaRequirement (item) {
+      if (this.form.matchRequirement.areaList.includes(item)) {
+        this.form.matchRequirement.areaList.remove(item)
+        return
+      }
+      this.form.matchRequirement.areaList.push(item)
     },
     switchFunctionOrClass (item) {
       if (this.form.functionOrClassList.includes(item)) {
