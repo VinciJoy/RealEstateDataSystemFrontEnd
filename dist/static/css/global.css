@@ -142,6 +142,10 @@
     border: 1px dashed #1890ff;
 }
 
+.ml-5 {
+  margin-left: 5px;
+}
+
 .clickable-txt {
   color: #a1a1a1;
   cursor: pointer;

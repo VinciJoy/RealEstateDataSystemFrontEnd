@@ -1,10 +1,15 @@
 <template>
     <a-row class="mt-40" :gutter="40">
+
+      <a-affix :offset-top="400" v-if="!history">
+        <a-button type="primary" style="float: right; width: 100px" @click="saveDraft">保 存</a-button>
+      </a-affix>
+
       <a-col style="border: 1px solid transparent" :span="2"></a-col>
       <a-col :span="20">
         <a-row class="left-blue part-title can-not-select" style="width: 100%">
           <h1 style="display: inline">发布产业资源</h1>
-          <div style="float: right">
+          <div style="float: right" v-if="!history">
             <a v-if="!userInfo.certificationVerified && userInfo.certificate.ID === 0" @click="certificateModalVisible = true" class="tag-desc"><a-icon style="color: gray;" theme="filled" type="down-circle" />点击完成实名认证</a>
             <a v-if="!userInfo.certificationVerified && userInfo.certificate.ID !== 0" @click="certificateModalVisible = true" class="tag-desc"><a-icon style="color: gray;" theme="filled" type="down-circle" />等待管理员认证</a>
             <a v-if="userInfo.certificationVerified" @click="certificateModalVisible = true" class="tag-desc"><a-icon style="color: forestgreen;" theme="filled" type="down-circle" />已完成实名认证</a>
@@ -15,18 +20,18 @@
         <div class="mt-20 sub-gray-line">
           <a-row>
             <h2 style="font-weight: bolder">项目类型</h2>
-            <a-checkbox-group v-model="form.itemTypeList" :options="itemTypeOptions" />
-            <a-input v-show="form.itemTypeList.includes('自定义')" v-model="form.customItemType" style="width: 200px" size="small"></a-input>
+            <a-checkbox-group :disabled="history" v-model="form.itemTypeList" :options="itemTypeOptions" />
+            <a-input :disabled="history" v-show="form.itemTypeList.includes('自定义')" v-model="form.customItemType" style="width: 200px" size="small"></a-input>
           </a-row>
 
           <a-row class="mt-10">
             <h2 style="font-weight: bolder">名称</h2>
-            <a-input size="small" style="width: 600px" v-model="form.name"></a-input>
+            <a-input :disabled="history" size="small" style="width: 600px" v-model="form.name"></a-input>
           </a-row>
 
           <a-row class="mt-10">
             <h2 style="font-weight: bolder">合作形式</h2>
-            <a-checkbox-group v-model="form.cooperationFormList" :options="cooperationFormOptions" />
+            <a-checkbox-group :disabled="history" v-model="form.cooperationFormList" :options="cooperationFormOptions" />
           </a-row>
 
           <a-row class="mt-10">
@@ -40,56 +45,56 @@
             <h2 style="font-weight: bolder">请选择产业项目的详细功能或形式分类</h2>
             <a-col>
               文<span style="margin-left: 28px">化</span>：
-              <span v-for="item of cultureOptions" style="cursor: pointer" @click="switchFunctionOrClass(item)" :class="(form.functionOrClassList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :key="item">
+              <span v-for="item of cultureOptions" @click="switchFunctionOrClass(item)" :class="(form.functionOrClassList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :style="history ? 'cursor: not-allowed' : 'cursor: pointer'" :key="item">
                 {{ item }}
               </span>
             </a-col>
 
              <a-col class="mt-10">
                旅<span style="margin-left: 28px">游</span>：
-              <span v-for="item of travelOptions" style="cursor: pointer" @click="switchFunctionOrClass(item)" :class="(form.functionOrClassList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :key="item">
+              <span v-for="item of travelOptions" @click="switchFunctionOrClass(item)" :class="(form.functionOrClassList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :style="history ? 'cursor: not-allowed' : 'cursor: pointer'" :key="item">
                 {{ item }}
               </span>
             </a-col>
 
              <a-col class="mt-10">
                教<span style="margin-left: 28px">育</span>：
-              <span v-for="item of educationOptions" style="cursor: pointer" @click="switchFunctionOrClass(item)" :class="(form.functionOrClassList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :key="item">
+              <span v-for="item of educationOptions" @click="switchFunctionOrClass(item)" :class="(form.functionOrClassList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :style="history ? 'cursor: not-allowed' : 'cursor: pointer'" :key="item">
                 {{ item }}
               </span>
             </a-col>
 
             <a-col class="mt-10">
               医<span style="margin-left: 28px">养</span>：
-              <span v-for="item of hospitalOptions" style="cursor: pointer" @click="switchFunctionOrClass(item)" :class="(form.functionOrClassList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :key="item">
+              <span v-for="item of hospitalOptions" @click="switchFunctionOrClass(item)" :class="(form.functionOrClassList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :style="history ? 'cursor: not-allowed' : 'cursor: pointer'"  :key="item">
                 {{ item }}
               </span>
             </a-col>
 
             <a-col class="mt-10">
               体<span style="margin-left: 28px">育</span>：
-              <span v-for="item of physicalOptions" style="cursor: pointer" @click="switchFunctionOrClass(item)" :class="(form.functionOrClassList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :key="item">
+              <span v-for="item of physicalOptions" @click="switchFunctionOrClass(item)" :class="(form.functionOrClassList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :style="history ? 'cursor: not-allowed' : 'cursor: pointer'"  :key="item">
                 {{ item }}
               </span>
             </a-col>
 
             <a-col class="mt-10">
               商<span style="margin-left: 28px">业</span>：
-              <span v-for="item of businessOptions" style="cursor: pointer" @click="switchFunctionOrClass(item)" :class="(form.functionOrClassList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :key="item">
+              <span v-for="item of businessOptions" @click="switchFunctionOrClass(item)" :class="(form.functionOrClassList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :style="history ? 'cursor: not-allowed' : 'cursor: pointer'"  :key="item">
                 {{ item }}
               </span>
             </a-col>
 
             <a-col class="mt-10">
               总部经济：
-              <span v-for="item of headquarterOptions" style="cursor: pointer" @click="switchFunctionOrClass(item)" :class="(form.functionOrClassList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :key="item">
+              <span v-for="item of headquarterOptions" @click="switchFunctionOrClass(item)" :class="(form.functionOrClassList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :style="history ? 'cursor: not-allowed' : 'cursor: pointer'"  :key="item">
                 {{ item }}
               </span>
             </a-col>
 
             <a-col class="mt-10">
               产业园区：
-              <span v-for="item of industrialParkOptions" style="cursor: pointer" @click="switchFunctionOrClass(item)" :class="(form.functionOrClassList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :key="item">
+              <span v-for="item of industrialParkOptions" @click="switchFunctionOrClass(item)" :class="(form.functionOrClassList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :style="history ? 'cursor: not-allowed' : 'cursor: pointer'"  :key="item">
                 {{ item }}
               </span>
             </a-col>
@@ -105,6 +110,7 @@
                   :withCredentials="true"
                   @preview="handlePreview"
                   class="file-uploader"
+                  :disabled="history"
                   list-type="picture-card"
                   @change="handleChange($event, ['form'],'coverPicList')"
                 >
@@ -119,10 +125,10 @@
             <h2 style="font-weight: bolder">资源方情况介绍</h2>
             <a-col :span="12">
               <a-col>
-                产业资源品牌：<a-input size="small" style="width: 50%" v-model="form.brand"></a-input>
+                产业资源品牌：<a-input :disabled="history" size="small" style="width: 50%" v-model="form.brand"></a-input>
               </a-col>
               <a-col class="mt-20">
-                产业资源方全称：<a-input size="small" style="width: 50%" v-model="form.fullName"></a-input>
+                产业资源方全称：<a-input :disabled="history" size="small" style="width: 50%" v-model="form.fullName"></a-input>
               </a-col>
             </a-col>
             <a-col :span="12">
@@ -136,6 +142,7 @@
                   :file-list="form.brandLogoList"
                   :withCredentials="true"
                   @preview="handlePreview"
+                  :disabled="history"
                   class="file-uploader"
                   list-type="picture-card"
                   @change="handleChange($event, ['form'],'brandLogoList')"
@@ -148,7 +155,7 @@
             </a-col>
             <a-col :span="24">
               公司及资源项目操作经验介绍：
-              <a-textarea v-model="form.operationExperienceIntroduction" class="mt-10"></a-textarea>
+              <a-textarea :disabled="history" v-model="form.operationExperienceIntroduction" class="mt-10"></a-textarea>
             </a-col>
             <a-col class="mt-20 mb-20" :span="24">
               电子版介绍上传：
@@ -156,6 +163,7 @@
                 name="file"
                 :file-list="form.introductionFileList"
                 :multiple="true"
+                :disabled="history"
                 :withCredentials="true"
                 :action="uploadFileURL"
                 @change="handleChange($event, ['form'],'introductionFileList', 'file')"
@@ -177,15 +185,15 @@
 
           <div>
 
-            <a-radio @click.prevent="changeStatus('operationCase')" v-model="form.operationCase.status">本项目已有已投入运营的案例</a-radio>
+            <a-radio :disabled="history" @click.prevent="changeStatus('operationCase')" v-model="form.operationCase.status">本项目已有已投入运营的案例</a-radio>
 
             <div v-show="form.operationCase.status" class="gray-board" style="padding: 10px 20px; border-bottom-left-radius: 0; border-bottom-right-radius: 0">
               <span v-if="form.operationCase.cases.length === 0" class="gray-font" style="font-size: 15px; font-weight: normal">暂无案例</span>
               <span v-for="(_, index) of form.operationCase.cases" :key="'operationCase' + index" style="font-size: 15px; margin-right: 20px">
                 <span @click="showCase(index)" :class="showCaseIndex === index ? 'blue' : 'clickable-txt'">案例{{ index + 1 }} </span>
-                <span @click="deleteCase(index)" class="clickable-txt">[删除]</span>
+                <span @click="deleteCase(index)" v-if="!history" class="clickable-txt">[删除]</span>
               </span>
-              <span class="clickable-txt" @click="addOperationCase" style="font-size: 15px; float: right"><a-icon type="plus"/>增加更多案例</span>
+              <span class="clickable-txt" @click="addOperationCase" v-if="!history" style="font-size: 15px; float: right"><a-icon type="plus"/>增加更多案例</span>
             </div>
 
             <div v-show="form.operationCase.status" v-if="showCaseIndex !== null" style="border: solid 1px #e8e8e8; border-bottom-left-radius: 5px; border-bottom-right-radius: 5px; padding: 10px 20px">
@@ -193,26 +201,26 @@
 
               <a-row>
                 <span class="input-tag">地区: </span>
-                <a-cascader style="width: 30%" v-model="form.operationCase.cases[showCaseIndex].location" :options="locationOptions" placeholder="请选择所在地区"/>
+                <a-cascader :disabled="history" style="width: 30%" v-model="form.operationCase.cases[showCaseIndex].location" :options="locationOptions" placeholder="请选择所在地区"/>
               </a-row>
 
               <a-row class="mt-20">
                 <span class="input-tag">面积: </span>
-                <a-radio v-model="form.operationCase.cases[showCaseIndex].spaceType === 'aboveGround'" @click="form.operationCase.cases[showCaseIndex].spaceType = 'aboveGround'">地上 </a-radio>
-                <a-radio v-model="form.operationCase.cases[showCaseIndex].spaceType === 'underGround'" @click="form.operationCase.cases[showCaseIndex].spaceType = 'underGround'">占地 </a-radio>
-                <a-input v-model="form.operationCase.cases[showCaseIndex].space" type="number" style="width: 200px"></a-input>
+                <a-radio :disabled="history" v-model="form.operationCase.cases[showCaseIndex].spaceType === 'aboveGround'" @click="form.operationCase.cases[showCaseIndex].spaceType = 'aboveGround'">地上 </a-radio>
+                <a-radio :disabled="history" v-model="form.operationCase.cases[showCaseIndex].spaceType === 'underGround'" @click="form.operationCase.cases[showCaseIndex].spaceType = 'underGround'">占地 </a-radio>
+                <a-input :disabled="history" v-model="form.operationCase.cases[showCaseIndex].space" type="number" style="width: 200px"></a-input>
                 <span v-if="form.operationCase.cases[showCaseIndex].spaceType === 'aboveGround'"> 万 m² </span><span v-else> 亩 </span>
               </a-row>
 
               <a-row class="mt-20">
                 <span class="input-tag">项目类型: </span>
-                <a-checkbox-group v-model="form.operationCase.cases[showCaseIndex].itemTypeList" :options="itemTypeOptions" />
-                <a-input v-show="form.operationCase.cases[showCaseIndex].itemTypeList.includes('自定义')" v-model="form.operationCase.cases[showCaseIndex].customItemType" style="width: 200px" size="small"></a-input>
+                <a-checkbox-group :disabled="history" v-model="form.operationCase.cases[showCaseIndex].itemTypeList" :options="itemTypeOptions" />
+                <a-input :disabled="history" v-show="form.operationCase.cases[showCaseIndex].itemTypeList.includes('自定义')" v-model="form.operationCase.cases[showCaseIndex].customItemType" style="width: 200px" size="small"></a-input>
               </a-row>
 
               <a-row class="mt-10">
                 <h2 style="font-weight: bolder">项目简介</h2>
-                <a-textarea v-model="form.operationCase.cases[showCaseIndex].introduction"></a-textarea>
+                <a-textarea :disabled="history" v-model="form.operationCase.cases[showCaseIndex].introduction"></a-textarea>
                 <span class="gray-font" style="font-weight: normal; font-size: 14px">
                   提示：介绍项目包含的具体内容、运营情况，及开业时间、客流量、带来就业人口、税收、取得社会效益等。
                 </span>
@@ -223,6 +231,7 @@
                 <a-col :span="12">
                   <a-upload
                     :action="uploadPicURL"
+                    :disabled="history"
                     name="file"
                     :file-list="form.operationCase.cases[showCaseIndex].coverPicList"
                     :withCredentials="true"
@@ -246,12 +255,13 @@
                       <img style="max-width: 100px; max-height: 100px; padding: 8px" :src="pic.thumbUrl" />
                     </div>
                     <div>
-                      <a-input v-model="pic.description" placeholder="描述" style="width: 104px; margin-top: 10px"></a-input>
+                      <a-input :disabled="history" v-model="pic.description" placeholder="描述" style="width: 104px; margin-top: 10px"></a-input>
                     </div>
                   </div>
                   <a-upload
                     :action="uploadPicURL"
                     name="file"
+                    :disabled="history"
                     :file-list="form.operationCase.cases[showCaseIndex].otherPicList"
                     :withCredentials="true"
                     @preview="handlePreview"
@@ -260,8 +270,8 @@
                     list-type="text"
                     @change="handleChange($event, ['form', 'operationCase', 'cases', showCaseIndex],'otherPicList')"
                   >
-                    <div class="upload-add" v-if="form.operationCase.cases[showCaseIndex].otherPicList.length < 4">
-                      <a-icon  class="upload-add-icon" :type="loading ? 'loading' : 'plus'" />
+                    <div class="upload-add" :style=" history ? 'cursor: not-allowed' : ''" v-if="form.operationCase.cases[showCaseIndex].otherPicList.length < 4">
+                      <a-icon :style=" history ? 'cursor: not-allowed' : ''" class="upload-add-icon" :type="loading ? 'loading' : 'plus'" />
                     </div>
                   </a-upload>
                 </a-col>
@@ -273,12 +283,12 @@
 
 <!--          规划方案 begin-->
           <div class="mt-10">
-            <a-radio @click.prevent="changeStatus('plan')" v-model="form.plan.status">本项目有规划方案</a-radio>
+            <a-radio :disabled="history" @click.prevent="changeStatus('plan')" v-model="form.plan.status">本项目有规划方案</a-radio>
 
             <div v-show="form.plan.status">
               <a-row class="mt-10">
                 <h2 style="font-weight: bolder">项目规划方案简介</h2>
-                <a-textarea v-model="form.plan.description"></a-textarea>
+                <a-textarea :disabled="history" v-model="form.plan.description"></a-textarea>
                 <span class="gray-font" style="font-size: 14px; font-weight: normal">
                   提示：介绍项目规划中包含的具体内容、预期取得社会效益等。
                 </span>
@@ -289,6 +299,7 @@
                 <a-col :span="12">
                   <a-upload
                     :action="uploadPicURL"
+                    :disabled="history"
                     name="file"
                     :file-list="form.plan.coverPicList"
                     :withCredentials="true"
@@ -312,7 +323,7 @@
                       <img style="max-width: 100px; max-height: 100px; padding: 8px" :src="pic.thumbUrl" />
                     </div>
                     <div>
-                      <a-input v-model="pic.description" placeholder="描述" style="width: 104px; margin-top: 10px"></a-input>
+                      <a-input :disabled="history" v-model="pic.description" placeholder="描述" style="width: 104px; margin-top: 10px"></a-input>
                     </div>
                   </div>
                   <a-upload
@@ -320,14 +331,15 @@
                     name="file"
                     :file-list="form.plan.otherPicList"
                     :withCredentials="true"
+                    :disabled="history"
                     @preview="handlePreview"
                     style="vertical-align: top"
                     class="file-uploader"
                     list-type="text"
                     @change="handleChange($event, ['form', 'plan'],'otherPicList')"
                   >
-                    <div class="upload-add" v-if="form.plan.otherPicList.length < 4">
-                      <a-icon  class="upload-add-icon" :type="loading ? 'loading' : 'plus'" />
+                    <div :style=" history ? 'cursor: not-allowed' : ''" class="upload-add" v-if="form.plan.otherPicList.length < 4">
+                      <a-icon :style=" history ? 'cursor: not-allowed' : ''" class="upload-add-icon" :type="loading ? 'loading' : 'plus'" />
                     </div>
                   </a-upload>
                 </a-col>
@@ -339,7 +351,7 @@
 
 <!--          暂无案例及规划方案 begin-->
           <div class="mt-10">
-            <a-radio v-model="noPlanNoOperationCase">本项目暂无案例及规划方案</a-radio>
+            <a-radio :disabled="history" v-model="noPlanNoOperationCase">本项目暂无案例及规划方案</a-radio>
           </div>
 <!--          暂无案例及规划方案 end-->
 
@@ -350,40 +362,40 @@
           按选址区域：
           <div class="mt-10">
             按<span style="margin-left: 22px">地</span><span style="margin-left: 22px">域</span>：
-            <span v-for="item of areaOptions" style="cursor: pointer" @click="switchAreaRequirement(item)" :class="(form.matchRequirement.areaList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :key="item">
+            <span v-for="item of areaOptions" @click="switchAreaRequirement(item)" :class="(form.matchRequirement.areaList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :style="history ? 'cursor: not-allowed' : 'cursor: pointer'"  :key="item">
               {{ item }}
             </span>
           </div>
           <div class="mt-10">
             按 城 市 能 级：
-            <span v-for="item of cityClassOptions" style="cursor: pointer" @click="switchAreaRequirement(item)" :class="(form.matchRequirement.areaList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :key="item">
+            <span v-for="item of cityClassOptions" @click="switchAreaRequirement(item)" :class="(form.matchRequirement.areaList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :style="history ? 'cursor: not-allowed' : 'cursor: pointer'" :key="item">
               {{ item }}
             </span>
           </div>
           <div class="mt-10">
             按城市功能区：
-            <span v-for="item of cityFunctionOptions" style="cursor: pointer" @click="switchAreaRequirement(item)" :class="(form.matchRequirement.areaList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :key="item">
+            <span v-for="item of cityFunctionOptions" @click="switchAreaRequirement(item)" :class="(form.matchRequirement.areaList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :style="history ? 'cursor: not-allowed' : 'cursor: pointer'" :key="item">
               {{ item }}
             </span>
           </div>
 
           <div class="mt-10">
             项目选址的其他特殊要求：
-            <a-textarea class="mt-10" v-model="form.matchRequirement.specialRequirement"></a-textarea>
+            <a-textarea :disabled="history" class="mt-10" v-model="form.matchRequirement.specialRequirement"></a-textarea>
           </div>
 
           <h2 style="font-weight: bolder" class="mt-20">占地面积</h2>
           <div>
-            本项目预计占地面积 <a-input type="number" style="width: 80px" size="small" v-model="form.smallSpace"></a-input> 平方米 —— <a-input style="width: 80px" type="number" size="small" v-model="form.largeSpace"></a-input> 平方米
+            本项目预计占地面积 <a-input :disabled="history" type="number" style="width: 80px" size="small" v-model="form.smallSpace"></a-input> 平方米 —— <a-input :disabled="history" style="width: 80px" type="number" size="small" v-model="form.largeSpace"></a-input> 平方米
           </div>
 
           <h2 style="font-weight: bolder" class="mt-20">投资金额</h2>
           <div>
-            本项目预计投资金额 <a-input type="number" style="width: 80px" size="small" v-model="form.lessInvestment"></a-input> 万元 —— <a-input style="width: 80px" type="number" size="small" v-model="form.largeInvestment"></a-input> 万元
+            本项目预计投资金额 <a-input :disabled="history" type="number" style="width: 80px" size="small" v-model="form.lessInvestment"></a-input> 万元 —— <a-input :disabled="history" style="width: 80px" type="number" size="small" v-model="form.largeInvestment"></a-input> 万元
           </div>
 
           <h2 style="font-weight: bolder" class="mt-20">项目优势自荐</h2>
-          <a-textarea v-model="form.advantage"></a-textarea>
+          <a-textarea :disabled="history" v-model="form.advantage"></a-textarea>
           <span class="gray-font" style="font-size: 14px; font-weight: normal">
             提示：可介绍包括项目能给区域带来的人流、对区域配套设施的完善、提高地产项目售价、提升去化速度等各种利好，带动就业人口、亩均纳税，以及项目的稀缺性、项目运营特色等各方面优势。
           </span>
@@ -392,7 +404,7 @@
           <div>
             <div>
               合作投资需求：
-              <a-radio-group class="mt-10" v-model="form.cooperationRequirement">
+              <a-radio-group :disabled="history" class="mt-10" v-model="form.cooperationRequirement">
                 <a-radio v-for="item of cooperationRequirementOptions" :key="item" :value="item">
                   {{ item }}
                 </a-radio>
@@ -400,7 +412,7 @@
             </div>
             <div class="mt-10">
               产业方收益需求：
-              <a-radio-group class="mt-10" v-model="form.benefitRequirement">
+              <a-radio-group :disabled="history" class="mt-10" v-model="form.benefitRequirement">
                 <a-radio v-for="item of benefitRequirementOptions" :key="item" :value="item">
                   {{ item }}
                 </a-radio>
@@ -408,14 +420,14 @@
             </div>
             <div class="mt-10">
               其他合作要求：
-              <a-textarea class="mt-10" v-model="form.otherCooperationRequirement"></a-textarea>
+              <a-textarea :disabled="history" class="mt-10" v-model="form.otherCooperationRequirement"></a-textarea>
               <span class="gray-font" style="font-size: 14px; font-weight: normal">
                 提示：可详细介绍本方对产业项目投资和收益的具体要求。
               </span>
             </div>
           </div>
 
-          <a-button class="mt-20" type="primary" @click="showSubmitModal">提 交 资 方 信 息</a-button>
+          <a-button class="mt-20" type="primary" @click="showSubmitModal" v-if="!history">提 交 资 方 信 息</a-button>
         </div>
       </a-col>
 
@@ -594,8 +606,26 @@ const itemTypeOptions = [
 
 export default {
   name: 'publishIndustryResource',
+  inject: [
+    'reload'
+  ],
   components: {
     userVerify
+  },
+  props: {
+    historyStringify: {
+      type: String
+    },
+    history: {
+      type: Boolean,
+      default: false
+    }
+  },
+  watch: {
+    '$route': 'init',
+    'historyStringify' () {
+      this.form = JSON.parse(this.historyStringify)
+    }
   },
   computed: {
     ...mapGetters(['userInfo']),
@@ -649,6 +679,7 @@ export default {
     return {
       mode: 'create',
       form: {
+        isDraft: true,
         areaList: [],
         coverPicList: [],
         title: '',
@@ -727,7 +758,25 @@ export default {
       if (this.$route.params.id) {
         this.mode = 'edit'
         api.getIndustryResource(this.$route.params.id).then((res) => {
-          this.form = JSON.parse(res.data.data.stringify)
+          let temp = JSON.parse(res.data.data.stringify)
+          if (typeof (temp.isDraft) === 'undefined') {
+            temp.isDraft = true
+          }
+          this.form = temp
+        })
+      }
+    },
+    saveDraft () {
+      this.form.isDraft = true
+      if (this.mode === 'create') {
+        api.publishIndustryResource(this.form).then((res) => {
+          // 如果是 create 保存后要跳转到草稿地址，不然会造成重复保存问题
+          this.$success('保存成功!')
+          this.$router.push('/user_center/publish_industry_resource/' + res.data.data.ID)
+        })
+      } else {
+        api.editIndustryResource(this.$route.params.id, this.form).then(() => {
+          this.$success('保存成功!')
         })
       }
     },
@@ -741,10 +790,10 @@ export default {
         return
       }
 
-      if (!this.userInfo.certificationVerified && this.userInfo.certificate.ID !== 0) {
-        this.$error('请等待管理员确认实名认证！')
-        return
-      }
+      // if (!this.userInfo.certificationVerified && this.userInfo.certificate.ID !== 0) {
+      //   this.$error('请等待管理员确认实名认证！')
+      //   return
+      // }
 
       this.submitModalVisible = true
 
@@ -769,6 +818,7 @@ export default {
       }, 1000)
     },
     submit () {
+      this.form.isDraft = false
       if (this.mode === 'create') {
         this.performSubmit()
       } else {
@@ -876,6 +926,7 @@ export default {
       form[list] = info.fileList
     },
     switchAreaRequirement (item) {
+      if (this.history) return
       if (this.form.matchRequirement.areaList.includes(item)) {
         this.form.matchRequirement.areaList.remove(item)
         return
@@ -883,6 +934,7 @@ export default {
       this.form.matchRequirement.areaList.push(item)
     },
     switchFunctionOrClass (item) {
+      if (this.history) return
       if (this.form.functionOrClassList.includes(item)) {
         this.form.functionOrClassList.remove(item)
         return

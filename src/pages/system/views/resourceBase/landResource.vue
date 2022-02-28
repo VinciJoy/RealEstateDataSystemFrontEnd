@@ -25,39 +25,29 @@
         <a-row class="mt-20 sub-gray-line">
 
           <a-col class="mt-10">
-            省：
-            <span style="cursor: pointer" :class="!selectedProvince.value ? 'blue' : 'clickable-txt'" @click="selectedProvince = {children: []}" :key="0">
-              不选择
+            地区选择：
+            <span style="cursor: pointer" :class="!selectedArea ? 'blue' : 'clickable-txt'" @click="selectedArea = null">
+              全部
             </span>
-            <span style="cursor: pointer" :class="selectedProvince === province ? 'blue' : 'clickable-txt'" @click="selectedProvince = province" v-for="province in options" :key="province.value">
-              {{ province.value }}
-            </span>
-          </a-col>
-
-          <a-col class="mt-10">
-            市：
-            <span style="cursor: pointer" :class="!selectedCity.value ? 'blue' : 'clickable-txt'" @click="selectedCity = {children: []}" :key="0">
-              不选择
-            </span>
-            <span style="cursor: pointer" :class="selectedCity === city ? 'blue' : 'clickable-txt'" @click="selectedCity = city" v-for="city in selectedProvince.children" :key="city.value">
-              {{ city.value }}
+            <span style="cursor: pointer" :class="selectedArea === area ? 'blue' : 'clickable-txt'" @click="selectedArea = area" v-for="area in areaOptions" :key="area">
+              {{ area }}
             </span>
           </a-col>
 
           <a-col class="mt-10">
-            区：
-            <span style="cursor: pointer" :class="!selectedArea.value ? 'blue' : 'clickable-txt'" @click="selectedArea = {children: []}" :key="0">
-              不选择
+            省份：
+            <span style="cursor: pointer" :class="!selectedProvince ? 'blue' : 'clickable-txt'" @click="selectedProvince = null">
+              全部
             </span>
-            <span style="cursor: pointer" :class="selectedArea === area ? 'blue' : 'clickable-txt'" @click="selectedArea = area" v-for="area in selectedCity.children" :key="area.value">
-              {{ area.value }}
+            <span style="cursor: pointer" :class="selectedProvince === province ? 'blue' : 'clickable-txt'" @click="selectedProvince = province" v-for="province in provinceOptions[selectedArea]" :key="province">
+              {{ province }}
             </span>
           </a-col>
 
           <a-col class="mt-10">
             用地性质：
-            <span style="cursor: pointer" :class="itemType === null ? 'blue' : 'clickable-txt'" @click="changeItemType(null)" :key="0">
-              不选择
+            <span style="cursor: pointer" :class="itemType === null ? 'blue' : 'clickable-txt'" @click="changeItemType(null)">
+              全部
             </span>
             <span style="cursor: pointer" :class="itemType === item ? 'blue' : 'clickable-txt'" @click="changeItemType(item)" v-for="item in ITEM_TYPES" :key="item">
               {{ item }}
@@ -66,8 +56,8 @@
 
           <a-col class="mt-10">
             项目形态：
-            <span style="cursor: pointer" :class="itemFormation === null ? 'blue' : 'clickable-txt'" @click="changeItemFormation(null)" :key="0">
-              不选择
+            <span style="cursor: pointer" :class="itemFormation === null ? 'blue' : 'clickable-txt'" @click="changeItemFormation(null)">
+              全部
             </span>
             <span style="cursor: pointer" :class="itemFormation === item ? 'blue' : 'clickable-txt'" @click="changeItemFormation(item)" v-for="item in itemFormations" :key="item">
               {{ item }}
@@ -76,8 +66,8 @@
 
           <a-col class="mt-10">
             交易方式：
-            <span style="cursor: pointer" :class="exchangeType === null ? 'blue' : 'clickable-txt'" @click="changeExchangeType(null)" :key="0">
-              不选择
+            <span style="cursor: pointer" :class="exchangeType === null ? 'blue' : 'clickable-txt'" @click="changeExchangeType(null)">
+              全部
             </span>
             <span style="cursor: pointer" :class="exchangeType === exchange ? 'blue' : 'clickable-txt'" @click="changeExchangeType(exchange)" v-for="exchange in EXCHANGE_TYPES" :key="exchange">
               {{ exchange }}
@@ -165,14 +155,77 @@ const itemFormations = [
   '一二级联动'
 ]
 
+const areaOptions = [
+  '华东区域',
+  '华北区域',
+  '华中区域',
+  '东北区域',
+  '西北区域',
+  '华南区域',
+  '西南区域',
+  '港澳台海外'
+]
+
+const provinceOptions = {
+  '华东区域': [
+    '上海市',
+    '江苏省',
+    '浙江省',
+    '福建省',
+    '安徽省',
+    '江西省',
+    '山东省'
+  ],
+  '华北区域': [
+    '北京市',
+    '天津市',
+    '河北省',
+    '陕西省',
+    '内蒙古自治区'
+  ],
+  '华中区域': [
+    '湖北省',
+    '湖南省',
+    '河南省'
+  ],
+  '东北区域': [
+    '辽宁省',
+    '吉林省',
+    '黑龙江省'
+  ],
+  '西北区域': [
+    '陕西省',
+    '甘肃省',
+    '青海省',
+    '宁夏自治区',
+    '新疆自治区'
+  ],
+  '华南区域': [
+    '广东省',
+    '广西自治区',
+    '海南省'
+  ],
+  '西南区域': [
+    '重庆市',
+    '四川省',
+    '贵州省',
+    '云南省',
+    '西藏自治区'
+  ],
+  '港澳台海外': [
+    '香港特别行政区',
+    '澳门特别行政区',
+    '海外'
+  ]
+}
+
 export default {
   name: 'landResource',
   data () {
     return {
       loading: false,
-      selectedProvince: {children: []},
-      selectedCity: {children: []},
-      selectedArea: {children: []},
+      selectedProvince: null,
+      selectedArea: null,
       options: options,
       ITEM_TYPES: ITEM_TYPES,
       EXCHANGE_TYPES: EXCHANGE_TYPES,
@@ -181,7 +234,9 @@ export default {
       count: 0,
       itemType: null,
       itemFormation: null,
+      provinceOptions: provinceOptions,
       itemFormations: itemFormations,
+      areaOptions: areaOptions,
       exchangeType: null,
       itemList: [],
       orderByRecommendation: '',
@@ -222,12 +277,6 @@ export default {
     },
     'selectedProvince': function () {
       this.init()
-    },
-    'selectedCity': function () {
-      this.init()
-    },
-    'selectedArea': function () {
-      this.init()
     }
   },
   methods: {
@@ -244,9 +293,7 @@ export default {
         orderByRecommendation: this.orderByRecommendation,
         orderByUpdatedTime: this.orderByUpdatedTime,
         orderBySpace: this.orderBySpace,
-        province: this.selectedProvince.value,
-        city: this.selectedCity.value,
-        area: this.selectedArea.value
+        province: this.selectedProvince
       }).then(res => {
         this.count = res.data.data.count
         this.itemList = res.data.data.landResources

@@ -43,10 +43,16 @@ export default {
   getCaptcha () {
     return ajax('/captchas/', 'post')
   },
+  changePassword (data) {
+    return ajax(rootApi + 'change_password/', 'patch', {data})
+  },
   checkEmail (data) {
     return ajax(rootApi + 'check_email_exists/', 'post', {data})
   },
+  checkUserName (data) {
+    return ajax(rootApi + 'check_user_name_exists/', 'post', {data})
+  },
   checkMobile (data) {
-    return ajax(rootApi + 'check_mobile_exists/', 'post', {data})
+    return ajax(rootApi + 'check_phone_exists/', 'post', {data})
   }
 }

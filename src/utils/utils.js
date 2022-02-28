@@ -53,8 +53,8 @@ function canvasDataURL (path, obj, callback) {
 }
 
 function CheckMobileExist (rule, value, callback) {
-  userApi.checkMobile(value).then(res => {
-    if (res.data.data.mobile === true) {
+  userApi.checkMobile({'phone': value}).then(res => {
+    if (res.data.data.phone === true) {
       callback(new Error('该手机号已经存在!'))
     } else {
       callback()
@@ -87,6 +87,16 @@ function CheckEmailExist (rule, value, callback) {
   }, _ => callback())
 }
 
+function CheckUserNameExist (rule, value, callback) {
+  userApi.checkUserName({'userName': value}).then(res => {
+    if (res.data.data.userName === true) {
+      callback(new Error('该用户名已经存在!'))
+    } else {
+      callback()
+    }
+  }, _ => callback())
+}
+
 function IsAdmin (userRole) {
   return [ROLE.ADMIN, ROLE.SUPER_ADMIN].includes(userRole)
 }
@@ -112,6 +122,7 @@ function Copy (source) {
 
 export default {
   CheckMobileExist: CheckMobileExist,
+  CheckUserNameExist: CheckUserNameExist,
   Copy: Copy,
   MobileValid: MobileValid,
   IsAdmin: IsAdmin,

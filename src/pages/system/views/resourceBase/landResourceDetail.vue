@@ -14,13 +14,13 @@
               <h2>
                 {{ itemBaseInfo.title }}
               </h2>
+              <p>
+                {{ form.subTitle }}
+              </p>
             </a-col>
             <a-col class="info-desc-content" style="text-align: right" :span="8">
               <p style="margin-bottom: 0">
                 更新时间：{{ itemBaseInfo.updatedAt }}
-              </p>
-              <p style="margin-bottom: 0">
-                发布人身份：{{ form.identity }}
               </p>
               <p>
                 300k
@@ -58,7 +58,7 @@
               v-if="mapVisible"
               :ak="ak"
               style="width: 600px; height: 400px; display: inline-block"
-              mapType="BMAP_SATELLITE_MAP"
+              mapType="BMAP_HYBRID_MAP"
               :scroll-wheel-zoom="true"
               :center="form.itemMap.center"
               :zoom="form.itemMap.zoom"
@@ -194,7 +194,7 @@
                 <th>总建筑面积（m²）</th>
                 <td style="background-color: #fafafa; cursor:auto" colspan="3">
                   <span v-if="form.itemBaseInfoForm.itemBaseMode === 'use'">
-                    {{ (form.itemBaseInfoForm.underGroundSpace - '' + spaceComputed * form.itemBaseInfoForm.comprehensiveFAR) | filterUndefined }}
+                    {{ (form.itemBaseInfoForm.underGroundSpace ? (form.itemBaseInfoForm.underGroundSpace - '' + spaceComputed * form.itemBaseInfoForm.comprehensiveFAR) : '-') | filterUndefined }}
                   </span>
                   <span v-else>
                     {{ (form.itemBaseInfoForm.underGroundSpace - '' + spaceComputed) | filterUndefined }}
@@ -206,8 +206,13 @@
           </a-col>
 
             <a-col class="mt-20">
+              <h2 style="font-weight: bolder">项目现状：</h2>
+              <p>{{ form.projectStatus ? form.projectStatus : '暂无项目现状' }}</p>
+            </a-col>
+
+            <a-col class="mt-20">
               <a-col>
-                <h2 style="font-weight: bolder">项目现状及四至信息：</h2>
+                <h2 style="font-weight: bolder">项目图片资料：</h2>
 
 <!--                <baidu-map-->
 <!--                  v-if="mapVisible"-->
@@ -223,94 +228,88 @@
 <!--                  <BaiduPolygon :clicking="true" :path="form.streetMap.polygonPath" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="2" :editing="true"/>-->
 <!--                </baidu-map>-->
 
-                <div class="mt-20" style="display: inline-block; padding-left: 20px; vertical-align: top">
-                  <a-col style="height: 200px" :span="12">
-                    <p style="margin-left: 10px">
-                      地块现状照片
+                <a-row>
+                  <a-col>
+                    <p class="pic-title">
+                      地块/项目现状照片
                     </p>
-                    <div class="pic-block" v-for="(pic, index) of form.landStatusPicList" :key="'streetPicList' + index" @click="handlePreview(pic)">
-                      <div class="upload-add" style="display: flex; justify-content: center">
-                        <img style="max-width: 100px; max-height: 100px; padding: 8px" :src="pic.thumbUrl" />
+                    <div class="pic-desc-block" v-for="(pic, index) of form.landStatusPicList" :key="'streetPicList' + index">
+                      <div @click="handlePreview(pic)" class="upload-add pic-block">
+                        <img class="pic-img" :src="pic.thumbUrl" />
                       </div>
-                      <a-popover>
-                        <template slot="content">
-                          <p>{{ pic.description }}</p>
-                        </template>
-                        <p class="pic-desc">
-                          {{ pic.description }}
-                        </p>
-                      </a-popover>
+                      <p class="pic-desc">
+                        {{ pic.description ? pic.description : '暂无描述' }}
+                      </p>
                     </div>
                   </a-col>
 
-                  <a-col style="height: 200px" :span="12">
-                    <p style="margin-left: 10px">
-                      四至街道现状
+                  <a-col>
+                    <p class="pic-title">
+                      项目四至现状
                     </p>
-                    <div class="pic-block" v-for="(pic, index) of form.streetPicList" :key="'streetPicList' + index" @click="handlePreview(pic)">
-                      <div class="upload-add" style="display: flex; justify-content: center">
-                        <img style="max-width: 100px; max-height: 100px; padding: 8px" :src="pic.thumbUrl" />
+                    <div class="pic-desc-block" v-for="(pic, index) of form.streetPicList" :key="'streetPicList' + index">
+                      <div @click="handlePreview(pic)" class="upload-add pic-block">
+                        <img class="pic-img" :src="pic.thumbUrl" />
                       </div>
-                      <a-popover>
-                        <template slot="content">
-                          <p>{{ pic.description }}</p>
-                        </template>
-                        <p class="pic-desc">
-                          {{ pic.description }}
-                        </p>
-                      </a-popover>
+                      <p class="pic-desc">
+                        {{ pic.description ? pic.description : '暂无描述' }}
+                      </p>
                     </div>
                   </a-col>
 
-                  <a-col style="height: 200px" :span="12">
-                    <p style="margin-left: 10px">
-                      规划及方案效果图
+                  <a-col>
+                    <p class="pic-title">
+                      规划方案及效果图
                     </p>
-                    <div class="pic-block" v-for="(pic, index) of form.effectPicList" :key="'streetPicList' + index" @click="handlePreview(pic)">
-                      <div class="upload-add" style="display: flex; justify-content: center">
-                        <img style="max-width: 100px; max-height: 100px; padding: 8px" :src="pic.thumbUrl" />
+                    <div class="pic-desc-block" v-for="(pic, index) of form.effectPicList" :key="'streetPicList' + index">
+                      <div @click="handlePreview(pic)" class="upload-add pic-block">
+                        <img class="pic-img" :src="pic.thumbUrl" />
                       </div>
-                      <a-popover>
-                        <template slot="content">
-                          <p>{{ pic.description }}</p>
-                        </template>
-                        <p class="pic-desc">
-                          {{ pic.description }}
-                        </p>
-                      </a-popover>
+                      <p class="pic-desc">
+                        {{ pic.description ? pic.description : '暂无描述' }}
+                      </p>
                     </div>
                   </a-col>
 
-                  <a-col style="height: 200px" :span="12">
-                    <p style="margin-left: 10px">
+                  <a-col>
+                    <p class="pic-title">
                       周边配套设施
                     </p>
-                    <div class="pic-block" v-for="(pic, index) of form.facilityPicList" :key="'streetPicList' + index" @click="handlePreview(pic)">
-                      <div class="upload-add" style="display: flex; justify-content: center">
-                        <img style="max-width: 100px; max-height: 100px; padding: 8px" :src="pic.thumbUrl" />
+                    <div class="pic-desc-block" v-for="(pic, index) of form.facilityPicList" :key="'streetPicList' + index">
+                      <div @click="handlePreview(pic)" class="upload-add pic-block">
+                        <img class="pic-img" :src="pic.thumbUrl" />
                       </div>
-                      <a-popover>
-                        <template slot="content">
-                          <p>{{ pic.description }}</p>
-                        </template>
-                        <p class="pic-desc">
-                          {{ pic.description }}
-                        </p>
-                      </a-popover>
+                      <p class="pic-desc">
+                        {{ pic.description ? pic.description : '暂无描述' }}
+                      </p>
+                    </div>
+                  </a-col>
+
+                  <a-col>
+                    <p class="pic-title">
+                      {{ form.otherPicListName ? form.otherPicListName : '其他' }}
+                    </p>
+                    <div class="pic-desc-block" v-for="(pic, index) of form.otherPicList" :key="'otherPicList' + index">
+                      <div @click="handlePreview(pic)" class="upload-add pic-block">
+                        <img class="pic-img" :src="pic.thumbUrl" />
+                      </div>
+                      <p class="pic-desc">
+                        {{ pic.description ? pic.description : '暂无描述' }}
+                      </p>
                     </div>
                   </a-col>
 
                   <a-modal width="80%" :visible="previewVisible" :footer="null" @cancel="previewVisible = false">
-                    <img style="width: 100%" :src="previewImage" />
+                    <img style="width: 100%;-webkit-user-drag: none;" :src="previewImage" />
                   </a-modal>
-                </div>
+                </a-row>
               </a-col>
             </a-col>
 
             <a-row class="mt-20">
             <h2 style="font-weight: bolder">项目进度:</h2>
             <a-tabs type="card">
-              <a-tab-pane key="1" tab="一级开发节点">
+              <a-tab-pane v-if="form.showNodeIndex === 1" key="1" tab="一级开发节点">
                 <div style="margin-bottom: 10px" v-for="progress of progressFirstSelected" :key="progress.name">
                   <a-icon type="check-circle" style="color: #0aa679; font-size: 16px"/> {{ progress.name }}
                 </div>
@@ -318,7 +317,7 @@
                   一级开发节点暂无进度
                 </div>
               </a-tab-pane>
-              <a-tab-pane key="2" tab="二级开发节点">
+              <a-tab-pane v-if="form.showNodeIndex === 2" key="2" tab="二级开发节点">
                 <div v-for="progress of progressSecondSelected" :key="progress.name">
                   <a-icon type="check-circle" style="color: #0aa679; font-size: 16px"/> {{ progress.name }}
                 </div>
@@ -326,7 +325,7 @@
                   二级开发节点暂无进度
                 </div>
               </a-tab-pane>
-              <a-tab-pane key="3" tab="其他类项目节点">
+              <a-tab-pane v-if="form.showNodeIndex === 3" key="3" tab="其他类项目节点">
                 <div v-for="progress of progressOthersSelected" :key="progress.name">
                   <a-icon type="check-circle" style="color: #0aa679; font-size: 16px"/> {{ progress.name }}
                 </div>
@@ -620,17 +619,22 @@ export default {
   font-size: 16px;
 }
 
-.pic-desc {
-  width: 104px;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  margin-top: 10px;
+.pic-block {
+  height: 200px;
+  width: 200px;
+  justify-content: center;
+  cursor: default;
 }
 
-.pic-block {
-  display: inline-block;
-  width: 115px;
+.pic-desc {
+  height: 200px;
+  word-wrap:break-word;
+  word-break:break-all;
+  overflow: hidden;
+}
+
+.pic-desc-block {
+  height: 210px;
 }
 
 .selected {
@@ -642,8 +646,20 @@ th {
   background-color: #fafafa;
 }
 
+.pic-img {
+  max-width: 200px;
+  max-height: 200px;
+  -webkit-user-drag: none;
+  padding: 8px;
+}
+
 td {
   padding: 10px;
+}
+
+.pic-title {
+  margin-bottom: 0;
+  margin-top: 40px;
 }
 
 </style>

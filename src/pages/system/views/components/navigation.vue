@@ -141,9 +141,15 @@
             tabindex="2"
           />
         </a-form-model-item>
+        <a-form-model-item label="手机" prop="phone" ref="phone">
+          <a-input
+            v-model="registerForm.phone"
+            tabindex="3"
+          />
+        </a-form-model-item>
         <a-form-model-item label="密码" prop="password">
           <a-input
-            tabindex="3"
+            tabindex="4"
             type="password"
             v-model="registerForm.password"
           />
@@ -151,7 +157,7 @@
         </a-form-model-item>
         <a-form-model-item label="确认密码" prop="repassword" v-if="modalMode === 'register'">
           <a-input
-            tabindex="4"
+            tabindex="5"
             type="password"
             v-model="registerForm.repassword"
           />
@@ -159,7 +165,7 @@
         <a-form-model-item label="验证码" prop="captcha_value">
           <a-input
             style="width: 50%"
-            tabindex="5"
+            tabindex="6"
             v-model="registerForm.captcha_value"
           />
           <img @click="getCaptcha" class="captchaImg" :src="captchaImgBas64">
@@ -204,6 +210,12 @@ export default {
     'reload'
   ],
   data () {
+    let validUserName = (rule, value, callback) => {
+      if (!/^[\d\w]+$/.test(value)) {
+        callback(new Error('用户名只能包含数字和字母!'))
+      }
+      callback()
+    }
     let checkRepassword = (rule, value, callback) => {
       if (value !== this.registerForm.password) {
         callback(new Error('两次输入密码不一致!'))
@@ -215,7 +227,7 @@ export default {
       loginRules: {
         user_name: [
           {required: true, message: '请输入用户名!', trigger: 'blur'},
-          {min: 5, max: 20, message: '用户名长度为5-20字符!', trigger: 'blur'}
+          {min: 5, max: 20, message: '用户名长度为5-128字符!', trigger: 'blur'}
         ],
         password: [
           {required: true, message: '请输入密码!', trigger: 'blur'},
@@ -228,7 +240,9 @@ export default {
       registerRules: {
         register_user_name: [
           {required: true, message: '请输入用户名!', trigger: 'blur'},
-          {min: 5, max: 20, message: '用户名长度为5-20字符!', trigger: 'blur'}
+          {min: 5, max: 20, message: '用户名长度为5-20字符!', trigger: 'blur'},
+          {validator: validUserName, trigger: 'blur'},
+          {validator: utils.CheckUserNameExist, trigger: 'blur'}
         ],
         password: [
           {required: true, message: '请输入密码!', trigger: 'blur'},
@@ -242,11 +256,15 @@ export default {
           {required: true, type: 'email', trigger: 'blur', message: '请输入正确的电子邮箱!'},
           {validator: utils.CheckEmailExist, trigger: 'blur'}
         ],
+        phone: [
+          {required: true, trigger: 'blur', message: '请输入手机号码!'},
+          {validator: utils.MobileValid, message: '请输入正确的电话号码!', trigger: 'blur'},
+          {validator: utils.CheckMobileExist, trigger: 'blur'}
+        ],
         captcha_value: [
           {required: true, message: '请输入验证码!', trigger: 'blur'}
         ]
       },
-      current: null,
       labelCol: {span: 4},
       wrapperCol: {span: 20},
       loginForm: {
@@ -258,6 +276,7 @@ export default {
       registerForm: {
         register_user_name: null,
         email: null,
+        phone: null,
         password: null,
         repassword: null,
         captcha_uuid: '',
@@ -317,6 +336,7 @@ export default {
       this.getUserInfo()
     },
     handleRoute (route) {
+      this.activeKeys = []
       if (route && route.indexOf('admin') < 0) {
         this.$router.push(route)
       } else {

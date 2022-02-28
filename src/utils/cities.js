@@ -16619,6 +16619,12 @@ const options = [
     'value': '澳门特别行政区',
     'label': '澳门特别行政区',
     'children': []
+  },
+  {
+    'code': '000000',
+    'value': '海外',
+    'label': '海外',
+    'children': []
   }
 ]
 
