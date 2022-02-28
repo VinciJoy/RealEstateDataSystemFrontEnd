@@ -432,6 +432,13 @@
                 <th colspan="2">地上业态指标面积合计（m²）</th>
                 <th> {{ computedAboveSpace }} </th>
               </tr>
+
+              <tr>
+                <th colspan="1">说明</th>
+                <th colspan="2">
+                  <a-input :disabled="history" v-model="form.aboveGroundDesc"></a-input>
+                </th>
+              </tr>
             </table>
           </a-row>
 
@@ -441,8 +448,8 @@
             <table class="mt-10" style="width: 100%" bordercolor="#e8e8e8" border="2">
               <tr>
                 <th style="width: 20%">指标分类</th>
-                <th style="width: 40%">具体产品</th>
-                <th style="width: 20%">建筑面积（m²）</th>
+                <th style="width: 30%">具体产品</th>
+                <th style="width: 30%">建筑面积（m²）</th>
                 <th style="width: 20%">车位个数</th>
               </tr>
               <tr>
@@ -500,6 +507,13 @@
               <tr>
                 <th>地下业态指标面积合计（m²）</th>
                 <th colspan="2"> {{ computedUnderSpace }} </th>
+              </tr>
+
+              <tr>
+                <th colspan="1">说明</th>
+                <th colspan="2">
+                  <a-input :disabled="history" v-model="form.underGroundDesc"></a-input>
+                </th>
               </tr>
             </table>
           </a-row>
@@ -1576,6 +1590,8 @@ export default {
           businessSpace: 0,
           itemBaseMode: 'use',
           aboveGround: [],
+          aboveGroundDesc: '',
+          underGroundDesc: '',
           underGround: [
             {
               type: null,
