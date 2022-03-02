@@ -7,8 +7,10 @@ export default {
   publishIndustryResource (data) {
     return ajax(rootApi, 'post', {data})
   },
-  getIndustryResource (id) {
-    return ajax(rootApi + id + '/', 'get')
+  getIndustryResource (id, params) {
+    return ajax(rootApi + id + '/', 'get', {
+      params
+    })
   },
   getIndustryResources (params) {
     if (!params['pageSize']) {

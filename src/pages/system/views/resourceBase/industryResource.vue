@@ -140,6 +140,7 @@
 import api from '@system/api/industryResource'
 import {mapGetters} from 'vuex'
 import utils from '@/utils/utils'
+import { AUDIT_STATUS } from '../../../../utils/constants'
 
 const areaOptions = [
   '华北区域',
@@ -235,7 +236,8 @@ export default {
         selectedOperationPlanList: this.selectedOperationPlanList.join('/'),
         selectedIndustryTypeList: this.selectedIndustryTypeList.join('/'),
         owner: false,
-        visible: true
+        visible: true,
+        auditStatus: AUDIT_STATUS.PASSED
       }).then(res => {
         this.count = res.data.data.count
         this.itemList = res.data.data.industryResources

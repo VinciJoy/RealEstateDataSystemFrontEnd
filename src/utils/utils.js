@@ -101,6 +101,10 @@ function IsAdmin (userRole) {
   return [ROLE.ADMIN, ROLE.SUPER_ADMIN].includes(userRole)
 }
 
+function IsSuperAdmin (userRole) {
+  return ROLE.SUPER_ADMIN === userRole
+}
+
 function MobileValid (rule, value, callback) {
   if (/^1[345789]\d{9}$/.test(value) === false) {
     if (rule) {
@@ -125,6 +129,7 @@ export default {
   CheckUserNameExist: CheckUserNameExist,
   Copy: Copy,
   MobileValid: MobileValid,
+  IsSuperAdmin: IsSuperAdmin,
   IsAdmin: IsAdmin,
   getBase64: getBase64,
   CheckEmailExist: CheckEmailExist

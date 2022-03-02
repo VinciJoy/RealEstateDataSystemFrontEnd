@@ -253,10 +253,10 @@
             <a-col class="mt-20">
               <h2 style="font-weight: bolder">合作模式要求：</h2>
               <div>
-                合作投资需求：{{ form.cooperationRequirement.length ? form.cooperationRequirement[0] : '暂无' }}
+                合作投资需求：{{ form.cooperationRequirement && form.cooperationRequirement.length ? form.cooperationRequirement[0] : '暂无' }}
               </div>
               <div>
-                产业方收益需求：{{ form.benefitRequirement.length ? form.benefitRequirement[0] : '暂无' }}
+                产业方收益需求：{{ form.benefitRequirement && form.benefitRequirement.length ? form.benefitRequirement[0] : '暂无' }}
               </div>
               <div>
                 其他合作要求：：{{ form.otherCooperationRequirement ? form.otherCooperationRequirement : '暂无' }}
@@ -375,7 +375,7 @@ export default {
     },
     'cooperationFormListComputed' () {
       let res = ''
-      if (this.form.cooperationFormList.length) {
+      if (this.form.cooperationFormList && this.form.cooperationFormList.length) {
         for (let cooperationForm of this.form.cooperationFormList) {
           if (res && res[res.length - 1] !== ' ' && !cooperationForm.includes('+')) {
             res += '/'

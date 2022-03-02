@@ -12,6 +12,38 @@
           <span>个人信息</span>
           </router-link>
         </a-menu-item>
+        <a-sub-menu v-if="utils.IsSuperAdmin(userInfo.role)" key="superAdminManagement">
+          <span slot="title"><a-icon type="dashboard" /><span>MVP控制台</span></span>
+          <a-menu-item key="superAdminUnhandle">
+            <router-link :to="{ name: 'superAdminUnhandle'}">
+              <a-icon type="dashboard" />
+              <span>未处理信息</span>
+            </router-link>
+          </a-menu-item>
+          <a-menu-item key="superAdminHandle">
+            <router-link :to="{ name: 'superAdminHandle'}">
+              <a-icon type="dashboard" />
+              <span>已处理信息</span>
+            </router-link>
+          </a-menu-item>
+        </a-sub-menu>
+        <a-sub-menu v-if="utils.IsAdmin(userInfo.role)" key="adminManagement">
+          <span slot="title"><a-icon type="dashboard" /><span>NPC审核端</span></span>
+          <a-menu-item key="adminUnhandle">
+            <router-link :to="{ name: 'adminUnhandle'}">
+              <a-icon type="dashboard" />
+              <span>未处理信息</span>
+            </router-link>
+          </a-menu-item>
+          <a-menu-item key="adminHandle">
+            <router-link :to="{ name: 'adminHandle'}">
+              <a-icon type="dashboard" />
+              <span>已处理信息</span>
+            </router-link>
+          </a-menu-item>
+        </a-sub-menu>
+        <a-sub-menu key="resource Base">
+          <span slot="title"><a-icon type="pie-chart" /><span>资源 Base</span></span>
         <a-menu-item key="userCenterLandResource">
           <router-link :to="{ name: 'userCenterLandResource'}">
             <a-icon type="pie-chart" />
@@ -24,6 +56,7 @@
             <span>产业资源</span>
           </router-link>
         </a-menu-item>
+        </a-sub-menu>
         <a-menu-item v-if="utils.IsAdmin(userInfo.role)" key="userManage">
           <router-link :to="{ name: 'userManage'}">
             <a-icon type="team" />
@@ -48,6 +81,18 @@ import utils from '@/utils/utils'
 import {mapGetters} from 'vuex'
 
 const MenuList = {
+  superAdminUnhandle: [
+    'superAdminUnhandle'
+  ],
+  superAdminHandle: [
+    'superAdminHandle'
+  ],
+  adminUnhandle: [
+    'adminUnhandle'
+  ],
+  adminHandle: [
+    'adminHandle'
+  ],
   userCenterLandResource: [
     'userCenterLandResource',
     'editLandResource',

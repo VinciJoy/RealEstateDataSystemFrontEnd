@@ -204,7 +204,11 @@ export default {
   methods: {
     init () {
       this.loading = true
-      api.getUsers(this.pageSize, this.pageIndex, this.keywords).then(res => {
+      api.getUsers({
+        pageSize: this.pageSize,
+        pageIndex: this.pageIndex,
+        keywords: this.keywords
+      }).then(res => {
         this.count = res.data.data.count
         this.users = res.data.data.users
         this.loading = false

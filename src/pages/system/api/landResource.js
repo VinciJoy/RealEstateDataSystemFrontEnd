@@ -7,8 +7,10 @@ export default {
   publishLandResource (data) {
     return ajax(rootApi, 'post', {data})
   },
-  getLandResource (id) {
-    return ajax(rootApi + id + '/', 'get')
+  getLandResource (id, params) {
+    return ajax(rootApi + id + '/', 'get', {
+      params
+    })
   },
   getLandResources (params) {
     if (!params['pageSize']) {

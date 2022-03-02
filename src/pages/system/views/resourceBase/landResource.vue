@@ -147,6 +147,7 @@ import options from '@/utils/cities'
 import { ITEM_TYPES, EXCHANGE_TYPES } from '@/utils/constants'
 import api from '@system/api/landResource'
 import {mapGetters} from 'vuex'
+import {AUDIT_STATUS} from "../../../../utils/constants";
 
 const itemFormations = [
   '土地使用权',
@@ -290,6 +291,7 @@ export default {
         exchangeType: this.exchangeType,
         itemFormation: this.itemFormation,
         visible: true,
+        auditStatus: AUDIT_STATUS.PASSED,
         orderByRecommendation: this.orderByRecommendation,
         orderByUpdatedTime: this.orderByUpdatedTime,
         orderBySpace: this.orderBySpace,

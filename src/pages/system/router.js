@@ -59,6 +59,26 @@ export default new Router({
           component: () => import(/* webpackChunkName: "land_resource" */ '@system/views/userCenter/landResource/landResource.vue')
         },
         {
+          path: 'super_admin_unhandle',
+          name: 'superAdminUnhandle',
+          component: () => import(/* webpackChunkName: "admin_management" */ '@system/views/userCenter/adminManagement/superAdminUnhandle.vue')
+        },
+        {
+          path: 'admin_unhandle',
+          name: 'adminUnhandle',
+          component: () => import(/* webpackChunkName: "admin_management" */ '@system/views/userCenter/adminManagement/adminUnhandle.vue')
+        },
+        {
+          path: 'admin_handle',
+          name: 'adminHandle',
+          component: () => import(/* webpackChunkName: "admin_management" */ '@system/views/userCenter/adminManagement/adminHandle.vue')
+        },
+        {
+          path: 'super_admin_handle',
+          name: 'superAdminHandle',
+          component: () => import(/* webpackChunkName: "admin_management" */ '@system/views/userCenter/adminManagement/superAdminHandle.vue')
+        },
+        {
           path: 'publish_land_resource/:id',
           name: 'editLandResource',
           component: () => import(/* webpackChunkName: "land_resource" */ '@system/views/userCenter/landResource/publishLandResource.vue')
@@ -86,7 +106,7 @@ export default new Router({
         {
           path: 'user_list',
           name: 'userManage',
-          component: () => import(/* webpackChunkName: "user_center" */ '@system/views/userCenter/users/users.vue')
+          component: () => import(/* webpackChunkName: "user_list" */ '@system/views/userCenter/users/users.vue')
         }
       ]
     },

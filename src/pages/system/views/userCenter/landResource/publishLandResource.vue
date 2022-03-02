@@ -2271,11 +2271,6 @@ export default {
   margin: 10px;
 }
 
-th {
-  padding: 10px;
-  background-color: #fafafa;
-}
-
 .pic-title {
   margin-bottom: 0;
   margin-top: 40px;
@@ -2298,6 +2293,11 @@ th {
 
 .upload-add-icon {
   padding: 80px;
+}
+
+th {
+  padding: 10px;
+  background-color: #fafafa;
 }
 
 td {

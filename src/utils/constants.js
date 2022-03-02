@@ -9,6 +9,20 @@ export const ROLE = {
   NORMAL: 0
 }
 
+export const AUDIT_STATUS = {
+  NotAudit: 0,
+  UnderAudit: 1,
+  NotPassed: 2,
+  PASSED: 3
+}
+
+export const AUDIT_STATUS_2_CN = [
+  '未审核',
+  '审核中',
+  '不通过',
+  '已通过'
+]
+
 export const ITEM_TYPES = [
   '住宅',
   '商住',
