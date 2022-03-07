@@ -167,7 +167,7 @@ export default {
         pageSize: this.pageSize,
         pageIndex: this.landPageIndex,
         owner: false,
-        adminID: 'not_null',
+        adminID: 'notNull',
         isDraft: false
       }).then(res => {
         this.landCount = res.data.data.count
@@ -180,7 +180,7 @@ export default {
         pageSize: this.pageSize,
         pageIndex: this.industryPageIndex,
         owner: false,
-        adminID: 'not_null',
+        adminID: 'notNull',
         isDraft: false
       }).then(res => {
         this.industryCount = res.data.data.count

@@ -86,7 +86,7 @@
 
     <a-modal
       v-model="adminModalVisible"
-      @ok="allocateTask"
+      @ok="allocateTask(null)"
     >
       <p>
         选择委托的管理员：
@@ -262,10 +262,10 @@ export default {
       if (!id && this.selectedAdmin.length === 0) {
         this.$error('请先选择委托的管理员！')
       } else {
-        let admin = id || this.selectedAdmin
+        let adminID = id || this.selectedAdmin
         if (this.handleType === 'landResource') {
           landApi.editLandResource(this.handleID, {
-            admin: admin
+            admin: adminID
           }).then(res => {
             this.getLands()
             this.adminModalVisible = false
@@ -274,7 +274,7 @@ export default {
         }
         if (this.handleType === 'industryResource') {
           industryApi.editIndustryResource(this.handleID, {
-            admin: admin
+            admin: adminID
           }).then(res => {
             this.getIndustries()
             this.adminModalVisible = false

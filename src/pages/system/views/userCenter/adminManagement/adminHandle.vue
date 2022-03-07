@@ -459,7 +459,7 @@ export default {
         owner: false,
         adminID: this.userInfo.ID,
         isDraft: false,
-        auditStatus: 'passed or notPassed'
+        auditStatus: 'passedOrNotPassed'
       }).then(res => {
         this.landCount = res.data.data.count
         this.landResources = res.data.data.landResources
@@ -473,7 +473,7 @@ export default {
         owner: false,
         adminID: this.userInfo.ID,
         isDraft: false,
-        auditStatus: 'passed or notPassed'
+        auditStatus: 'passedOrNotPassed'
       }).then(res => {
         this.industryCount = res.data.data.count
         this.industryResources = res.data.data.industryResources
