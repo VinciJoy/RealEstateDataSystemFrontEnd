@@ -62,7 +62,7 @@
 <!--    tab end-->
 
     <!--    modal begin-->
-    <a-modal width="80%" v-model="industryModalVisible" :footer="null">
+    <a-modal :zIndex="1" width="80%" v-model="industryModalVisible" :footer="null">
       <div v-show="loading" style="text-align: center">
         <a-spin tip="加载中..."></a-spin>
       </div>
@@ -73,7 +73,7 @@
       </div>
     </a-modal>
 
-    <a-modal width="80%" v-model="landModalVisible" :footer="null">
+    <a-modal :zIndex="1" width="80%" v-model="landModalVisible" :footer="null">
       <div v-show="loading" style="text-align: center">
         <a-spin tip="加载中..."></a-spin>
       </div>
@@ -87,6 +87,7 @@
     <a-modal
       v-model="adminModalVisible"
       @ok="allocateTask(null)"
+      :zIndex="2"
     >
       <p>
         选择委托的管理员：
@@ -267,6 +268,7 @@ export default {
           landApi.editLandResource(this.handleID, {
             admin: adminID
           }).then(res => {
+            this.$success('任务委托成功！')
             this.getLands()
             this.adminModalVisible = false
             this.landModalVisible = false
@@ -276,6 +278,7 @@ export default {
           industryApi.editIndustryResource(this.handleID, {
             admin: adminID
           }).then(res => {
+            this.$success('任务委托成功！')
             this.getIndustries()
             this.adminModalVisible = false
             this.industryModalVisible = false

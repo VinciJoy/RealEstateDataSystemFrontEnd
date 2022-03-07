@@ -194,32 +194,30 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['userInfo'])
+    ...mapGetters(['userInfo']),
+    anyChanged () {
+      let ret = ''
+      const changedItem = [
+        'pageIndex',
+        'orderByUpdatedTime',
+        'orderByRecommendation',
+        'selectedCooperationFormList',
+        'selectedOperationPlanList',
+        'selectedIndustryTypeList',
+        'selectedAreaList'
+      ]
+      for (let item of changedItem) {
+        ret += this[item]
+      }
+      return ret
+    }
   },
   mounted () {
     this.picBaseURL = process.env.API_ROOT + '/system/pics/temp/'
     this.init()
   },
   watch: {
-    'pageIndex': function () {
-      this.init()
-    },
-    'orderByUpdatedTime': function () {
-      this.init()
-    },
-    'orderByRecommendation': function () {
-      this.init()
-    },
-    'selectedCooperationFormList': function () {
-      this.init()
-    },
-    'selectedOperationPlanList': function () {
-      this.init()
-    },
-    'selectedIndustryTypeList': function () {
-      this.init()
-    },
-    'selectedAreaList': function () {
+    'anyChanged' () {
       this.init()
     }
   },

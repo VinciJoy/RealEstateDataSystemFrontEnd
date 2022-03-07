@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-modal v-model="certificateModalVisible" width="80%" :footer="null" title="身份认证" :closable="false">
+    <a-modal :visible="certificateModalVisible" width="80%" :footer="null" title="身份认证" @cancel="closeModal">
       <a-row :gutter="20">
         <a-col :span="12" style="border-right: 2px solid #e0e0e0">
           <a-form-model

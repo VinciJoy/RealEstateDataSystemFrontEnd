@@ -47,7 +47,7 @@
                 </a-select>
               </a-col>
               <a-col :span="10">
-                <a-input :disabled="history" @blur="itemTypeValid" v-model="userDefinedItemType" v-if="form.itemType.includes('自定义')"></a-input>
+                <a-input :disabled="history" placeholder="请输入自定义内容" @blur="itemTypeValid" v-model="userDefinedItemType" v-if="form.itemType.includes('自定义')"></a-input>
               </a-col>
             </a-col>
             <a-col :span="8">
@@ -68,7 +68,7 @@
                 </a-select>
               </a-col>
               <a-col :span="8">
-                <a-input :disabled="history" @blur="exchangeTypeValid" v-model="userDefinedExchangeType" v-if="form.exchangeType.includes('自定义')"></a-input>
+                <a-input :disabled="history" placeholder="请输入自定义内容" @blur="exchangeTypeValid" v-model="userDefinedExchangeType" v-if="form.exchangeType.includes('自定义')"></a-input>
               </a-col>
             </a-col>
           </a-row>

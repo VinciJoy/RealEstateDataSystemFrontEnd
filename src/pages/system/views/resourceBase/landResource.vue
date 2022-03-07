@@ -248,35 +248,31 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['userInfo'])
+    ...mapGetters(['userInfo']),
+    anyChanged () {
+      let ret = ''
+      const changedItem = [
+        'pageIndex',
+        'orderBySpace',
+        'itemType',
+        'orderByRecommendation',
+        'orderByUpdatedTime',
+        'exchangeType',
+        'selectedProvince',
+        'itemFormation'
+      ]
+      for (let item of changedItem) {
+        ret += this[item]
+      }
+      return ret
+    }
   },
   mounted () {
     this.picBaseURL = process.env.API_ROOT + '/system/pics/temp/'
     this.init()
   },
   watch: {
-    'pageIndex': function () {
-      this.init()
-    },
-    'orderBySpace': function () {
-      this.init()
-    },
-    'itemType': function () {
-      this.init()
-    },
-    'orderByRecommendation': function () {
-      this.init()
-    },
-    'orderByUpdatedTime': function () {
-      this.init()
-    },
-    'exchangeType': function () {
-      this.init()
-    },
-    'itemFormation': function () {
-      this.init()
-    },
-    'selectedProvince': function () {
+    'anyChanged' () {
       this.init()
     }
   },
