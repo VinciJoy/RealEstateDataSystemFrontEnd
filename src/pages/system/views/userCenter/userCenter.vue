@@ -57,6 +57,24 @@
           </router-link>
         </a-menu-item>
         </a-sub-menu>
+        <a-menu-item key="likedResource">
+          <router-link :to="{ name: 'likedResource'}">
+            <a-icon type="folder" />
+            <span>收藏的项目</span>
+          </router-link>
+        </a-menu-item>
+        <a-menu-item key="userCenterSubscribeItemList">
+          <router-link :to="{ name: 'userCenterSubscribeItemList'}">
+            <a-icon type="bulb" />
+            <span>定制的项目</span>
+          </router-link>
+        </a-menu-item>
+        <a-menu-item key="userCenterSubscribe">
+          <router-link :to="{ name: 'userCenterSubscribe'}">
+            <a-icon type="monitor" />
+            <span>定制规则</span>
+          </router-link>
+        </a-menu-item>
         <a-menu-item v-if="utils.IsAdmin(userInfo.role)" key="userManage">
           <router-link :to="{ name: 'userManage'}">
             <a-icon type="team" />
@@ -83,6 +101,15 @@ import {mapGetters} from 'vuex'
 const MenuList = {
   superAdminUnhandle: [
     'superAdminUnhandle'
+  ],
+  likedResource: [
+    'likedResource'
+  ],
+  userCenterSubscribeItemList: [
+    'userCenterSubscribeItemList'
+  ],
+  userCenterSubscribe: [
+    'userCenterSubscribe'
   ],
   superAdminHandle: [
     'superAdminHandle'

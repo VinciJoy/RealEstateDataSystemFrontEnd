@@ -154,10 +154,69 @@
               </a-col>
             </a-col>
             <a-col :span="24">
-              公司及资源项目操作经验介绍：
+              公司及产业内容简介：
               <a-textarea :disabled="history" v-model="form.operationExperienceIntroduction" class="mt-10"></a-textarea>
             </a-col>
-            <a-col class="mt-20 mb-20" :span="24">
+            <a-col :span="24" class="mt-10">
+              <p>
+                添加相关图片:
+              </p>
+              <a-upload
+                :action="uploadPicURL"
+                :file-list="form.introductionPicList"
+                :withCredentials="true"
+                :disabled="history"
+                @preview="handlePreview"
+                list-type="picture-card"
+                @change="handleChange($event, ['form'],'introductionPicList')"
+              >
+                <div>
+                  <a-icon :type="loading ? 'loading' : 'plus'" />
+                </div>
+              </a-upload>
+            </a-col>
+            <a-col :span="24" class="mt-10">
+              <a-radio :disabled="history" :checked="form.hasProduction" @click="form.hasProduction = !form.hasProduction">产业资源有产品系</a-radio>
+              <div v-show="form.hasProduction" class="mt-10">
+                <div v-for="(production, index) in form.productionList" :key="'production' + index">
+                  <div style="display: inline-block; vertical-align: top; width: 10%">
+                    产品系（{{ index + 1 }}）<span class="clickable-txt" @click="deleteProduction(index)">[删除]</span>
+                  </div>
+                  <div style="display: inline-block; width: 80%">
+                    <div>
+                      名称：
+                      <a-input v-model="production.title" :disabled="history" style="width: 80%"></a-input>
+                    </div>
+                    <div class="mt-10">
+                      <div style="vertical-align: top;display: inline-block">简介：</div>
+                      <a-textarea v-model="production.desc" :disabled="history" style="width: 80%"></a-textarea>
+                    </div>
+                    <div class="mt-10">
+                      <div style="vertical-align: top;display: inline-block">照片：</div>
+                      <a-upload
+                        :action="uploadPicURL"
+                        :file-list="production.picList"
+                        :withCredentials="true"
+                        :disabled="history"
+                        style="width: 80%"
+                        @preview="handlePreview"
+                        class="file-uploader"
+                        list-type="picture-card"
+                        @change="handleChange($event, ['form', 'productionList', index],'picList')"
+                      >
+                        <div v-if="production.picList < 1">
+                          <a-icon :type="loading ? 'loading' : 'plus'" />
+                        </div>
+                      </a-upload>
+                    </div>
+                  </div>
+                </div>
+                <a-button type="dashed" style="width: 100%" v-if="!history" @click="addProduction">
+                  <a-icon type="plus" /> 增 加 产 品 系
+                </a-button>
+              </div>
+            </a-col>
+            <a-col class="mt-10 mb-20" :span="24">
               电子版介绍上传：
               <a-upload-dragger
                 name="file"
@@ -189,30 +248,35 @@
 
             <div v-show="form.operationCase.status" class="gray-board" style="padding: 10px 20px; border-bottom-left-radius: 0; border-bottom-right-radius: 0">
               <span v-if="form.operationCase.cases.length === 0" class="gray-font" style="font-size: 15px; font-weight: normal">暂无案例</span>
-              <span v-for="(_, index) of form.operationCase.cases" :key="'operationCase' + index" style="font-size: 15px; margin-right: 20px">
-                <span @click="showCase(index)" :class="showCaseIndex === index ? 'blue' : 'clickable-txt'">案例{{ index + 1 }} </span>
+              <span v-for="(_case, index) of form.operationCase.cases" :key="'operationCase' + index" style="font-size: 15px; margin-right: 20px">
+                <span @click="showCase(index)" :class="showCaseIndex === index ? 'blue' : 'clickable-txt'">{{ _case.title ? _case.title : '案例' + (index + 1) }} </span>
                 <span @click="deleteCase(index)" v-if="!history" class="clickable-txt">[删除]</span>
               </span>
               <span class="clickable-txt" @click="addOperationCase" v-if="!history" style="font-size: 15px; float: right"><a-icon type="plus"/>增加更多案例</span>
             </div>
 
             <div v-show="form.operationCase.status" v-if="showCaseIndex !== null" style="border: solid 1px #e8e8e8; border-bottom-left-radius: 5px; border-bottom-right-radius: 5px; padding: 10px 20px">
-              <h2 style="font-weight: bolder">产业落地案例项目介绍</h2>
+              <h2 style="font-weight: bolder">已落地项目介绍</h2>
 
               <a-row>
+                <span class="input-tag">项目名称: </span>
+                <a-input :disabled="history" style="width: 200px" v-model="form.operationCase.cases[showCaseIndex].title" placeholder="请输入项目名称"/>
+              </a-row>
+
+              <a-row class="mt-10">
                 <span class="input-tag">地区: </span>
                 <a-cascader :disabled="history" style="width: 30%" v-model="form.operationCase.cases[showCaseIndex].location" :options="locationOptions" placeholder="请选择所在地区"/>
               </a-row>
 
-              <a-row class="mt-20">
+              <a-row class="mt-10">
                 <span class="input-tag">面积: </span>
                 <a-radio :disabled="history" v-model="form.operationCase.cases[showCaseIndex].spaceType === 'aboveGround'" @click="form.operationCase.cases[showCaseIndex].spaceType = 'aboveGround'">地上 </a-radio>
                 <a-radio :disabled="history" v-model="form.operationCase.cases[showCaseIndex].spaceType === 'underGround'" @click="form.operationCase.cases[showCaseIndex].spaceType = 'underGround'">占地 </a-radio>
                 <a-input :disabled="history" v-model="form.operationCase.cases[showCaseIndex].space" type="number" style="width: 200px"></a-input>
-                <span v-if="form.operationCase.cases[showCaseIndex].spaceType === 'aboveGround'"> 万 m² </span><span v-else> 亩 </span>
+                <span v-if="form.operationCase.cases[showCaseIndex].spaceType === 'aboveGround'"> 万 m² </span><span v-else> 万 m² </span>
               </a-row>
 
-              <a-row class="mt-20">
+              <a-row class="mt-10">
                 <span class="input-tag">项目类型: </span>
                 <a-checkbox-group :disabled="history" v-model="form.operationCase.cases[showCaseIndex].itemTypeList" :options="itemTypeOptions" />
                 <a-input :disabled="history" v-show="form.operationCase.cases[showCaseIndex].itemTypeList.includes('自定义')" v-model="form.operationCase.cases[showCaseIndex].customItemType" style="width: 200px" size="small"></a-input>
@@ -358,8 +422,8 @@
         </div>
 
         <div class="mt-20 sub-gray-line">
-          <h2 style="font-weight: bolder">匹配项目建设要求</h2>
-          按选址区域：
+          <h2 style="font-weight: bolder">项目建设要求</h2>
+          选址要求：
           <div class="mt-10">
             按<span style="margin-left: 22px">地</span><span style="margin-left: 22px">域</span>：
             <span v-for="item of areaOptions" @click="switchAreaRequirement(item)" :class="(form.matchRequirement.areaList.includes(item) ? 'blue' : 'clickable-txt') + ' ml-10'" :style="history ? 'cursor: not-allowed' : 'cursor: pointer'"  :key="item">
@@ -384,14 +448,22 @@
             <a-textarea :disabled="history" class="mt-10" v-model="form.matchRequirement.specialRequirement"></a-textarea>
           </div>
 
-          <h2 style="font-weight: bolder" class="mt-20">占地面积</h2>
-          <div>
-            本项目预计占地面积 <a-input :disabled="history" type="number" style="width: 80px" size="small" v-model="form.smallSpace"></a-input> 平方米 —— <a-input :disabled="history" style="width: 80px" type="number" size="small" v-model="form.largeSpace"></a-input> 平方米
+          <div class="mt-10">
+            占地面积：本项目预计占地面积 <a-input :disabled="history" type="number" style="width: 80px" size="small" v-model="form.smallSpace"></a-input> 万㎡ —— <a-input :disabled="history" style="width: 80px" type="number" size="small" v-model="form.largeSpace"></a-input> 万㎡
           </div>
 
-          <h2 style="font-weight: bolder" class="mt-20">投资金额</h2>
-          <div>
-            本项目预计投资金额 <a-input :disabled="history" type="number" style="width: 80px" size="small" v-model="form.lessInvestment"></a-input> 万元 —— <a-input :disabled="history" style="width: 80px" type="number" size="small" v-model="form.largeInvestment"></a-input> 万元
+          <div class="mt-10">
+            投资金额：本项目预计投资金额 <a-input :disabled="history" type="number" style="width: 80px" size="small" v-model="form.lessInvestment"></a-input> 亿元 —— <a-input :disabled="history" style="width: 80px" type="number" size="small" v-model="form.largeInvestment"></a-input> 亿元
+          </div>
+
+          <div class="mt-10" v-for="(production, index) of form.productionList" :key="'production2' + index">
+            产品系（{{ index }}）{{ production.title }}：
+            <div class="mt-10">
+              占地面积：本产品系预计占地面积 <a-input :disabled="history" type="number" style="width: 80px" size="small" v-model="production.smallSpace"></a-input> 万㎡ —— <a-input :disabled="history" style="width: 80px" type="number" size="small" v-model="production.largeSpace"></a-input> 万㎡
+            </div>
+            <div class="mt-10">
+              投资金额：本产品系预计投资金额 <a-input :disabled="history" type="number" style="width: 80px" size="small" v-model="production.lessInvestment"></a-input> 亿元 —— <a-input :disabled="history" style="width: 80px" type="number" size="small" v-model="production.largeInvestment"></a-input> 亿元
+            </div>
           </div>
 
           <h2 style="font-weight: bolder" class="mt-20">项目优势自荐</h2>
@@ -460,7 +532,7 @@
 import {mapActions, mapGetters} from 'vuex'
 import userVerify from '../../components/userVerify'
 import utils from '@/utils/utils'
-import {HTTP} from '@/utils/constants'
+import {HTTP, areaOptions, itemTypeOptions, cooperationFormOptions} from '@/utils/constants'
 import options from '@/utils/cities'
 import api from '@system/api/industryResource'
 
@@ -511,26 +583,6 @@ const cityClassOptions = [
   '旅游城市',
   '工业城市',
   '县城'
-]
-
-const areaOptions = [
-  '全国',
-  '华北区域',
-  '华东区域',
-  '华中区域',
-  '东北区域',
-  '西北区域',
-  '华南区域',
-  '西南区域',
-  '港澳台及海外'
-]
-
-const cooperationFormOptions = [
-  '投资',
-  '品牌导入',
-  'IP 资源导入',
-  '客户资源导入',
-  ' + 运营'
 ]
 
 const businessOptions = [
@@ -590,18 +642,6 @@ const cultureOptions = [
   '文娱休闲',
   '博物展览',
   '历史文化'
-]
-
-const itemTypeOptions = [
-  '文化类',
-  '旅游类',
-  '教育类',
-  '体育类',
-  '医养类',
-  '商业类',
-  '总部经济',
-  '产业园区',
-  '自定义'
 ]
 
 export default {
@@ -678,9 +718,13 @@ export default {
   data () {
     return {
       mode: 'create',
+      areaOptions,
       form: {
         isDraft: true,
+        hasProduction: false,
+        productionList: [],
         areaList: [],
+        introductionPicList: [],
         coverPicList: [],
         title: '',
         coverPicUuid: '',
@@ -729,16 +773,15 @@ export default {
       benefitRequirementOptions: benefitRequirementOptions,
       industrialParkOptions: industrialParkOptions,
       cityClassOptions: cityClassOptions,
-      areaOptions: areaOptions,
       headquarterOptions: headquarterOptions,
-      itemTypeOptions: itemTypeOptions,
+      itemTypeOptions,
       businessOptions: businessOptions,
       physicalOptions: physicalOptions,
       educationOptions: educationOptions,
       cultureOptions: cultureOptions,
       hospitalOptions: hospitalOptions,
       travelOptions: travelOptions,
-      cooperationFormOptions: cooperationFormOptions,
+      cooperationFormOptions,
       certificateForm: {},
       certificateModalVisible: false,
       submitModalVisible: false,
@@ -762,9 +805,25 @@ export default {
           if (typeof (temp.isDraft) === 'undefined') {
             temp.isDraft = true
           }
+          if (typeof (temp.hasProduction) === 'undefined') {
+            temp.hasProduction = false
+          }
+          if (typeof (temp.productionList) === 'undefined') {
+            temp.productionList = []
+          }
           this.form = temp
         })
       }
+    },
+    deleteProduction (index) {
+      this.form.productionList.splice(index, 1)
+    },
+    addProduction () {
+      this.form.productionList.push({
+        title: '',
+        desc: '',
+        picList: []
+      })
     },
     saveDraft () {
       this.form.isDraft = true
@@ -798,7 +857,8 @@ export default {
       this.submitModalVisible = true
 
       this.form.areaList = this.form.matchRequirement.areaList
-      this.form.caseNum = this.form.operationCase.cases.length
+      this.form.caseNum = 0
+      if (this.form.operationCase.status) this.form.caseNum = this.form.operationCase.cases.length
       this.form.planNum = 0
       if (this.form.plan.status) {
         this.form.planNum = 1
@@ -874,6 +934,7 @@ export default {
 
       // mark1
       this.form.operationCase.cases.push({
+        title: '',
         location: [],
         spaceType: 'aboveGround',
         space: 0,

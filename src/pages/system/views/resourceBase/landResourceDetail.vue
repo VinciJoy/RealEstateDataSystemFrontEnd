@@ -35,8 +35,9 @@
                 <img v-if="itemBaseInfo.recommendation % 2" src="../../../../../static/imgs/halfstar.png"/>
                 <img v-for="i in (Math.floor((10 - itemBaseInfo.recommendation) / 2))" :key="'un_star' + i" src="../../../../../static/imgs/unstar.png"/>
                 <div style="float: right">
-                  <a-button type="primary"><a-icon type="heart" />我感兴趣</a-button>
-                  <a-button type="primary">更多咨询</a-button>
+                  <a-button type="primary" v-show="!itemBaseInfo.liked" @click="likeResource"><a-icon type="folder"/>收藏本信息</a-button>
+                  <a-button v-show="itemBaseInfo.liked" @click="likeResource"><a-icon type="folder"/>取消收藏</a-button>
+                  <a-button @click="showConsultModal" type="primary">更多咨询</a-button>
                 </div>
               </a-col>
             </a-col>
@@ -370,6 +371,44 @@
         <a-col :span="6"></a-col>
       </a-row>
     </a-col>
+
+<!--    modal begin-->
+    <a-modal
+      v-model="consultModalVisible"
+      :maskClosable="false"
+      :closable="false"
+      okText="确认并提交"
+      :confirm-loading="loading"
+      @ok="createConsult"
+    >
+      <a-row>
+        <a-col :span="24">
+          请您填写如下信息，以便后续工作人员和您取得联系：
+        </a-col>
+        <a-col :span="12" class="mt-10">
+          姓名：<a-input v-model="consultInfo.name" style="width: 70%"></a-input>
+        </a-col>
+        <a-col :span="12" class="mt-10">
+          电话：<a-input v-model="consultInfo.phone" style="width: 70%"></a-input>
+        </a-col>
+        <a-col :span="12" class="mt-10">
+          公司：<a-input v-model="consultInfo.company" style="width: 70%"></a-input>
+        </a-col>
+        <a-col :span="12" class="mt-10">
+          职务：<a-input v-model="consultInfo.position" style="width: 70%"></a-input>
+        </a-col>
+        <a-col :span="24" class="mt-10">
+          <div>
+            对本资源的诉求或疑问：
+          </div>
+          <a-textarea v-model="consultInfo.desc"></a-textarea>
+        </a-col>
+        <a-col :span="24" class="mt-10">
+          提示：点击“确认并提交”后，摩贝云工作人员会与您联系。摩贝云将不会对您及您所在公司收取任何费用，请您确认通过摩贝云平台了解并有意向推进本项目，点击“确认并提交”按钮。
+        </a-col>
+      </a-row>
+    </a-modal>
+<!--    modal end-->
   </a-row>
 </template>
 
@@ -381,6 +420,8 @@ import BaiduMapType from 'vue-baidu-map/components/controls/MapType'
 import BaiduPolygon from 'vue-baidu-map/components/overlays/Polygon'
 import BaiduCircle from 'vue-baidu-map/components/overlays/Circle'
 import BaiduNavigation from 'vue-baidu-map/components/controls/Navigation'
+import consultApi from '@system/api/consult'
+import {mapGetters} from 'vuex'
 
 export default {
   name: 'landResourceDetail',
@@ -393,6 +434,7 @@ export default {
     BaiduNavigation
   },
   computed: {
+    ...mapGetters(['userInfo']),
     'progressFirstSelected': function () {
       let temp = []
       for (let key in this.form.progressForm.first) {
@@ -446,6 +488,17 @@ export default {
   data () {
     return {
       mapVisible: false,
+      loading: false,
+      consultModalVisible: false,
+      consultInfo: {
+        resourceType: 'landResource',
+        resourceID: '',
+        name: '',
+        company: '',
+        desc: '',
+        phone: '',
+        position: ''
+      },
       form: {
         totalTransactionAmount: 0,
         investAmount: 0,
@@ -506,7 +559,8 @@ export default {
         title: '',
         recommendation: 0,
         itemType: '',
-        updatedAt: ''
+        updatedAt: '',
+        liked: false
       }
     }
   },
@@ -524,6 +578,7 @@ export default {
   methods: {
     init () {
       this.picBaseURL = process.env.API_ROOT + '/system/pics/temp/'
+      this.consultInfo.resourceID = this.$route.params.id - ''
       api.getLandResource(this.$route.params.id).then((res) => {
         this.mapVisible = false
         this.form = JSON.parse(res.data.data.stringify)
@@ -532,6 +587,7 @@ export default {
         this.itemBaseInfo.recommendation = res.data.data.landResource.recommendation
         this.itemBaseInfo.itemType = res.data.data.landResource.itemType
         this.itemBaseInfo.coverPicUuid = res.data.data.landResource.coverPicUuid
+        this.itemBaseInfo.liked = res.data.data.landResource.liked
         if (!this.form.landStatusPicList.length) {
           this.form.landStatusPicList = [{
             uid: 'landStatusPicList',
@@ -565,10 +621,43 @@ export default {
         }
 
         this.mapVisible = true
+      }).catch(res => {
+        this.$router.go(-1)
+      })
+      if (this.userInfo && this.userInfo.certificate) {
+        if (this.userInfo.certificate.name) {
+          this.consultInfo.name = this.userInfo.certificate.name
+        }
+        if (this.userInfo.certificate.company) {
+          this.consultInfo.company = this.userInfo.certificate.company
+        }
+        if (this.userInfo.certificate.position) {
+          this.consultInfo.position = this.userInfo.certificate.position
+        }
+      }
+    },
+    createConsult () {
+      this.loading = true
+      consultApi.createConsult(this.consultInfo).then(res => {
+        this.$success('提交咨询成功！')
+        this.consultModalVisible = false
+        this.loading = false
+      })
+    },
+    showConsultModal () {
+      this.consultModalVisible = true
+    },
+    likeResource () {
+      api.likeLandResource(this.$route.params.id).then(res => {
+        if (this.itemBaseInfo.liked) {
+          this.$success('取消收藏成功！')
+        } else {
+          this.$success('收藏成功！')
+        }
+        this.itemBaseInfo.liked = !this.itemBaseInfo.liked
       })
     },
     addThreeCircle (map) {
-
       if (this.form[map].threeCirclePath.radius) {
         this.form[map].threeCirclePath.radius = 0
         return
@@ -587,7 +676,6 @@ export default {
       this.form[map].threeCirclePath.radius = 3000
     },
     addFiveCircle (map) {
-
       if (this.form[map].fiveCirclePath.radius) {
         this.form[map].fiveCirclePath.radius = 0
         return

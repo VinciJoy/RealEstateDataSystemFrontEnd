@@ -86,7 +86,7 @@
       <a-col :span="10">
         <div class="left-blue part-title can-not-select" style="width: 100%">
           <h1 style="display: inline">系统公告</h1>
-          <span style="float: right; cursor: pointer" class="tag-desc">MORE +</span>
+          <span style="float: right; cursor: pointer" class="clickable-txt">MORE +</span>
         </div>
 
         <div class="can-not-select mt-20" style="width: 100%">
@@ -148,11 +148,16 @@
             <a-row>
               <img style="padding-top: 10px; height: 90%; width: 90%" src="../../../../../static/imgs/envelope.png"/>
               <div style="color: white; position: absolute; text-align: center; font-size: 20px; font-weight: bolder;left:0; right:30px; top: 40px; bottom:0;">
-                <div class="can-not-select">
-                  请查收您的定制项目
+                <div v-show="userInfo.subscribeUnreadCount > 0" class="can-not-select">
+                  <p>请查收您的定制项目</p>
+                  <p>您有{{ userInfo.subscribeUnreadCount }}条新消息</p>
+                  <a-button @click="$router.push({name: 'userCenterSubscribeItemList'})">点击查看</a-button>
                 </div>
-                <div style="margin-top: 30px">
-                  <a-button>去定制</a-button>
+                <div v-show="userInfo.subscribeUnreadCount === 0" style="margin-top: 30px">
+                  <p>
+                    定制我的项目、产业需求
+                  </p>
+                  <a-button @click="$router.push({name: 'userCenterSubscribe'})">去定制</a-button>
                 </div>
               </div>
             </a-row>
@@ -161,20 +166,14 @@
           <a-col :span="6">
             <a-col class="board-head" style="border-top-left-radius: 10px;">
               <span class="blue" style="font-weight: normal; font-size: 1.5em">土地/资产</span>
-              <span style="float: right; cursor: pointer; font-size: 1.0em" class="tag-desc">MORE+</span>
+              <span style="float: right; cursor: pointer; font-size: 1.0em" @click="$router.push({name: 'landResource'})" class="clickable-txt">MORE+</span>
             </a-col>
             <a-col class="board-body" style="border-bottom-left-radius: 10px; border-right: 2px solid #e9e9e9;">
-              <h2 class="not-allow-txt-overflow">
-                上海市奉贤区占地 150亩
-              </h2>
-              <h2 class="not-allow-txt-overflow">
-                浙江省杭州市拱墅区地上占地面积浙江省杭州市拱墅区地上占地面积
-              </h2>
-              <h2 class="not-allow-txt-overflow">
-                上海市奉贤区占地 150亩
-              </h2>
+              <h3 @click="goToLand(land.ID)" v-for="(land, index) of landList" class="not-allow-txt-overflow clickable-txt" :key="'land' + index">
+                {{ land.title }}
+              </h3>
               <div style="text-align: center">
-                <a-button type="primary" size="small">发布土地/资产信息</a-button>
+                <a-button type="primary" @click="$router.push({name: 'publishLandResource'})">发布土地/资产信息</a-button>
               </div>
             </a-col>
           </a-col>
@@ -182,7 +181,7 @@
           <a-col :span="6">
             <a-col class="board-head">
               <span class="blue" style="font-weight: normal; font-size: 1.5em">资金</span>
-              <span style="float: right; cursor: pointer; font-size: 1.0em" class="tag-desc">MORE+</span>
+              <span style="float: right; cursor: pointer; font-size: 1.0em" class="clickable-txt">MORE+</span>
             </a-col>
             <a-col class="board-body" style="border-right: 2px solid #e9e9e9">
               <h2 class="not-allow-txt-overflow">
@@ -195,7 +194,7 @@
                 上海市奉贤区占地 150亩
               </h2>
               <div style="text-align: center">
-                <a-button type="primary" size="small">发布资金信息</a-button>
+                <a-button type="primary" disabled="disabled">发布资金信息</a-button>
               </div>
             </a-col>
           </a-col>
@@ -203,20 +202,14 @@
           <a-col :span="6">
             <a-col class="board-head" style="border-top-right-radius: 10px">
               <span class="blue" style="font-weight: normal; font-size: 1.5em">产业</span>
-              <span style="float: right; cursor: pointer; font-size: 1.0em" class="tag-desc">MORE+</span>
+              <span style="float: right; cursor: pointer; font-size: 1.0em" @click="$router.push({name: 'industryResource'})" class="clickable-txt">MORE+</span>
             </a-col>
             <a-col class="board-body" style="border-bottom-right-radius: 10px;">
-              <h2 class="not-allow-txt-overflow">
-                上海市奉贤区占地 150亩
-              </h2>
-              <h2 class="not-allow-txt-overflow">
-                浙江省杭州市拱墅区地上占地面积浙江省杭州市拱墅区地上占地面积
-              </h2>
-              <h2 class="not-allow-txt-overflow">
-                上海市奉贤区占地 150亩
-              </h2>
+              <h3 @click="goToIndustry(industry.ID)" v-for="(industry, index) of industryList" class="not-allow-txt-overflow clickable-txt" :key="'industry' + index">
+                {{ industry.title }}
+              </h3>
               <div style="text-align: center">
-                <a-button type="primary" size="small">发布产业信息</a-button>
+                <a-button type="primary" @click="$router.push({name: 'publishIndustryResource'})">发布产业信息</a-button>
               </div>
             </a-col>
           </a-col>
@@ -233,51 +226,21 @@
         <a-row>
           <div class="left-blue part-title can-not-select" style="width: 100%">
             <h1 style="display:inline;">土地/资产转让信息</h1>
-            <span style="float: right; cursor: pointer; font-size: 1.5em" class="tag-desc">MORE+</span>
+            <span style="float: right; cursor: pointer; font-size: 1.5em" class="clickable-txt" @click="$router.push({name: 'landResource'})">MORE+</span>
           </div>
         </a-row>
 
         <a-row :gutter="24" class="mt-20">
-          <a-col :span="6">
-            <div class="info-pic-container">123</div>
-            <div class="info-desc-container">
-              <span class="info-desc-title">上海市奉贤区占地 150 亩</span>
-              <br>
-              <div>
-                <span class="info-desc-content">发布时间：2021/11/25</span>
-                <span class="info-desc-content" style="float: right"><a-icon type="eye" />300</span>
-              </div>
+          <a-col style="cursor:pointer;" @click="goToLand(land.ID)" v-for="(land, index) of landList" :span="6" :key="'desc_land' + index">
+            <div class="info-pic-container">
+              <img v-if="land.coverPicUuid" style="max-width: 100%; max-height: 100%" :src="picBaseURL + item.coverPicUuid"/>
+              <img v-else style="width: 100%; height: 100%" src="static/imgs/default-img.jpeg"/>
             </div>
-          </a-col>
-          <a-col :span="6">
-            <div class="info-pic-container">123</div>
             <div class="info-desc-container">
-              <span class="info-desc-title">上海市奉贤区占地 150 亩</span>
+              <div class="info-desc-title not-allow-txt-overflow" >{{land.title}}</div>
               <br>
               <div>
-                <span class="info-desc-content">发布时间：2021/11/25</span>
-                <span class="info-desc-content" style="float: right"><a-icon type="eye" />300</span>
-              </div>
-            </div>
-          </a-col>
-          <a-col :span="6">
-            <div class="info-pic-container">123</div>
-            <div class="info-desc-container">
-              <span class="info-desc-title">上海市奉贤区占地 150 亩</span>
-              <br>
-              <div>
-                <span class="info-desc-content">发布时间：2021/11/25</span>
-                <span class="info-desc-content" style="float: right"><a-icon type="eye" />300</span>
-              </div>
-            </div>
-          </a-col>
-          <a-col :span="6">
-            <div class="info-pic-container">123</div>
-            <div class="info-desc-container">
-              <span class="info-desc-title">上海市奉贤区占地 150 亩</span>
-              <br>
-              <div>
-                <span class="info-desc-content">发布时间：2021/11/25</span>
+                <span class="info-desc-content">发布时间：{{ land.updatedAt }}</span>
                 <span class="info-desc-content" style="float: right"><a-icon type="eye" />300</span>
               </div>
             </div>
@@ -295,7 +258,7 @@
         <a-row>
           <div class="left-blue part-title can-not-select" style="width: 100%">
             <h1 style="display:inline;">资金信息</h1>
-            <span style="float: right; cursor: pointer; font-size: 1.5em" class="tag-desc">MORE+</span>
+            <span style="float: right; cursor: pointer; font-size: 1.5em" class="clickable-txt">MORE+</span>
           </div>
         </a-row>
 
@@ -357,51 +320,21 @@
         <a-row>
           <div class="left-blue part-title can-not-select" style="width: 100%">
             <h1 style="display:inline;">产业资源信息</h1>
-            <span style="float: right; cursor: pointer; font-size: 1.5em" class="tag-desc">MORE+</span>
+            <span style="float: right; cursor: pointer; font-size: 1.5em" class="clickable-txt" @click="$router.push({name: 'industryResource'})">MORE+</span>
           </div>
         </a-row>
 
         <a-row :gutter="24" class="mt-20">
-          <a-col :span="6">
-            <div class="info-pic-container">123</div>
-            <div class="info-desc-container">
-              <span class="info-desc-title">上海市奉贤区占地 150 亩</span>
-              <br>
-              <div>
-                <span class="info-desc-content">发布时间：2021/11/25</span>
-                <span class="info-desc-content" style="float: right"><a-icon type="eye" />300</span>
-              </div>
+          <a-col style="cursor: pointer" @click="goToIndustry(industry.ID)" v-for="(industry, index) of industryList" :span="6" :key="'desc_industry' + index">
+            <div class="info-pic-container">
+              <img v-if="industry.coverPicUuid" style="max-width: 100%; max-height: 100%" :src="picBaseURL + item.coverPicUuid"/>
+              <img v-else style="width: 100%; height: 100%" src="static/imgs/default-img.jpeg"/>
             </div>
-          </a-col>
-          <a-col :span="6">
-            <div class="info-pic-container">123</div>
             <div class="info-desc-container">
-              <span class="info-desc-title">上海市奉贤区占地 150 亩</span>
+              <div class="info-desc-title not-allow-txt-overflow">{{ industry.title }}</div>
               <br>
               <div>
-                <span class="info-desc-content">发布时间：2021/11/25</span>
-                <span class="info-desc-content" style="float: right"><a-icon type="eye" />300</span>
-              </div>
-            </div>
-          </a-col>
-          <a-col :span="6">
-            <div class="info-pic-container">123</div>
-            <div class="info-desc-container">
-              <span class="info-desc-title">上海市奉贤区占地 150 亩</span>
-              <br>
-              <div>
-                <span class="info-desc-content">发布时间：2021/11/25</span>
-                <span class="info-desc-content" style="float: right"><a-icon type="eye" />300</span>
-              </div>
-            </div>
-          </a-col>
-          <a-col :span="6">
-            <div class="info-pic-container">123</div>
-            <div class="info-desc-container">
-              <span class="info-desc-title">上海市奉贤区占地 150 亩</span>
-              <br>
-              <div>
-                <span class="info-desc-content">发布时间：2021/11/25</span>
+                <span class="info-desc-content">更新时间：{{ industry.updatedAt }}</span>
                 <span class="info-desc-content" style="float: right"><a-icon type="eye" />300</span>
               </div>
             </div>
@@ -414,16 +347,68 @@
 </template>
 
 <script>
+import industryApi from '@system/api/industryResource'
+import landApi from '@system/api/landResource'
+
+import {mapGetters} from 'vuex'
+import {AUDIT_STATUS} from '../../../../utils/constants'
 
 export default {
   data () {
-    return {}
+    return {
+      loading: false,
+      picBaseURL: '',
+      landList: [],
+      industryList: []
+    }
   },
-  created () {
+  mounted () {
+    this.picBaseURL = process.env.API_ROOT + '/system/pics/temp/'
     this.init()
   },
+  computed: {
+    ...mapGetters(['userInfo'])
+
+  },
   methods: {
-    init () {}
+    init () {
+      this.getIndustryResources()
+      this.getLandResources()
+    },
+    goToIndustry (id) {
+      this.$router.push({name: 'industryResourceDetail', params: { id }})
+    },
+    goToLand (id) {
+      this.$router.push({name: 'landResourceDetail', params: { id }})
+    },
+    getLandResources () {
+      this.loading = true
+      landApi.getLandResources({
+        pageSize: 4,
+        pageIndex: 1,
+        orderByUpdatedTime: 'DESC',
+        owner: false,
+        visible: true,
+        auditStatus: AUDIT_STATUS.PASSED
+      }).then(res => {
+        this.landList = res.data.data.landResources
+        this.loading = false
+      })
+    },
+    getIndustryResources () {
+      this.loading = true
+      industryApi.getIndustryResources({
+        pageSize: 4,
+        pageIndex: 1,
+        orderByUpdatedTime: 'DESC',
+        owner: false,
+        visible: true,
+        auditStatus: AUDIT_STATUS.PASSED
+      }).then(res => {
+        this.industryList = res.data.data.industryResources
+        this.loading = false
+      })
+    }
   }
 }
 </script>

@@ -15,7 +15,7 @@
         </a-select>
       </span>
       <span slot="title" slot-scope="text, record">
-        {{ text.title ? text.title : '暂无' }}
+        {{ text.title }}
       </span>
       <span slot="visible" slot-scope="text, record">
         <a-switch :disabled="!utils.IsAdmin(userInfo.role) || text.isDraft" v-model="record.visible" @click="changeVisible(record)" />

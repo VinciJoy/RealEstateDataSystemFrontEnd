@@ -55,9 +55,27 @@
       </a-tab-pane>
 
       <a-tab-pane key="2" tab="客户端信息">
-        Content of Tab Pane 2
+        <p>
+          咨询信息：
+        </p>
+        <a-table
+          :columns="consultColumns"
+          :data-source="consultList"
+          :row-key="record => record.ID"
+          :pagination="false"
+          :loading="consultLoading"
+        >
+          <template slot="resourceType" slot-scope="text, record">
+            {{ text.resourceType === 'landResource' ? '土地' : '产业' }}
+          </template>
+          <template slot="auditStatus" slot-scope="text, record">
+            {{ text.consultStatus | filterConsultStatus }}
+          </template>
+        </a-table>
+        <a-row class="mt-20">
+          <a-pagination style="display: inline-block; float: right;" :page-size="pageSize" v-model="consultPageIndex" :total="consultCount" />
+        </a-row>
       </a-tab-pane>
-
     </a-tabs>
 <!--    tab end-->
   </div>
@@ -68,7 +86,42 @@ import industryApi from '@system/api/industryResource'
 import landApi from '@system/api/landResource'
 import publishIndustryResource from '../industryResource/publishIndustryResource'
 import publishLandResource from '../landResource/publishLandResource'
-import { AUDIT_STATUS_2_CN } from '../../../../../utils/constants'
+import { AUDIT_STATUS_2_CN, CONSULT_STATUS_2_CN } from '../../../../../utils/constants'
+import consultApi from '@system/api/consult'
+
+const consultColumns = [
+  {
+    title: '标 题',
+    dataIndex: 'resourceTitle',
+    ellipsis: true,
+    key: 'title'
+  },
+  {
+    title: '类 型',
+    key: 'resourceType',
+    scopedSlots: { customRender: 'resourceType' }
+  },
+  {
+    title: '创建者',
+    dataIndex: 'creator.user_name',
+    ellipsis: true,
+    width: 100,
+    key: 'creator'
+  },
+  {
+    title: '创建时间',
+    dataIndex: 'createdAt',
+    ellipsis: true,
+    width: 150,
+    key: 'createdAt'
+  },
+  {
+    title: '状 态',
+    key: 'auditStatus',
+    width: 100,
+    scopedSlots: { customRender: 'auditStatus' }
+  }
+]
 
 const columns = [
   {
@@ -124,11 +177,29 @@ export default {
         value = 0
       }
       return AUDIT_STATUS_2_CN[value - '']
+    },
+    'filterConsultStatus': (value) => {
+      if (!value) {
+        value = 0
+      }
+      return CONSULT_STATUS_2_CN[value - '']
+    }
+  },
+  watch: {
+    'landPageIndex' () {
+      this.getLands()
+    },
+    'consultPageIndex' () {
+      this.getConsults()
+    },
+    'industryPageIndex' () {
+      this.getIndustries()
     }
   },
   data () {
     return {
       columns,
+      consultColumns,
       landStringify: '',
       industryStringify: '',
       handleType: '',
@@ -136,11 +207,15 @@ export default {
       ak: 'a79kmTteEBy6rw3dpBZYMq86S2PGEmKo',
       industryResources: [],
       landResources: [],
+      consultList: [],
       admins: [],
       selectedAdmin: [],
       pageSize: 10,
       industryCount: 0,
+      consultCount: 0,
+      consultPageIndex: 0,
       landCount: 0,
+      consultLoading: false,
       loading: false,
       adminModalVisible: false,
       industryLoading: false,
@@ -161,6 +236,18 @@ export default {
       this.loading = true
       this.getIndustries()
       this.getLands()
+      this.getConsults()
+    },
+    getConsults () {
+      consultApi.getConsults({
+        pageSize: this.pageSize,
+        pageIndex: this.consultPageIndex,
+        adminID: 'notNull'
+      }).then(res => {
+        this.consultCount = res.data.data.count
+        this.consultList = res.data.data.consults
+        this.consultLoading = false
+      })
     },
     getLands () {
       landApi.getLandResources({

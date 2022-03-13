@@ -25,19 +25,26 @@
         <a-row class="mt-20 sub-gray-line">
 
           <a-col class="mt-10">
-            选址要求：
+            <span class="filter-title">选址要求：</span>
+            <span>按 地 域：</span>
             <span style="cursor: pointer" :class="!selectedAreaList.length ? 'blue' : 'clickable-txt'" @click="changeArea(null)" :key="'selectedAreaList' + 0">
-              不选择
+              全选
             </span>
             <span style="cursor: pointer" :class="selectedAreaList.includes(item) ? 'blue' : 'clickable-txt'" @click="changeArea(item)" v-for="item in areaOptions" :key="'selectedAreaList' + item">
               {{ item }}
             </span>
+            <div>
+              按 城 市 能 级：
+              <span style="cursor: pointer" :class="selectedAreaList.includes(item) ? 'blue' : 'clickable-txt'" @click="changeArea(item)" v-for="item in cityClassOptions" :key="'selectedAreaList' + item">
+                {{ item }}
+              </span>
+            </div>
           </a-col>
 
           <a-col class="mt-10">
-            产业分类：
+            <span class="filter-title">产业分类：</span>
             <span style="cursor: pointer" :class="!selectedIndustryTypeList.length ? 'blue' : 'clickable-txt'" @click="changeIndustryClass(null)" :key="'selectedIndustryTypeList' + 0">
-              不选择
+              全选
             </span>
             <span style="cursor: pointer" :class="selectedIndustryTypeList.includes(item) ? 'blue' : 'clickable-txt'" @click="changeIndustryClass(item)" v-for="item in industryClassOptions" :key="'selectedIndustryTypeList' + item">
               {{ item }}
@@ -45,9 +52,9 @@
           </a-col>
 
           <a-col class="mt-10">
-            合作形式：
+            <span class="filter-title">合作形式：</span>
             <span style="cursor: pointer" :class="!selectedCooperationFormList.length ? 'blue' : 'clickable-txt'" @click="changeCooperationForm(null)" :key="'selectedCooperationFormList' + 0">
-              不选择
+              全选
             </span>
             <span style="cursor: pointer" :class="selectedCooperationFormList.includes(item) ? 'blue' : 'clickable-txt'" @click="changeCooperationForm(item)" v-for="item in cooperationFormOptions" :key="'selectedCooperationFormList' + item">
               {{ item }}
@@ -55,9 +62,9 @@
           </a-col>
 
           <a-col class="mt-10">
-            项目案例：
+            <span class="filter-title">项目案例：</span>
             <span style="cursor: pointer" :class="!selectedOperationPlanList.length ? 'blue' : 'clickable-txt'" @click="changeOperationPlan(null)">
-              不选择
+              全选
             </span>
             <span style="cursor: pointer" :class="selectedOperationPlanList.includes('有经营案例') ? 'blue' : 'clickable-txt'" @click="changeOperationPlan('有经营案例')">
               有经营案例
@@ -67,7 +74,7 @@
             </span>
           </a-col>
           <a-row class="mt-10">
-              排序：
+            <span class="filter-title">排序：</span>
             <span class="clickable-txt" @click="orderByUpdatedTime = 'ASC'" v-show="orderByUpdatedTime === ''">更新时间 </span>
             <span style="cursor: pointer" class="blue" @click="orderByUpdatedTime = 'DESC'" v-show="orderByUpdatedTime === 'ASC'">更新时间↓</span>
             <span style="cursor: pointer" class="blue" @click="orderByUpdatedTime = ''" v-show="orderByUpdatedTime === 'DESC'">更新时间↑</span>
@@ -80,9 +87,9 @@
 <!--            <span style="cursor: pointer" class="blue" @click="orderByPrice = 'DESC'" v-show="orderByPrice === 'ASC'">交易对价↓</span>-->
 <!--            <span style="cursor: pointer" class="blue" @click="orderByPrice = ''" v-show="orderByPrice === 'DESC'">交易对价↑</span>-->
 
-            <span class="clickable-txt" @click="orderByRecommendation = 'ASC'" v-show="orderByRecommendation === ''">推荐指数 </span>
-            <span style="cursor: pointer" class="blue" @click="orderByRecommendation = 'DESC'" v-show="orderByRecommendation === 'ASC'">推荐指数↓</span>
-            <span style="cursor: pointer" class="blue" @click="orderByRecommendation = ''" v-show="orderByRecommendation === 'DESC'">推荐指数↑</span>
+            <span class="clickable-txt" @click="orderByRecommendation = 'ASC'" v-show="orderByRecommendation === ''">特别推荐 </span>
+            <span style="cursor: pointer" class="blue" @click="orderByRecommendation = 'DESC'" v-show="orderByRecommendation === 'ASC'">特别推荐↓</span>
+            <span style="cursor: pointer" class="blue" @click="orderByRecommendation = ''" v-show="orderByRecommendation === 'DESC'">特别推荐↑</span>
         </a-row>
         </a-row>
 
@@ -110,17 +117,14 @@
             </a-col>
             <a-row class="can-not-select" :gutter="20" style="width: 100%; position: absolute; bottom: 0">
               <a-col style="font-size: 18px; line-height: 1.8">
-                <a-col>
-                  推荐指数:
-                  <img v-for="i in (Math.floor(item.recommendation / 2))" :key="'full_star' + i" src="../../../../../static/imgs/fullstar.png"/>
-                  <img v-if="item.recommendation % 2" src="../../../../../static/imgs/halfstar.png"/>
-                  <img v-for="i in (Math.floor((10 - item.recommendation) / 2))" :key="'un_star' + i" src="../../../../../static/imgs/unstar.png"/>
+                <a-col v-if="item.recommendation">
+                  <img src="../../../../../static/imgs/fullstar.png"/><span style="font-weight: bolder"> 特别推荐</span>
                 </a-col>
                 <a-col>
                    产业功能：{{ item.functionOrClassList ? item.functionOrClassList : '无' }}
                 </a-col>
-                <a-col>
-                  含 {{ item.caseNum }} 个经营案例，{{ item.planNum }} 个规划方案
+                <a-col v-if="item.caseNum || item.planNum">
+                  含{{ item.caseNum ? item.planNum ? '经营案例,' : '经营案例' : ''}}{{ item.planNum ? '规划方案' : ''}}
                   <div class="info-desc-content" style="display: inline-block; float: right">更新时间：{{ item.updatedAt }} 300k</div>
                 </a-col>
               </a-col>
@@ -153,6 +157,15 @@ const areaOptions = [
   '港澳台及海外'
 ]
 
+const cityClassOptions = [
+  '一线城市',
+  '二线城市',
+  '三/四线城市',
+  '旅游城市',
+  '工业城市',
+  '县城'
+]
+
 const cooperationFormOptions = [
   '投资',
   '品牌导入',
@@ -182,6 +195,7 @@ export default {
       selectedCooperationFormList: [],
       selectedOperationPlanList: [],
       industryClassOptions: industryClassOptions,
+      cityClassOptions: cityClassOptions,
       cooperationFormOptions: cooperationFormOptions,
       areaOptions: areaOptions,
       pageSize: 10,
@@ -229,10 +243,10 @@ export default {
         pageIndex: this.pageIndex,
         orderByUpdatedTime: this.orderByUpdatedTime,
         orderByRecommendation: this.orderByRecommendation,
-        selectedAreaList: this.selectedAreaList.join('/'),
-        selectedCooperationFormList: this.selectedCooperationFormList.join('/'),
-        selectedOperationPlanList: this.selectedOperationPlanList.join('/'),
-        selectedIndustryTypeList: this.selectedIndustryTypeList.join('/'),
+        selectedAreaList: this.selectedAreaList.join(','),
+        selectedCooperationFormList: this.selectedCooperationFormList.join(','),
+        selectedOperationPlanList: this.selectedOperationPlanList.join(','),
+        selectedIndustryTypeList: this.selectedIndustryTypeList.join(','),
         owner: false,
         visible: true,
         auditStatus: AUDIT_STATUS.PASSED
@@ -314,5 +328,9 @@ export default {
 <style scoped>
 .selected{
     color: #40a9ff;
+}
+
+.filter-title {
+  font-weight: bolder;
 }
 </style>

@@ -21,7 +21,7 @@
                 {{ text.isDraft ? '草稿' : '发布' }}
               </template>
               <template slot="action" slot-scope="text, record">
-                <a @click="showHandleModal('industryResource' ,record)">处理</a>
+                <a @click="showHandleModal('industryResource' ,record.ID)">处理</a>
               </template>
             </a-table>
             <a-row class="mt-20">
@@ -44,7 +44,7 @@
                 {{ text.isDraft ? '草稿' : '发布' }}
               </template>
               <template slot="action" slot-scope="text, record">
-                <a @click="showHandleModal('landResource' ,record)">处理</a>
+                <a @click="showHandleModal('landResource' ,record.ID)">处理</a>
               </template>
             </a-table>
             <a-row class="mt-20">
@@ -55,7 +55,26 @@
       </a-tab-pane>
 
       <a-tab-pane key="2" tab="客户端信息">
-        Content of Tab Pane 2
+        <p>
+          咨询信息：
+        </p>
+        <a-table
+          :columns="consultColumns"
+          :data-source="consultList"
+          :row-key="record => record.ID"
+          :pagination="false"
+          :loading="consultLoading"
+        >
+          <template slot="resourceType" slot-scope="text, record">
+            {{ text.resourceType === 'landResource' ? '土地' : '产业' }}
+          </template>
+          <template slot="action" slot-scope="text, record">
+            <a @click="showHandleModal(text.resourceType, text.resourceID, record)">处理</a>
+          </template>
+        </a-table>
+        <a-row class="mt-20">
+          <a-pagination style="display: inline-block; float: right;" :page-size="pageSize" v-model="consultPageIndex" :total="consultCount" />
+        </a-row>
       </a-tab-pane>
 
     </a-tabs>
@@ -67,6 +86,26 @@
         <a-spin tip="加载中..."></a-spin>
       </div>
       <publishIndustryResource :history="true" :historyStringify="industryStringify"></publishIndustryResource>
+      <a-row v-if="consultID" class="mt-10">
+        <a-col style="border: 1px solid transparent" :span="2"></a-col>
+          <a-col :span="20">
+          <a-col :span="12">
+            <span style="font-weight: bolder">姓名：</span>{{ consult.userName ? consult.userName : '暂无' }}
+          </a-col>
+          <a-col :span="12">
+            <span style="font-weight: bolder">电话：</span>{{ consult.userPhone ? consult.userPhone : '暂无' }}
+          </a-col>
+          <a-col :span="12">
+            <span style="font-weight: bolder">公司：</span>{{ consult.userCompany ? consult.userCompany : '暂无' }}
+          </a-col>
+          <a-col :span="12">
+            <span style="font-weight: bolder">职务：</span>{{ consult.userPosition ? consult.userPosition : '暂无' }}
+          </a-col>
+            <a-col :span="24">
+              <span style="font-weight: bolder">诉求或疑问：</span>{{ consult.desc ? consult.desc : '暂无' }}
+            </a-col>
+        </a-col>
+      </a-row>
       <div style="text-align: center" class="mt-10">
         <a-button type="primary" @click="allocateTask(userInfo.ID)">超级管理员自审</a-button>
         <a-button type="primary" @click="showAllocateTaskModal">管理员委托</a-button>
@@ -78,6 +117,26 @@
         <a-spin tip="加载中..."></a-spin>
       </div>
       <publishLandResource :history="true" :historyStringify="landStringify"></publishLandResource>
+      <a-row v-if="consultID" class="mt-10">
+        <a-col style="border: 1px solid transparent" :span="2"></a-col>
+          <a-col :span="20">
+          <a-col :span="12">
+            <span style="font-weight: bolder">姓名：</span>{{ consult.userName ? consult.userName : '暂无' }}
+          </a-col>
+          <a-col :span="12">
+            <span style="font-weight: bolder">电话：</span>{{ consult.userPhone ? consult.userPhone : '暂无' }}
+          </a-col>
+          <a-col :span="12">
+            <span style="font-weight: bolder">公司：</span>{{ consult.userCompany ? consult.userCompany : '暂无' }}
+          </a-col>
+          <a-col :span="12">
+            <span style="font-weight: bolder">职务：</span>{{ consult.userPosition ? consult.userPosition : '暂无' }}
+          </a-col>
+            <a-col :span="24">
+              <span style="font-weight: bolder">诉求或疑问：</span>{{ consult.desc ? consult.desc : '暂无' }}
+            </a-col>
+        </a-col>
+      </a-row>
       <div style="text-align: center" class="mt-10">
         <a-button type="primary" @click="allocateTask(userInfo.ID)">超级管理员自审</a-button>
         <a-button type="primary" @click="showAllocateTaskModal">管理员委托</a-button>
@@ -128,10 +187,46 @@ import BaiduSearch from 'vue-baidu-map/components/search/LocalSearch'
 import BaiduCircle from 'vue-baidu-map/components/overlays/Circle'
 import industryApi from '@system/api/industryResource'
 import landApi from '@system/api/landResource'
+import consultApi from '@system/api/consult'
 import publishIndustryResource from '../industryResource/publishIndustryResource'
 import publishLandResource from '../landResource/publishLandResource'
 import userApi from '@system/api/user'
 import {mapGetters} from 'vuex'
+
+const consultColumns = [
+  {
+    title: '标 题',
+    dataIndex: 'resourceTitle',
+    ellipsis: true,
+    key: 'title'
+  },
+  {
+    title: '类 型',
+    key: 'resourceType',
+    scopedSlots: { customRender: 'resourceType' }
+  },
+  {
+    title: '创建者',
+    dataIndex: 'creator.user_name',
+    ellipsis: true,
+    width: 100,
+    key: 'creator'
+  },
+  {
+    title: '创建时间',
+    dataIndex: 'createdAt',
+    ellipsis: true,
+    width: 150,
+    key: 'createdAt'
+  },
+  {
+    title: '操 作',
+    key: 'action',
+    ellipsis: true,
+    width: 100,
+    scopedSlots: { customRender: 'action' }
+  }
+]
 
 const columns = [
   {
@@ -190,31 +285,55 @@ export default {
     BaiduNavigation,
     publishLandResource
   },
+  watch: {
+    'landPageIndex' () {
+      this.getLands()
+    },
+    'consultPageIndex' () {
+      this.getConsults()
+    },
+    'industryPageIndex' () {
+      this.getIndustries()
+    }
+  },
   computed: {
     ...mapGetters(['userInfo'])
   },
   data () {
     return {
       columns,
+      consultColumns,
       landStringify: '',
       industryStringify: '',
       handleType: '',
       handleID: '',
       ak: 'a79kmTteEBy6rw3dpBZYMq86S2PGEmKo',
       industryResources: [],
+      consult: {
+        userName: '',
+        userPosition: '',
+        userCompany: '',
+        userPhone: '',
+        desc: ''
+      },
       landResources: [],
+      consultList: [],
       admins: [],
       selectedAdmin: [],
       pageSize: 10,
       industryCount: 0,
       landCount: 0,
+      consultCount: 0,
       loading: false,
+      consultID: 0,
+      consultLoading: false,
       adminModalVisible: false,
       industryLoading: false,
       landLoading: false,
       landModalVisible: false,
       industryModalVisible: false,
       landPageIndex: 1,
+      consultPageIndex: 1,
       industryPageIndex: 1
     }
   },
@@ -225,6 +344,7 @@ export default {
     init () {
       this.industryLoading = true
       this.landLoading = true
+      this.consultLoading = true
       this.loading = true
       userApi.getUsers({pageSize: this.pageSize, pageIndex: 0, admin: true}).then(res => {
         this.admins = res.data.data.users
@@ -232,6 +352,18 @@ export default {
       })
       this.getIndustries()
       this.getLands()
+      this.getConsults()
+    },
+    getConsults () {
+      consultApi.getConsults({
+        pageSize: this.pageSize,
+        pageIndex: this.consultPageIndex,
+        adminID: 'null'
+      }).then(res => {
+        this.consultCount = res.data.data.count
+        this.consultList = res.data.data.consults
+        this.consultLoading = false
+      })
     },
     getLands () {
       landApi.getLandResources({
@@ -264,6 +396,18 @@ export default {
         this.$error('请先选择委托的管理员！')
       } else {
         let adminID = id || this.selectedAdmin
+        if (this.consultID) {
+          consultApi.editConsult(this.consultID, {
+            admin: adminID
+          }).then(res => {
+            this.$success('任务委托成功！')
+            this.getConsults()
+            this.adminModalVisible = false
+            this.industryModalVisible = false
+            this.landModalVisible = false
+          })
+          return
+        }
         if (this.handleType === 'landResource') {
           landApi.editLandResource(this.handleID, {
             admin: adminID
@@ -273,6 +417,7 @@ export default {
             this.adminModalVisible = false
             this.landModalVisible = false
           })
+          return
         }
         if (this.handleType === 'industryResource') {
           industryApi.editIndustryResource(this.handleID, {
@@ -290,13 +435,18 @@ export default {
       this.selectedAdmin = []
       this.adminModalVisible = true
     },
-    showHandleModal (resourceType, record) {
+    showHandleModal (resourceType, resourceID = 0, consult = null) {
+      this.consultID = 0
+      if (consult) {
+        this.consultID = consult.ID
+      }
+      this.consult = consult
       this.loading = true
       if (resourceType === 'landResource') {
         this.landModalVisible = true
         this.handleType = 'landResource'
-        this.handleID = record.ID
-        landApi.getLandResource(record.ID).then(res => {
+        this.handleID = resourceID
+        landApi.getLandResource(resourceID).then(res => {
           this.landStringify = res.data.data.stringify
           this.loading = false
         })
@@ -304,8 +454,8 @@ export default {
       if (resourceType === 'industryResource') {
         this.industryModalVisible = true
         this.handleType = 'industryResource'
-        this.handleID = record.ID
-        industryApi.getIndustryResource(record.ID).then(res => {
+        this.handleID = resourceID
+        industryApi.getIndustryResource(resourceID).then(res => {
           this.industryStringify = res.data.data.stringify
           this.loading = false
         })

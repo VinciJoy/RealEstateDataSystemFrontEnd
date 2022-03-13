@@ -12,6 +12,9 @@ export default {
       params
     })
   },
+  likeLandResource (id) {
+    return ajax(rootApi + 'like/' + id + '/', 'get')
+  },
   getLandResources (params) {
     if (!params['pageSize']) {
       params['pageSize'] = 20

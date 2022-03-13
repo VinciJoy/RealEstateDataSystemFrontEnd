@@ -8,11 +8,12 @@
       :loading="loading"
     >
       <template slot="recommendation" slot-scope="text, record">
-        <a-select :disabled="!utils.IsAdmin(userInfo.role) || text.isDraft" style="width: 70px" v-model="record.recommendation" @change="changeRecommendation(record)">
-          <a-select-option v-for="i of 11" :value="i - 1" :key="i - 1">
-            {{ i - 1 }}
-          </a-select-option>
-        </a-select>
+<!--        <a-select :disabled="!utils.IsAdmin(userInfo.role) || text.isDraft" style="width: 70px" v-model="record.recommendation" @change="changeRecommendation(record)">-->
+<!--          <a-select-option v-for="i of 11" :value="i - 1" :key="i - 1">-->
+<!--            {{ i - 1 }}-->
+<!--          </a-select-option>-->
+<!--        </a-select>-->
+        <a-switch :disabled="!utils.IsAdmin(userInfo.role) || text.isDraft" :checked="record.recommendation !== 0" @change="changeRecommendation($event, record)"></a-switch>
       </template>
       <template slot="isDraft" slot-scope="text, record">
         {{ text.isDraft ? '草稿' : '发布' }}
@@ -105,7 +106,7 @@ const columns = [
     scopedSlots: { customRender: 'isDraft' }
   },
   {
-    title: '推荐指数',
+    title: '特别推荐',
     key: 'recommendation',
     ellipsis: true,
     width: 150,
@@ -142,6 +143,14 @@ export default {
   },
   mounted () {
     this.init()
+  },
+  watch: {
+    'pageIndex' () {
+      this.init()
+    },
+    'count' () {
+      if ((this.pageIndex - 1) * this.pageSize === this.count) this.pageIndex -= 1
+    }
   },
   computed: {
     ...mapGetters(['userInfo'])
@@ -200,9 +209,14 @@ export default {
     goToEdit (record) {
       this.$router.push('publish_industry_resource/' + record.ID)
     },
-    changeRecommendation (record) {
+    changeRecommendation (check, record) {
+      if (check) {
+        record.recommendation = 1
+      } else {
+        record.recommendation = 0
+      }
       api.editIndustryResource(record.ID, {recommendation: record.recommendation}).then(res => {
-        this.$success('推荐指数修改成功!')
+        this.$success('特别推荐修改成功!')
       })
     },
     goToAdd () {

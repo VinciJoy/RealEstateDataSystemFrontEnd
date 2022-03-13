@@ -54,6 +54,31 @@ export default new Router({
           component: () => import(/* webpackChunkName: "user_center" */ '@system/views/userCenter/userInfo/userInfo.vue')
         },
         {
+          path: 'liked_resource',
+          name: 'likedResource',
+          component: () => import(/* webpackChunkName: "user_center" */ '@system/views/userCenter/likedResource/likedResource.vue')
+        },
+        {
+          path: 'subscribe',
+          name: 'userCenterSubscribe',
+          component: () => import(/* webpackChunkName: "user_center" */ '@system/views/userCenter/subscribe/subscribe.vue')
+        },
+        {
+          path: 'subscribe_item_list',
+          name: 'userCenterSubscribeItemList',
+          component: () => import(/* webpackChunkName: "user_center" */ '@system/views/userCenter/subscribe/subscribeItemList.vue')
+        },
+        {
+          path: 'publish_subscribe/:id',
+          name: 'editSubscribe',
+          component: () => import(/* webpackChunkName: "land_resource" */ '@system/views/userCenter/subscribe/publishSubscribe.vue')
+        },
+        {
+          path: 'publish_subscribe',
+          name: 'publishSubscribe',
+          component: () => import(/* webpackChunkName: "land_resource" */ '@system/views/userCenter/subscribe/publishSubscribe.vue')
+        },
+        {
           path: 'land_resource',
           name: 'userCenterLandResource',
           component: () => import(/* webpackChunkName: "land_resource" */ '@system/views/userCenter/landResource/landResource.vue')

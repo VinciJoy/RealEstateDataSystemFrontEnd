@@ -6,7 +6,42 @@
       </div>
       <publishIndustryResource v-show="handleType === 'industryResource'" :history="true" :historyStringify="industryStringify"></publishIndustryResource>
       <publishLandResource v-show="handleType === 'landResource'" :history="true" :historyStringify="landStringify"></publishLandResource>
-      <a-row class="mt-20">
+      <a-row v-if="isConsult" class="mt-20">
+        <a-col style="border: 1px solid transparent" :span="2"></a-col>
+          <a-col :span="20">
+          <a-col :span="12">
+            <span style="font-weight: bolder">姓名：</span>{{ consult.userName ? consult.userName : '暂无' }}
+          </a-col>
+          <a-col :span="12">
+            <span style="font-weight: bolder">电话：</span>{{ consult.userPhone ? consult.userPhone : '暂无' }}
+          </a-col>
+          <a-col :span="12">
+            <span style="font-weight: bolder">公司：</span>{{ consult.userCompany ? consult.userCompany : '暂无' }}
+          </a-col>
+          <a-col :span="12">
+            <span style="font-weight: bolder">职务：</span>{{ consult.userPosition ? consult.userPosition : '暂无' }}
+          </a-col>
+            <a-col :span="24">
+              <span style="font-weight: bolder">诉求或疑问：</span>{{ consult.desc ? consult.desc : '暂无' }}
+            </a-col>
+            <a-col class="mt-10" :span="24">
+              <h3 style="font-weight: bolder;">咨询状态：</h3>
+              <a-select placeholder="请选择审核状态" v-model="consultForm.consultStatus" style="width: 200px">
+                <a-select-option :disabled="index < 1" v-for="(consultStatus, index) of CONSULT_STATUS_2_CN" :key="consultStatus" :value="index">
+                  {{ consultStatus }}
+                </a-select-option>
+              </a-select>
+            </a-col>
+            <a-col class="mt-10" :span="24">
+              <h3 style="font-weight: bolder;">处理记录：</h3>
+              <a-input v-model="consultForm.record"></a-input>
+            </a-col>
+            <a-col :span="24" class="mt-20" style="text-align: center">
+              <a-button type="primary" @click="submitConsult">完成咨询</a-button>
+            </a-col>
+        </a-col>
+      </a-row>
+      <a-row v-if="!isConsult" class="mt-20">
         <a-col style="border: 1px solid transparent" :span="2"></a-col>
         <a-col :span="20">
           <h3 style="font-weight: bolder; display: inline-block">审核状态：</h3>
@@ -581,11 +616,12 @@ import BaiduSearch from 'vue-baidu-map/components/search/LocalSearch'
 import BaiduCircle from 'vue-baidu-map/components/overlays/Circle'
 import publishIndustryResource from '../industryResource/publishIndustryResource'
 import publishLandResource from '../landResource/publishLandResource'
-import {AUDIT_STATUS_2_CN} from '../../../../../utils/constants'
+import {AUDIT_STATUS_2_CN, CONSULT_STATUS_2_CN} from '../../../../../utils/constants'
 import landApi from '@system/api/landResource'
 import AuditApi from '@system/api/audit'
 import industryApi from '@system/api/industryResource'
 import {HTTP} from '@/utils/constants'
+import consultApi from '@system/api/consult'
 
 export default {
   name: 'handleModal',
@@ -605,6 +641,13 @@ export default {
     handleType: {
       type: String
     },
+    consult: {
+      type: Object
+    },
+    isConsult: {
+      type: Boolean,
+      default: false
+    },
     handleID: {
       type: Number,
       default: 0
@@ -617,6 +660,7 @@ export default {
   data () {
     return {
       AUDIT_STATUS_2_CN,
+      CONSULT_STATUS_2_CN,
       userDefinedAroundStatus: '',
       uploadFileURL: '',
       loading: false,
@@ -626,6 +670,11 @@ export default {
       dataForm: {
         itemBaseInfoForm: {},
         landCostForm: {}
+      },
+      consultForm: {
+        consultStatus: [],
+        desc: '',
+        record: ''
       },
       form: {
         resourceType: '',
@@ -793,6 +842,11 @@ export default {
       this.form.resourceID = this.handleID
       this.uploadFileURL = process.env.API_ROOT + '/system/files/'
       this.getAudit()
+      if (this.isConsult) {
+        let temp = JSON.parse(this.consult.stringify)
+        this.consultForm.consultStatus = this.consult.consultStatus
+        this.consultForm.record = temp.consult.record
+      }
       if (this.handleType === 'landResource') {
         landApi.getLandResource(this.handleID).then(res => {
           this.landStringify = res.data.data.stringify
@@ -815,14 +869,15 @@ export default {
       }).then(res => {
         if (res.data.data.stringify) {
           this.form = JSON.parse(res.data.data.stringify)['audit']
-          for (let i = 0; i < this.form.normalAudit.agreementFileList.length; i++) {
-            this.form.normalAudit.agreementFileList[i].url = this.uploadFileURL + 'temp/' + this.form.normalAudit.agreementFileList[i].uuid + '/'
+          if (this.form.normalAudit.agreementFileList) {
+            for (let i = 0; i < this.form.normalAudit.agreementFileList.length; i++) {
+              this.form.normalAudit.agreementFileList[i].url = this.uploadFileURL + 'temp/' + this.form.normalAudit.agreementFileList[i].uuid + '/'
+            }
           }
         }
       })
     },
     async handleChange (info) {
-
       if (info.fileList.length === 0) {
         this.form.normalAudit.agreementFileList = []
         return
@@ -875,6 +930,20 @@ export default {
           this.closeModal()
         })
       }
+    },
+    submitConsult () {
+      if (!this.consultForm.consultStatus || (Array.isArray(this.consultForm.consultStatus) && this.consultForm.consultStatus.length === 0)) {
+        this.$error('请选择咨询状态!')
+        return
+      }
+      consultApi.editConsult(this.consult.ID, {
+        consultStatus: this.consultForm.consultStatus,
+        consult: this.consultForm
+      }).then(res => {
+        this.$success('处理成功！')
+        this.$emit('getConsults')
+        this.closeModal()
+      })
     }
   }
 }

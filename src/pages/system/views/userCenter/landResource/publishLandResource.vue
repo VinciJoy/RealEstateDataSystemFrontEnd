@@ -1163,7 +1163,7 @@
 import options from '@/utils/cities'
 import api from '@system/api/landResource'
 import utils from '@/utils/utils'
-import { ITEM_TYPES, EXCHANGE_TYPES, HTTP } from '@/utils/constants'
+import { ITEM_TYPES, EXCHANGE_TYPES, HTTP, itemFormations } from '@/utils/constants'
 import BaiduMap from 'vue-baidu-map/components/map/Map.vue'
 import BaiduScale from 'vue-baidu-map/components/controls/Scale'
 import BaiduNavigation from 'vue-baidu-map/components/controls/Navigation'
@@ -1358,13 +1358,6 @@ const secondNode = [
   }
 ]
 
-const itemFormations = [
-  '土地使用权',
-  '在建工程',
-  '现房',
-  '一二级联动'
-]
-
 export default {
   name: 'publishLandResource',
   props: {
@@ -1523,14 +1516,14 @@ export default {
       secondNodeStatus: '',
       nodeVisible: true,
       certificateModalVisible: false,
-      itemFormations: itemFormations,
+      itemFormations,
       identities: identities,
-      EXCHANGE_TYPES: EXCHANGE_TYPES,
+      EXCHANGE_TYPES,
       firstNode: firstNode,
       secondNode: secondNode,
       aboveGroundTypes: aboveGroundTypes,
       underGroundTypes: underGroundTypes,
-      ITEM_TYPES: ITEM_TYPES,
+      ITEM_TYPES,
       form: {
         showNodeIndex: 0,
         subTitle: '',

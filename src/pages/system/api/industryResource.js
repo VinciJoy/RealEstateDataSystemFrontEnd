@@ -12,6 +12,9 @@ export default {
       params
     })
   },
+  likeIndustryResource (id) {
+    return ajax(rootApi + 'like/' + id + '/', 'get')
+  },
   getIndustryResources (params) {
     if (!params['pageSize']) {
       params['pageSize'] = 20

@@ -24,7 +24,7 @@
                 {{ text.auditStatus | filterAuditStatus }}
               </template>
               <template slot="action" slot-scope="text, record">
-                <a @click="showHandleModal('industryResource' ,record)">处理</a>
+                <a @click="showHandleModal('industryResource' ,record.ID)">处理</a>
               </template>
             </a-table>
             <a-row class="mt-20">
@@ -50,7 +50,7 @@
                 {{ text.auditStatus | filterAuditStatus }}
               </template>
               <template slot="action" slot-scope="text, record">
-                <a @click="showHandleModal('landResource' ,record)">处理</a>
+                <a @click="showHandleModal('landResource' ,record.ID)">处理</a>
               </template>
             </a-table>
             <a-row class="mt-20">
@@ -61,14 +61,32 @@
       </a-tab-pane>
 
       <a-tab-pane key="2" tab="客户端信息">
-        Content of Tab Pane 2
+        <p>
+          咨询信息：
+        </p>
+        <a-table
+          :columns="consultColumns"
+          :data-source="consultList"
+          :row-key="record => record.ID"
+          :pagination="false"
+          :loading="consultLoading"
+        >
+          <template slot="resourceType" slot-scope="text, record">
+            {{ text.resourceType === 'landResource' ? '土地' : '产业' }}
+          </template>
+          <template slot="action" slot-scope="text, record">
+            <a @click="showHandleModal(text.resourceType, text.resourceID, true, record)">处理</a>
+          </template>
+        </a-table>
+        <a-row class="mt-20">
+          <a-pagination style="display: inline-block; float: right;" :page-size="pageSize" v-model="consultPageIndex" :total="consultCount" />
+        </a-row>
       </a-tab-pane>
-
     </a-tabs>
 <!--    tab end-->
 
     <!--    modal begin-->
-    <handleModal @getLands="getLands" @getIndustries="getIndustries" :handleType="handleType" @closeHandleModal="modalVisible=false" :modalVisible="modalVisible" :handleID="handleID"></handleModal>
+    <handleModal :consult="consult" :isConsult="isConsult" @getConsults="getConsults" @getLands="getLands" @getIndustries="getIndustries" :handleType="handleType" @closeHandleModal="modalVisible=false" :modalVisible="modalVisible" :handleID="handleID"></handleModal>
 <!--    modal end-->
   </div>
 </template>
@@ -80,6 +98,42 @@ import userApi from '@system/api/user'
 import {mapGetters} from 'vuex'
 import handleModal from './handleModal'
 import {AUDIT_STATUS_2_CN} from '../../../../../utils/constants'
+import consultApi from '@system/api/consult'
+
+const consultColumns = [
+  {
+    title: '标 题',
+    dataIndex: 'resourceTitle',
+    ellipsis: true,
+    key: 'title'
+  },
+  {
+    title: '类 型',
+    key: 'resourceType',
+    scopedSlots: { customRender: 'resourceType' }
+  },
+  {
+    title: '创建者',
+    dataIndex: 'creator.user_name',
+    ellipsis: true,
+    width: 100,
+    key: 'creator'
+  },
+  {
+    title: '创建时间',
+    dataIndex: 'createdAt',
+    ellipsis: true,
+    width: 150,
+    key: 'createdAt'
+  },
+  {
+    title: '操 作',
+    key: 'action',
+    ellipsis: true,
+    width: 100,
+    scopedSlots: { customRender: 'action' }
+  }
+]
 
 const columns = [
   {
@@ -143,23 +197,41 @@ export default {
       return AUDIT_STATUS_2_CN[value - '']
     }
   },
+  watch: {
+    'landPageIndex' () {
+      this.getLands()
+    },
+    'consultPageIndex' () {
+      this.getConsults()
+    },
+    'industryPageIndex' () {
+      this.getIndustries()
+    }
+  },
   data () {
     return {
       columns,
+      consultColumns,
       handleType: '',
       handleID: 0,
       industryResources: [],
       landResources: [],
+      consultList: [],
       admins: [],
       selectedAdmin: [],
       pageSize: 10,
       industryCount: 0,
+      consult: {},
       landCount: 0,
+      consultCount: 0,
       loading: false,
+      consultLoading: false,
+      isConsult: false,
       industryLoading: false,
       landLoading: false,
       modalVisible: false,
       landPageIndex: 1,
+      consultPageIndex: 1,
       industryPageIndex: 1
     }
   },
@@ -180,6 +252,19 @@ export default {
       })
       this.getIndustries()
       this.getLands()
+      this.getConsults()
+    },
+    getConsults () {
+      consultApi.getConsults({
+        pageSize: this.pageSize,
+        pageIndex: this.consultPageIndex,
+        adminID: this.userInfo.ID,
+        consultStatus: 'passedOrNotPassed'
+      }).then(res => {
+        this.consultCount = res.data.data.count
+        this.consultList = res.data.data.consults
+        this.consultLoading = false
+      })
     },
     getLands () {
       landApi.getLandResources({
@@ -209,26 +294,13 @@ export default {
         this.industryLoading = false
       })
     },
-    showHandleModal (resourceType, record) {
+    showHandleModal (resourceType, recordID, isConsult = false, consult) {
+      this.isConsult = isConsult
+      this.consult = consult
       this.loading = true
       this.modalVisible = true
-      this.handleID = record.ID
-      if (resourceType === 'landResource') {
-        this.handleType = 'landResource'
-        // landApi.getLandResource(record.ID).then(res => {
-        //   this.landStringify = res.data.data.stringify
-        //   this.dataForm = JSON.parse(this.landStringify)
-        //   this.loading = false
-        // })
-      }
-      if (resourceType === 'industryResource') {
-        this.handleType = 'industryResource'
-        // industryApi.getIndustryResource(record.ID).then(res => {
-        //   this.industryStringify = res.data.data.stringify
-        //   this.dataForm = JSON.parse(this.industryStringify)
-        //   this.loading = false
-        // })
-      }
+      this.handleType = resourceType
+      this.handleID = recordID
     }
   }
 }

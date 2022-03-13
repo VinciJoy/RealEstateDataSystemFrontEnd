@@ -32,8 +32,9 @@
                 <img v-if="itemBaseInfo.recommendation % 2" src="../../../../../static/imgs/halfstar.png"/>
                 <img v-for="i in (Math.floor((10 - itemBaseInfo.recommendation) / 2))" :key="'un_star' + i" src="../../../../../static/imgs/unstar.png"/>
                 <div style="float: right">
-                  <a-button type="primary"><a-icon type="heart" />我感兴趣</a-button>
-                  <a-button type="primary">更多咨询</a-button>
+                  <a-button type="primary" :loading="loading" v-show="!itemBaseInfo.liked" @click="likeResource"><a-icon type="folder"/>收藏本信息</a-button>
+                  <a-button :loading="loading" v-show="itemBaseInfo.liked" @click="likeResource"><a-icon type="folder"/>取消收藏</a-button>
+                  <a-button @click="showConsultModal" :loading="loading" type="primary">更多咨询</a-button>
                 </div>
               </a-col>
             </a-col>
@@ -72,9 +73,6 @@
                 <a-col>
                   产业资源品牌：<span>{{ form.brand ? form.brand : '暂无' }}</span>
                 </a-col>
-                <a-col class="mt-10">
-                  产业资源方全称：<span>{{ form.fullName ? form.fullName : '暂无' }}</span>
-                </a-col>
               </a-col>
               <a-col :span="1">
                 logo：
@@ -94,25 +92,35 @@
               {{ form.operationExperienceIntroduction ? form.operationExperienceIntroduction : '暂无' }}
             </a-col>
 
-            <a-col class="mt-20">
-              <h2 style="font-weight: bolder">本项目已有已投入运营的案例：</h2>
+            <a-col v-if="form.operationCase && form.operationCase.status" class="mt-20">
+              <h2 style="font-weight: bolder">已落地项目介绍：</h2>
               <div v-if="form.operationCase && form.operationCase.status">
               <div class="gray-board" style="padding: 10px 20px; border-bottom-left-radius: 0; border-bottom-right-radius: 0">
                 <span v-if="(!form.operationCase.cases || form.operationCase.cases.length === 0)" class="gray-font" style="font-size: 15px; font-weight: normal">暂无案例</span>
-                <span v-for="(_, index) of form.operationCase.cases" :key="'operationCase' + index" style="font-size: 15px; margin-right: 20px">
-                  <span @click="showCase(index)" :class="showCaseIndex === index ? 'blue' : 'clickable-txt'">案例{{ index + 1 }} </span>
+                <span v-for="(_case, index) of form.operationCase.cases" :key="'operationCase' + index" style="font-size: 15px; margin-right: 20px">
+                  <span @click="showCase(index)" :class="showCaseIndex === index ? 'blue' : 'clickable-txt'">{{ _case.title ? _case.title : '案例' + (index + 1) }} </span>
                 </span>
               </div>
 
                 <div v-if="showCaseIndex !== null" style="border: solid 1px #e8e8e8; border-bottom-left-radius: 5px; border-bottom-right-radius: 5px; padding: 10px 20px">
-              <h2 style="font-weight: bolder">产业落地案例项目介绍</h2>
 
-              <a-row>
-                <span class="input-tag">地区: </span>
+              <a-row class="mt-10">
+                <a-col :span="12">
+                  <img v-if="(form.operationCase.cases[showCaseIndex].coverPicList && form.operationCase.cases[showCaseIndex].coverPicList.length)" style="width: 80px; height: 80px" :src="picBaseURL + form.operationCase.cases[showCaseIndex].coverPicList[0].response.data.uuid"/>
+                </a-col>
+              </a-row>
+
+              <a-row class="mt-10">
+                <span class="input-tag">项目名称: </span>
+                {{ form.operationCase.cases[showCaseIndex].title ? form.operationCase.cases[showCaseIndex].title : '暂无' }}
+              </a-row>
+
+              <a-row class="mt-10">
+                <span class="input-tag">位置: </span>
                 {{ (form.operationCase.cases[showCaseIndex].location && form.operationCase.cases[showCaseIndex].location.length) ? form.operationCase.cases[showCaseIndex].location.join("/") : '暂无' }}
               </a-row>
 
-              <a-row class="mt-20">
+              <a-row class="mt-10">
                 <span class="input-tag">面积: </span>
                 <span v-if="!form.operationCase.cases[showCaseIndex].space">
                   暂无
@@ -120,11 +128,11 @@
                 <span v-else>
                   {{ form.operationCase.cases[showCaseIndex].spaceType === 'aboveGround' ? '地上 ' : '占地 ' }}
                   {{ form.operationCase.cases[showCaseIndex].space }}
-                  <span v-if="form.operationCase.cases[showCaseIndex].spaceType === 'aboveGround'"> 万 m² </span><span v-else> 亩 </span>
+                  <span v-if="form.operationCase.cases[showCaseIndex].spaceType === 'aboveGround'"> 万 m² </span><span v-else> 万 m² </span>
                 </span>
               </a-row>
 
-              <a-row class="mt-20">
+              <a-row class="mt-10">
                 <span class="input-tag">项目类型: </span>
                 {{ (form.operationCase.cases[showCaseIndex].itemTypeList && form.operationCase.cases[showCaseIndex].itemTypeList.length) ? form.operationCase.cases[showCaseIndex].itemTypeList.join("/") : '暂无' }}
               </a-row>
@@ -132,16 +140,6 @@
               <a-row class="mt-10">
                 <h2 style="font-weight: bolder">项目简介</h2>
                 {{ form.operationCase.cases[showCaseIndex].introduction ? form.operationCase.cases[showCaseIndex].introduction : '暂无' }}
-              </a-row>
-
-              <a-row class="mt-10">
-                <h2 style="font-weight: bolder">封面图片</h2>
-                <a-col :span="12">
-                  <img v-if="(form.operationCase.cases[showCaseIndex].coverPicList && form.operationCase.cases[showCaseIndex].coverPicList.length)" style="width: 80px; height: 80px" :src="picBaseURL + form.operationCase.cases[showCaseIndex].coverPicList[0].response.data.uuid"/>
-                  <div v-else>
-                    暂无
-                  </div>
-                </a-col>
               </a-row>
 
               <a-row class="mt-10">
@@ -170,7 +168,7 @@
               </div>
             </a-col>
 
-            <a-col class="mt-20">
+            <a-col v-if="form.plan && form.plan.status" class="mt-20">
               <h2 style="font-weight: bolder">本项目有规划方案：</h2>
                 <div v-if="form.plan && form.plan.status" style="border: solid 1px #e8e8e8; border-radius: 5px; padding: 10px 20px">
 
@@ -253,10 +251,10 @@
             <a-col class="mt-20">
               <h2 style="font-weight: bolder">合作模式要求：</h2>
               <div>
-                合作投资需求：{{ form.cooperationRequirement && form.cooperationRequirement.length ? form.cooperationRequirement[0] : '暂无' }}
+                合作投资需求：{{ form.cooperationRequirement ? form.cooperationRequirement : '暂无' }}
               </div>
               <div>
-                产业方收益需求：{{ form.benefitRequirement && form.benefitRequirement.length ? form.benefitRequirement[0] : '暂无' }}
+                产业方收益需求：{{ form.benefitRequirement ? form.benefitRequirement : '暂无' }}
               </div>
               <div>
                 其他合作要求：：{{ form.otherCooperationRequirement ? form.otherCooperationRequirement : '暂无' }}
@@ -277,13 +275,51 @@
     <a-modal width="80%" :visible="previewVisible" :footer="null" @cancel="previewVisible = false">
       <img style="width: 100%" :src="previewImage" />
     </a-modal>
+
+    <a-modal
+      v-model="consultModalVisible"
+      :maskClosable="false"
+      :closable="false"
+      okText="确认并提交"
+      :confirm-loading="loading"
+      @ok="createConsult"
+    >
+      <a-row>
+        <a-col :span="24">
+          请您填写如下信息，以便后续工作人员和您取得联系：
+        </a-col>
+        <a-col :span="12" class="mt-10">
+          姓名：<a-input v-model="consultInfo.name" style="width: 70%"></a-input>
+        </a-col>
+        <a-col :span="12" class="mt-10">
+          电话：<a-input v-model="consultInfo.phone" style="width: 70%"></a-input>
+        </a-col>
+        <a-col :span="12" class="mt-10">
+          公司：<a-input v-model="consultInfo.company" style="width: 70%"></a-input>
+        </a-col>
+        <a-col :span="12" class="mt-10">
+          职务：<a-input v-model="consultInfo.position" style="width: 70%"></a-input>
+        </a-col>
+        <a-col :span="24" class="mt-10">
+          <div>
+            对本资源的诉求或疑问：
+          </div>
+          <a-textarea v-model="consultInfo.desc"></a-textarea>
+        </a-col>
+        <a-col :span="24" class="mt-10">
+          提示：点击“确认并提交”后，摩贝云工作人员会与您联系。摩贝云将不会对您及您所在公司收取任何费用，请您确认通过摩贝云平台了解并有意向推进本项目，点击“确认并提交”按钮。
+        </a-col>
+      </a-row>
+    </a-modal>
 <!--    modal end-->
   </a-row>
 </template>
 
 <script>
 import api from '@system/api/industryResource'
+import consultApi from '@system/api/consult'
 import utils from '@/utils/utils'
+import { mapGetters } from 'vuex'
 
 const cityClassOptions = [
   '一线城市',
@@ -318,11 +354,22 @@ export default {
   name: 'industryResourceDetail',
   data () {
     return {
+      loading: false,
       picBaseURL: '',
+      consultModalVisible: false,
       form: {
         itemTypeList: [],
         functionOrClassList: [],
         cooperationFormList: []
+      },
+      consultInfo: {
+        resourceType: 'industryResource',
+        resourceID: '',
+        name: '',
+        company: '',
+        desc: '',
+        phone: '',
+        position: ''
       },
       previewImage: '',
       areaOptions: areaOptions,
@@ -334,12 +381,14 @@ export default {
       itemBaseInfo: {
         updatedAt: '',
         title: '',
+        liked: false,
         recommendation: 0,
         coverPicUuid: ''
       }
     }
   },
   computed: {
+    ...mapGetters(['userInfo']),
     'matchRequirementArea' () {
       let res = []
       if (!this.form.matchRequirement || !this.form.matchRequirement.areaList) return '暂无'
@@ -394,12 +443,54 @@ export default {
   methods: {
     init () {
       this.picBaseURL = process.env.API_ROOT + '/system/pics/temp/'
+      this.consultInfo.resourceID = this.$route.params.id - ''
       api.getIndustryResource(this.$route.params.id).then((res) => {
         this.form = JSON.parse(res.data.data.stringify)
         this.itemBaseInfo.updatedAt = res.data.data.industryResource.updatedAt
         this.itemBaseInfo.title = res.data.data.industryResource.title
         this.itemBaseInfo.recommendation = res.data.data.industryResource.recommendation
         this.itemBaseInfo.coverPicUuid = res.data.data.industryResource.coverPicUuid
+        this.itemBaseInfo.liked = res.data.data.industryResource.liked
+        if (this.form.operationCase.cases && this.form.operationCase.cases.length !== 0) {
+          this.showCaseIndex = 0
+        }
+      }).catch(res => {
+        this.$router.go(-1)
+      })
+      if (this.userInfo && this.userInfo.certificate) {
+        if (this.userInfo.certificate.name) {
+          this.consultInfo.name = this.userInfo.certificate.name
+        }
+        if (this.userInfo.certificate.company) {
+          this.consultInfo.company = this.userInfo.certificate.company
+        }
+        if (this.userInfo.certificate.position) {
+          this.consultInfo.position = this.userInfo.certificate.position
+        }
+      }
+    },
+    createConsult () {
+      this.loading = true
+      consultApi.createConsult(this.consultInfo).then(res => {
+        this.$success('提交咨询成功！')
+        this.consultModalVisible = false
+        this.loading = false
+      })
+    },
+    showConsultModal () {
+      this.consultModalVisible = true
+    },
+    likeResource () {
+      this.loading = true
+      api.likeIndustryResource(this.$route.params.id).then(res => {
+        if (this.itemBaseInfo.liked) {
+          this.$success('取消收藏成功！')
+          this.loading = false
+        } else {
+          this.$success('收藏成功！')
+          this.loading = false
+        }
+        this.itemBaseInfo.liked = !this.itemBaseInfo.liked
       })
     },
     async handlePreview (file) {
