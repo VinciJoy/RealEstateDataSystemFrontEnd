@@ -242,6 +242,9 @@
                         {{ pic.description ? pic.description : '暂无描述' }}
                       </p>
                     </div>
+                    <div v-if="!form.landStatusPicList || form.landStatusPicList.length === 0">
+                      暂无
+                    </div>
                   </a-col>
 
                   <a-col>
@@ -255,6 +258,9 @@
                       <p class="pic-desc">
                         {{ pic.description ? pic.description : '暂无描述' }}
                       </p>
+                    </div>
+                    <div v-if="!form.streetPicList || form.streetPicList.length === 0">
+                      暂无
                     </div>
                   </a-col>
 
@@ -270,6 +276,9 @@
                         {{ pic.description ? pic.description : '暂无描述' }}
                       </p>
                     </div>
+                    <div v-if="!form.effectPicList || form.effectPicList.length === 0">
+                      暂无
+                    </div>
                   </a-col>
 
                   <a-col>
@@ -283,6 +292,9 @@
                       <p class="pic-desc">
                         {{ pic.description ? pic.description : '暂无描述' }}
                       </p>
+                    </div>
+                    <div v-if="!form.facilityPicList || form.facilityPicList.length === 0">
+                      暂无
                     </div>
                   </a-col>
 
@@ -298,6 +310,9 @@
                         {{ pic.description ? pic.description : '暂无描述' }}
                       </p>
                     </div>
+                    <div v-if="!form.otherPicList || form.otherPicList.length === 0">
+                      暂无
+                    </div>
                   </a-col>
 
                   <a-modal width="80%" :visible="previewVisible" :footer="null" @cancel="previewVisible = false">
@@ -310,7 +325,7 @@
             <a-row class="mt-20">
             <h2 style="font-weight: bolder">项目进度:</h2>
             <a-tabs type="card">
-              <a-tab-pane v-if="form.showNodeIndex === 1" key="1" tab="一级开发节点">
+              <a-tab-pane v-if="!form.showNodeIndex || form.showNodeIndex === 1" key="1" tab="一级开发节点">
                 <div style="margin-bottom: 10px" v-for="progress of progressFirstSelected" :key="progress.name">
                   <a-icon type="check-circle" style="color: #0aa679; font-size: 16px"/> {{ progress.name }}
                 </div>
@@ -588,37 +603,6 @@ export default {
         this.itemBaseInfo.itemType = res.data.data.landResource.itemType
         this.itemBaseInfo.coverPicUuid = res.data.data.landResource.coverPicUuid
         this.itemBaseInfo.liked = res.data.data.landResource.liked
-        if (!this.form.landStatusPicList.length) {
-          this.form.landStatusPicList = [{
-            uid: 'landStatusPicList',
-            name: '未上传图片',
-            status: 'removed'
-          }]
-        }
-
-        if (!this.form.streetPicList.length) {
-          this.form.streetPicList = [{
-            uid: 'streetPicList',
-            name: '未上传图片',
-            status: 'removed'
-          }]
-        }
-
-        if (!this.form.effectPicList.length) {
-          this.form.effectPicList = [{
-            uid: 'effectPicList',
-            name: '未上传图片',
-            status: 'removed'
-          }]
-        }
-
-        if (!this.form.facilityPicList.length) {
-          this.form.facilityPicList = [{
-            uid: 'facilityPicList',
-            name: '未上传图片',
-            status: 'removed'
-          }]
-        }
 
         this.mapVisible = true
       }).catch(res => {

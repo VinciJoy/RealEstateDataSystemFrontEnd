@@ -233,7 +233,7 @@
         <a-row :gutter="24" class="mt-20">
           <a-col style="cursor:pointer;" @click="goToLand(land.ID)" v-for="(land, index) of landList" :span="6" :key="'desc_land' + index">
             <div class="info-pic-container">
-              <img v-if="land.coverPicUuid" style="max-width: 100%; max-height: 100%" :src="picBaseURL + land.coverPicUuid"/>
+              <img v-if="land.coverPicUuid" style="width: 100%; height: 100%" :src="picBaseURL + land.coverPicUuid"/>
               <img v-else style="width: 100%; height: 100%" src="static/imgs/default-img.jpeg"/>
             </div>
             <div class="info-desc-container">
@@ -327,7 +327,7 @@
         <a-row :gutter="24" class="mt-20">
           <a-col style="cursor: pointer" @click="goToIndustry(industry.ID)" v-for="(industry, index) of industryList" :span="6" :key="'desc_industry' + index">
             <div class="info-pic-container">
-              <img v-if="industry.coverPicUuid" style="max-width: 100%; max-height: 100%" :src="picBaseURL + industry.coverPicUuid"/>
+              <img v-if="industry.coverPicUuid" style="width: 100%; height: 100%" :src="picBaseURL + industry.coverPicUuid"/>
               <img v-else style="width: 100%; height: 100%" src="static/imgs/default-img.jpeg"/>
             </div>
             <div class="info-desc-container">
