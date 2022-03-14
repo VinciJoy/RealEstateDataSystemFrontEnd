@@ -117,15 +117,12 @@
             </a-col>
             <a-row class="can-not-select" :gutter="20" style="width: 100%; position: absolute; bottom: 0">
               <a-col style="font-size: 18px; line-height: 1.8">
-                <a-col v-if="item.recommendation">
-                  <img src="../../../../../static/imgs/fullstar.png"/><span style="font-weight: bolder"> 特别推荐</span>
+                <a-col>
+                  <span v-if="item.caseNum || item.planNum" >含{{ item.caseNum ? item.planNum ? '经营案例,' : '经营案例' : ''}}{{ item.planNum ? '规划方案' : ''}}</span>
                 </a-col>
                 <a-col>
-                   产业功能：{{ item.functionOrClassList ? item.functionOrClassList : '无' }}
-                </a-col>
-                <a-col v-if="item.caseNum || item.planNum">
-                  含{{ item.caseNum ? item.planNum ? '经营案例,' : '经营案例' : ''}}{{ item.planNum ? '规划方案' : ''}}
-                  <div class="info-desc-content" style="display: inline-block; float: right">更新时间：{{ item.updatedAt }} 300k</div>
+                  <span>产业功能：{{ item.functionOrClassList ? item.functionOrClassList : '无' }}</span>
+                  <span class="info-desc-content" style="display: inline-block; float: right">更新时间：{{ item.updatedAt }} 300k</span>
                 </a-col>
               </a-col>
             </a-row>

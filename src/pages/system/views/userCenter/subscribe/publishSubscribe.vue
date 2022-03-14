@@ -74,6 +74,8 @@
         </a-button>
       </a-col>
     </a-col>
+
+    <phoneVerify @changed="certificateChange" :phone="userInfo.phone" :phoneModalVisible="phoneModalVisible" @closePhoneVerifyModal="phoneModalVisible = false"></phoneVerify>
   </a-row>
 </template>
 
@@ -82,11 +84,13 @@ import {mapActions, mapGetters} from 'vuex'
 import userVerify from '../../components/userVerify'
 import {areaOptions, ITEM_TYPES, itemFormations, EXCHANGE_TYPES, itemTypeOptions, cooperationFormOptions} from '@/utils/constants'
 import api from '@system/api/subscribe'
+import phoneVerify from '../../components/phoneVerify'
 
 export default {
   name: 'publishSubscribe',
   components: {
-    userVerify
+    userVerify,
+    phoneVerify
   },
   props: {
     historyStringify: {
@@ -103,6 +107,7 @@ export default {
   data () {
     return {
       certificateModalVisible: false,
+      phoneModalVisible: false,
       ITEM_TYPES,
       areaOptions,
       itemFormations,
@@ -153,6 +158,11 @@ export default {
       }
     },
     submitSubscribe () {
+      if (this.form.alertPhone && !this.userInfo.phoneVerified) {
+        this.$error('请先完成手机验证！')
+        this.phoneModalVisible = true
+        return
+      }
       api.createSubscribe(this.form).then(res => {
         this.$success('定制需求成功！')
         this.$router.push({name: 'userCenterSubscribe'})
