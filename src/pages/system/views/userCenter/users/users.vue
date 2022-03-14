@@ -16,7 +16,6 @@
         <a-form-model-item label="用户名" prop="user_name" ref="user_name">
           <a-input
             v-model="editForm.user_name"
-            tabindex="1"
             @blur="
                () => {
                  $refs.user_name.onFieldBlur()
@@ -25,10 +24,19 @@
         </a-form-model-item>
         <a-form-model-item label="密码" prop="password">
           <a-input
-            tabindex="2"
             type="password"
             v-model="editForm.password"
             placeholder="该字段不为空则修改密码"
+          />
+        </a-form-model-item>
+        <a-form-model-item label="电话">
+          <a-input
+            v-model="editForm.phone"
+          />
+        </a-form-model-item>
+        <a-form-model-item label="电话已验证">
+          <a-switch
+            v-model="editForm.phoneVerified"
           />
         </a-form-model-item>
         <a-form-model-item label="角色" prop="role">

@@ -65,7 +65,7 @@
 
       <a-col :span="24" class="mt-20">
         <h3 style="font-weight: bolder;">如有新土地/项目符合上述条件，请按以下方式推送给我</h3>
-        <a-radio :checked="form.alertSystem" @click="form.alertSystem = !form.alertSystem">在摩贝云系统中提醒</a-radio>
+        <a-radio :checked="form.alertSystem" :disabled="true">在摩贝云系统中提醒</a-radio>
         <a-radio :checked="form.alertPhone" @click="form.alertPhone = !form.alertPhone">短信提示</a-radio>
       </a-col>
       <a-col class="mt-20" :span="24">
@@ -128,7 +128,7 @@ export default {
           cooperationList: [],
           customType: ''
         },
-        alertSystem: false,
+        alertSystem: true,
         alertPhone: false
       }
     }

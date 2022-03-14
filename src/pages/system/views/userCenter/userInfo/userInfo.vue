@@ -9,10 +9,14 @@
           {{ userInfo.user_name }}
         </div>
         <div>
-          <a v-if="!userInfo.certificationVerified && userInfo.certificate.ID === 0" @click="certificateModalVisible = true" class="tag-desc">点击完成实名认证<a-icon style="color: gray;" class="ml-5" theme="filled" type="down-circle" /></a>
-          <a v-if="!userInfo.certificationVerified && userInfo.certificate.ID !== 0" @click="certificateModalVisible = true" class="tag-desc">等待管理员认证<a-icon style="color: gray;" class="ml-5" theme="filled" type="down-circle" /></a>
-          <a v-if="userInfo.certificationVerified" @click="certificateModalVisible = true" class="tag-desc">已完成实名认证<a-icon style="color: forestgreen;" theme="filled" type="down-circle" class="ml-5"/></a>
+          <div v-if="!userInfo.certificationVerified && userInfo.certificate.ID === 0" @click="certificateModalVisible = true" class="tag-desc clickable-txt">点击完成实名认证<a-icon style="color: gray;" class="ml-5" theme="filled" type="down-circle" /></div>
+          <div v-if="!userInfo.certificationVerified && userInfo.certificate.ID !== 0" @click="certificateModalVisible = true" class="tag-desc clickable-txt">等待管理员认证<a-icon style="color: gray;" class="ml-5" theme="filled" type="down-circle" /></div>
+          <div v-if="userInfo.certificationVerified" @click="certificateModalVisible = true" class="tag-desc clickable-txt">已完成实名认证<a-icon style="color: forestgreen;" theme="filled" type="down-circle" class="ml-5"/></div>
+
+          <div v-if="!userInfo.phoneVerified" @click="phoneModalVisible = true" class="tag-desc clickable-txt">点击完成手机验证<a-icon style="color: gray;" class="ml-5" theme="filled" type="down-circle" /></div>
+          <div v-if="userInfo.phoneVerified" @click="phoneModalVisible = true" class="tag-desc clickable-txt">已完成手机验证<a-icon style="color: forestgreen;" theme="filled" type="down-circle" class="ml-5"/></div>
           <userVerify @changed="certificateChange" :editable="(userInfo.certificate.ID === 0) && (!userInfo.certificationVerified)" :passedInCertificateForm="certificateForm" :certificateModalVisible="certificateModalVisible" @closeUserVerifyModal="certificateModalVisible = false"></userVerify>
+          <phoneVerify @changed="certificateChange" :phone="userInfo.phone" :phoneModalVisible="phoneModalVisible" @closePhoneVerifyModal="phoneModalVisible = false"></phoneVerify>
         </div>
         <div>
           <a @click="changePasswordVisible = true" class="tag-desc">修改密码</a>
@@ -76,12 +80,14 @@
 <script>
 import {mapActions, mapGetters} from 'vuex'
 import userVerify from '../../components/userVerify'
+import phoneVerify from '../../components/phoneVerify'
 import api from '@system/api/user'
 
 export default {
   name: 'userInfo',
   components: {
-    userVerify
+    userVerify,
+    phoneVerify
   },
   data () {
     let checkRepassword = (rule, value, callback) => {
@@ -106,6 +112,7 @@ export default {
         ]
       },
       certificateModalVisible: false,
+      phoneModalVisible: false,
       changePasswordVisible: false,
       passwordForm: {
         oldPassword: '',

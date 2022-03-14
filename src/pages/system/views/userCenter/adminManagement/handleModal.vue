@@ -26,7 +26,7 @@
             </a-col>
             <a-col class="mt-10" :span="24">
               <h3 style="font-weight: bolder;">咨询状态：</h3>
-              <a-select placeholder="请选择审核状态" v-model="consultForm.consultStatus" style="width: 200px">
+              <a-select placeholder="请选择咨询状态" v-model="consultForm.consultStatus" style="width: 200px">
                 <a-select-option :disabled="index < 1" v-for="(consultStatus, index) of CONSULT_STATUS_2_CN" :key="consultStatus" :value="index">
                   {{ consultStatus }}
                 </a-select-option>
@@ -50,6 +50,11 @@
               {{ auditStatus }}
             </a-select-option>
           </a-select>
+
+          <div v-show="handleType === 'landResource'">
+            <h3 style="font-weight: bolder; display: inline-block">审核分数：</h3>
+            <a-input type="number" style="display: inline-block; width: 120px" v-model="form.auditScore"></a-input>
+          </div>
 
           <a-tabs class="mt-10" type="card">
             <a-tab-pane key="常规审核" tab="常规审核">
@@ -125,7 +130,7 @@
               </div>
             </a-tab-pane>
 
-            <a-tab-pane key="专业审核" tab="专业审核">
+            <a-tab-pane v-if="handleType === 'landResource'" key="专业审核" tab="专业审核">
               <div>
                 <h3 style="font-weight: bolder;">项目关键点提炼：</h3>
                 <table style="width: 100%" bordercolor="#e8e8e8" border="2">
@@ -677,6 +682,7 @@ export default {
         record: ''
       },
       form: {
+        auditScore: 0,
         resourceType: '',
         resourceID: '',
         normalAudit: {
@@ -910,6 +916,19 @@ export default {
         this.$error('请选择审核状态!')
         return
       }
+
+      this.form.auditScore -= ''
+      if (this.handleType === 'landResource' && this.form.auditScore > 40) {
+        this.$error('审核分数不能大于40!')
+        return
+      }
+
+
+      if (this.handleType === 'landResource' && !this.form.auditScore) {
+        this.$error('审核分数不能小于1!')
+        return
+      }
+
       if (this.handleType === 'landResource') {
         landApi.editLandResource(this.handleID, {
           auditStatus: this.form.auditStatus,

@@ -163,7 +163,7 @@
             </a-row>
           </a-col>
 
-          <a-col :span="6">
+          <a-col :span="9">
             <a-col class="board-head" style="border-top-left-radius: 10px;">
               <span class="blue" style="font-weight: normal; font-size: 1.5em">土地/资产</span>
               <span style="float: right; cursor: pointer; font-size: 1.0em" @click="$router.push({name: 'landResource'})" class="clickable-txt">MORE+</span>
@@ -178,28 +178,7 @@
             </a-col>
           </a-col>
 
-          <a-col :span="6">
-            <a-col class="board-head">
-              <span class="blue" style="font-weight: normal; font-size: 1.5em">资金</span>
-              <span style="float: right; cursor: pointer; font-size: 1.0em" class="clickable-txt">MORE+</span>
-            </a-col>
-            <a-col class="board-body" style="border-right: 2px solid #e9e9e9">
-              <h2 class="not-allow-txt-overflow">
-                上海市奉贤区占地 150亩
-              </h2>
-              <h2 class="not-allow-txt-overflow">
-                浙江省杭州市拱墅区地上占地面积浙江省杭州市拱墅区地上占地面积
-              </h2>
-              <h2 class="not-allow-txt-overflow">
-                上海市奉贤区占地 150亩
-              </h2>
-              <div style="text-align: center">
-                <a-button type="primary" disabled="disabled">发布资金信息</a-button>
-              </div>
-            </a-col>
-          </a-col>
-
-          <a-col :span="6">
+          <a-col :span="9">
             <a-col class="board-head" style="border-top-right-radius: 10px">
               <span class="blue" style="font-weight: normal; font-size: 1.5em">产业</span>
               <span style="float: right; cursor: pointer; font-size: 1.0em" @click="$router.push({name: 'industryResource'})" class="clickable-txt">MORE+</span>
@@ -249,68 +228,6 @@
       </a-col>
     </a-row>
 <!--    estate info end-->
-
-<!--    money info begin-->
-    <a-row class="mt-40" :gutter="16">
-      <a-col style="border: 1px solid transparent" :span="2"></a-col>
-
-      <a-col :span="20">
-        <a-row>
-          <div class="left-blue part-title can-not-select" style="width: 100%">
-            <h1 style="display:inline;">资金信息</h1>
-            <span style="float: right; cursor: pointer; font-size: 1.5em" class="clickable-txt">MORE+</span>
-          </div>
-        </a-row>
-
-        <a-row :gutter="24" class="mt-20">
-          <a-col :span="6">
-            <div class="info-pic-container">123</div>
-            <div class="info-desc-container">
-              <span class="info-desc-title">上海市奉贤区占地 150 亩</span>
-              <br>
-              <div>
-                <span class="info-desc-content">发布时间：2021/11/25</span>
-                <span class="info-desc-content" style="float: right"><a-icon type="eye" />300</span>
-              </div>
-            </div>
-          </a-col>
-          <a-col :span="6">
-            <div class="info-pic-container">123</div>
-            <div class="info-desc-container">
-              <span class="info-desc-title">上海市奉贤区占地 150 亩</span>
-              <br>
-              <div>
-                <span class="info-desc-content">发布时间：2021/11/25</span>
-                <span class="info-desc-content" style="float: right"><a-icon type="eye" />300</span>
-              </div>
-            </div>
-          </a-col>
-          <a-col :span="6">
-            <div class="info-pic-container">123</div>
-            <div class="info-desc-container">
-              <span class="info-desc-title">上海市奉贤区占地 150 亩</span>
-              <br>
-              <div>
-                <span class="info-desc-content">发布时间：2021/11/25</span>
-                <span class="info-desc-content" style="float: right"><a-icon type="eye" />300</span>
-              </div>
-            </div>
-          </a-col>
-          <a-col :span="6">
-            <div class="info-pic-container">123</div>
-            <div class="info-desc-container">
-              <span class="info-desc-title">上海市奉贤区占地 150 亩</span>
-              <br>
-              <div>
-                <span class="info-desc-content">发布时间：2021/11/25</span>
-                <span class="info-desc-content" style="float: right"><a-icon type="eye" />300</span>
-              </div>
-            </div>
-          </a-col>
-        </a-row>
-      </a-col>
-    </a-row>
-<!--    money info end-->
 
 <!--    industry info begin-->
     <a-row class="mt-40" :gutter="16">

@@ -73,7 +73,7 @@
             </a-col>
           </a-row>
           <a-row class="mt-20">
-            <span class="input-tag">项目名称(选填): </span>
+            <span class="input-tag">项目名称: </span>
             <a-input :disabled="history" v-model="form.subTitle" placeholder="请输入项目名称" style="width:40%"></a-input>
           </a-row>
           <a-row class="mt-20">
@@ -1863,6 +1863,11 @@ export default {
 
       if (!this.form.itemBaseInfoForm.comprehensiveFAR || this.form.itemBaseInfoForm.comprehensiveFAR <= 0) {
         this.$error('请输入正确的综合容积率！')
+        return
+      }
+
+      if (!this.form.subTitle) {
+        this.$error('请输入项目名称！')
         return
       }
 

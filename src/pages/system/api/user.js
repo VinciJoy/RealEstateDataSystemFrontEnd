@@ -18,6 +18,12 @@ export default {
       params
     })
   },
+  getPhoneCode (phone) {
+    return ajax(rootApi + 'verify_phone/' + phone + '/', 'get')
+  },
+  verifyPhone (data) {
+    return ajax(rootApi + 'verify_phone/', 'post', {data})
+  },
   deleteUser (userID) {
     return ajax(rootApi + userID + '/', 'delete')
   },

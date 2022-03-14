@@ -120,9 +120,46 @@
               <a-col style="font-size: 18px; line-height: 1.8">
                 <a-col>
                   推荐指数:
-                  <img v-for="i in (Math.floor(item.recommendation / 2))" :key="'full_star' + i" src="../../../../../static/imgs/fullstar.png"/>
-                  <img v-if="item.recommendation % 2" src="../../../../../static/imgs/halfstar.png"/>
-                  <img v-for="i in (Math.floor((10 - item.recommendation) / 2))" :key="'un_star' + i" src="../../../../../static/imgs/unstar.png"/>
+                  <img v-for="i in 2" :key="'full_star' + i" src="../../../../../static/imgs/fullstar.png"/>
+                  <template v-if="finalScore(item) <= 60">
+                    <img src="../../../../../static/imgs/unstar.png"/>
+                    <img src="../../../../../static/imgs/unstar.png"/>
+                    <img src="../../../../../static/imgs/unstar.png"/>
+                  </template>
+                  <template v-if="finalScore(item) > 60 && finalScore(item) < 66">
+                    <img src="../../../../../static/imgs/halfstar.png"/>
+                    <img src="../../../../../static/imgs/unstar.png"/>
+                    <img src="../../../../../static/imgs/unstar.png"/>
+                  </template>
+                  <template v-else-if="finalScore(item) >= 66 && finalScore(item) < 76">
+                    <img src="../../../../../static/imgs/fullstar.png"/>
+                    <img src="../../../../../static/imgs/unstar.png"/>
+                    <img src="../../../../../static/imgs/unstar.png"/>
+                  </template>
+                  <template v-else-if="finalScore(item) >= 76 && finalScore(item) < 86">
+                    <img src="../../../../../static/imgs/fullstar.png"/>
+                    <img src="../../../../../static/imgs/halfstar.png"/>
+                    <img src="../../../../../static/imgs/unstar.png"/>
+                  </template>
+
+                  <template v-else-if="finalScore(item) >= 86 && finalScore(item) < 96">
+                    <img src="../../../../../static/imgs/fullstar.png"/>
+                    <img src="../../../../../static/imgs/fullstar.png"/>
+                    <img src="../../../../../static/imgs/unstar.png"/>
+                  </template>
+
+                  <template v-else-if="finalScore(item) >= 96 && finalScore(item) < 101">
+                    <img src="../../../../../static/imgs/fullstar.png"/>
+                    <img src="../../../../../static/imgs/fullstar.png"/>
+                    <img src="../../../../../static/imgs/halfstar.png"/>
+                  </template>
+
+                  <template v-else-if="finalScore(item) >= 101">
+                    <img src="../../../../../static/imgs/fullstar.png"/>
+                    <img src="../../../../../static/imgs/fullstar.png"/>
+                    <img src="../../../../../static/imgs/fullstar.png"/>
+                  </template>
+
                 </a-col>
                 <a-col>用地性质：{{ item.itemType }}</a-col>
                 <a-col>
@@ -297,6 +334,11 @@ export default {
         this.itemList = res.data.data.landResources
         this.loading = false
       })
+    },
+    finalScore (item) {
+      console.log('recommendation: ', item.recommendation)
+      console.log('score: ', item.score)
+      return (item.score - '') + (item.recommendation - '')
     },
     goToDetail (id) {
       this.$router.push({name: 'landResourceDetail', params: { id }})

@@ -7,13 +7,6 @@
       :pagination="false"
       :loading="loading"
     >
-      <span slot="recommendation" slot-scope="text, record">
-        <a-select :disabled="!utils.IsAdmin(userInfo.role) || text.isDraft" style="width: 70px" v-model="record.recommendation" @change="changeRecommendation(record)">
-          <a-select-option v-for="i of 11" :value="i - 1" :key="i - 1">
-            {{ i - 1 }}
-          </a-select-option>
-        </a-select>
-      </span>
       <span slot="title" slot-scope="text, record">
         {{ text.title }}
       </span>
@@ -120,11 +113,6 @@ const columns = [
     title: '可 见',
     key: 'visible',
     scopedSlots: { customRender: 'visible' }
-  },
-  {
-    title: '推荐指数',
-    key: 'recommendation',
-    scopedSlots: { customRender: 'recommendation' }
   },
   {
     title: '操 作',
