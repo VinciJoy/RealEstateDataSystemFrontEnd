@@ -117,6 +117,9 @@
             </a-col>
             <a-row class="can-not-select" :gutter="20" style="width: 100%; position: absolute; bottom: 0">
               <a-col style="font-size: 18px; line-height: 1.8">
+                <a-col v-if="item.recommendation">
+                  <img src="../../../../../static/imgs/fullstar.png"/><span style="font-weight: bolder"> 特别推荐</span>
+                </a-col>
                 <a-col>
                   <span v-if="item.caseNum || item.planNum" >含{{ item.caseNum ? item.planNum ? '经营案例,' : '经营案例' : ''}}{{ item.planNum ? '规划方案' : ''}}</span>
                 </a-col>
