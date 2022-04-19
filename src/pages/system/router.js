@@ -24,6 +24,16 @@ export default new Router({
       component: () => import(/* webpackChunkName: "tax" */ '@system/views/utils/tax.vue')
     },
     {
+      path: '/more_analyse',
+      name: 'moreAnalyse',
+      component: () => import(/* webpackChunkName: "tax" */ '@system/views/moreAnalyse/moreAnalyse.vue')
+    },
+    {
+      path: '/others',
+      name: 'others',
+      component: () => import(/* webpackChunkName: "tax" */ '@system/views/utils/others.vue')
+    },
+    {
       path: '/land_resource',
       name: 'landResource',
       component: () => import(/* webpackChunkName: "land_resource" */ '@system/views/resourceBase/landResource.vue')

@@ -7,17 +7,9 @@
       <a-menu-item key="home" @click="handleRoute('/')">
         首页
       </a-menu-item>
-      <a-sub-menu key="moreAnalyse">
-        <span slot="title">
-          More分析<a-icon type="caret-down"/>
-        </span>
-        <a-menu-item key="analyse:1">
-          analyse 1
-        </a-menu-item>
-        <a-menu-item key="analyse:2">
-          analyse 2
-        </a-menu-item>
-      </a-sub-menu>
+      <a-menu-item key="moreAnalyse" @click="$router.push({name: 'moreAnalyse'})">
+          More分析
+      </a-menu-item>
       <a-sub-menu key="resourceBase">
         <span slot="title">
           资源Base<a-icon type="caret-down"/>
