@@ -25,17 +25,22 @@
         <a-row class="mt-20 sub-gray-line">
 
           <a-col class="mt-10">
-            <span class="filter-title">选址要求：</span>
-            <span>按 地 域：</span>
-            <span style="cursor: pointer" :class="!selectedAreaList.length ? 'blue' : 'clickable-txt'" @click="changeArea(null)" :key="'selectedAreaList' + 0">
-              全选
-            </span>
-            <span style="cursor: pointer" :class="selectedAreaList.includes(item) ? 'blue' : 'clickable-txt'" @click="changeArea(item)" v-for="item in areaOptions" :key="'selectedAreaList' + item">
-              {{ item }}
-            </span>
+            <div class="filter-title">选址要求：</div>
+            <div>
+              <span>按 地 域：</span>
+              <span style="cursor: pointer" :class="!selectedAreaList.length ? 'blue' : 'clickable-txt'" @click="changeArea(null, 'selectedAreaList', areaOptions)" :key="'selectedAreaList' + 0">
+                全选
+              </span>
+              <span style="cursor: pointer" :class="selectedAreaList.includes(item) ? 'blue' : 'clickable-txt'" @click="changeArea(item, 'selectedAreaList')" v-for="item in areaOptions" :key="'selectedAreaList' + item">
+                {{ item }}
+              </span>
+            </div>
             <div>
               按 城 市 能 级：
-              <span style="cursor: pointer" :class="selectedAreaList.includes(item) ? 'blue' : 'clickable-txt'" @click="changeArea(item)" v-for="item in cityClassOptions" :key="'selectedAreaList' + item">
+              <span style="cursor: pointer" :class="!selectCityClass.length ? 'blue' : 'clickable-txt'" @click="changeArea(null, 'selectCityClass', cityClassOptions)" :key="'selectCityClass' + 0">
+                全选
+              </span>
+              <span style="cursor: pointer" :class="selectCityClass.includes(item) ? 'blue' : 'clickable-txt'" @click="changeArea(item, 'selectCityClass')" v-for="item in cityClassOptions" :key="'selectCityClass' + item">
                 {{ item }}
               </span>
             </div>
@@ -75,19 +80,11 @@
           </a-col>
           <a-row class="mt-10">
             <span class="filter-title">排序：</span>
-            <span class="clickable-txt" @click="orderByUpdatedTime = 'ASC'" v-show="orderByUpdatedTime === ''">更新时间 </span>
+            <span class="clickable-txt" @click="orderByUpdatedTime = 'ASC'; orderByRecommendation = ''" v-show="orderByUpdatedTime === ''">更新时间 </span>
             <span style="cursor: pointer" class="blue" @click="orderByUpdatedTime = 'DESC'" v-show="orderByUpdatedTime === 'ASC'">更新时间↓</span>
             <span style="cursor: pointer" class="blue" @click="orderByUpdatedTime = ''" v-show="orderByUpdatedTime === 'DESC'">更新时间↑</span>
 
-<!--            <span class="clickable-txt" @click="orderBySpace = 'ASC'" v-show="orderBySpace === ''">地上占地面积 </span>-->
-<!--            <span style="cursor: pointer" class="blue" @click="orderBySpace = 'DESC'" v-show="orderBySpace === 'ASC'">地上占地面积↓</span>-->
-<!--            <span style="cursor: pointer" class="blue" @click="orderBySpace = ''" v-show="orderBySpace === 'DESC'">地上占地面积↑</span>-->
-
-<!--            <span class="clickable-txt" @click="orderByPrice = 'ASC'" v-show="orderByPrice === ''">交易对价 </span>-->
-<!--            <span style="cursor: pointer" class="blue" @click="orderByPrice = 'DESC'" v-show="orderByPrice === 'ASC'">交易对价↓</span>-->
-<!--            <span style="cursor: pointer" class="blue" @click="orderByPrice = ''" v-show="orderByPrice === 'DESC'">交易对价↑</span>-->
-
-            <span class="clickable-txt" @click="orderByRecommendation = 'ASC'" v-show="orderByRecommendation === ''">特别推荐 </span>
+            <span class="clickable-txt" @click="orderByRecommendation = 'ASC';orderByUpdatedTime = ''" v-show="orderByRecommendation === ''">特别推荐 </span>
             <span style="cursor: pointer" class="blue" @click="orderByRecommendation = 'DESC'" v-show="orderByRecommendation === 'ASC'">特别推荐↓</span>
             <span style="cursor: pointer" class="blue" @click="orderByRecommendation = ''" v-show="orderByRecommendation === 'DESC'">特别推荐↑</span>
         </a-row>
@@ -104,10 +101,10 @@
           </p>
         </a-row>
 
-        <a-row v-for="item of itemList" :key="item.ID" class="mt-20" :gutter="20" style="height: 200px; cursor: pointer">
+        <a-row v-for="item of itemList" :key="item.ID" class="mt-20" :gutter="20" style="height: 210px; cursor: pointer">
           <a-col @click="goToDetail(item.ID)" :span="6" style="height: 100%; max-width: 100%; display: flex; justify-content: center">
-            <img v-if="item.coverPicUuid" style="max-width: 100%; max-height: 100%" :src="picBaseURL + item.coverPicUuid"/>
-            <img v-else style="width: 100%; height: 100%" src="static/imgs/default-img.jpeg"/>
+            <img v-if="item.coverPicUuid" style="width: 280px; height: 210px" :src="picBaseURL + item.coverPicUuid"/>
+            <img v-else style="width: 280px; height: 210px" src="static/imgs/default-img.jpeg"/>
           </a-col>
           <a-col @click="goToDetail(item.ID)" :span="18" style="height: 100%;">
             <a-col>
@@ -191,6 +188,7 @@ export default {
     return {
       loading: false,
       selectedAreaList: [],
+      selectCityClass: [],
       selectedIndustryTypeList: [],
       selectedCooperationFormList: [],
       selectedOperationPlanList: [],
@@ -218,7 +216,8 @@ export default {
         'selectedCooperationFormList',
         'selectedOperationPlanList',
         'selectedIndustryTypeList',
-        'selectedAreaList'
+        'selectedAreaList',
+        'selectCityClass'
       ]
       for (let item of changedItem) {
         ret += this[item]
@@ -243,7 +242,7 @@ export default {
         pageIndex: this.pageIndex,
         orderByUpdatedTime: this.orderByUpdatedTime,
         orderByRecommendation: this.orderByRecommendation,
-        selectedAreaList: this.selectedAreaList.join(','),
+        selectedAreaList: [...this.selectCityClass, ...this.selectedAreaList].join(','),
         selectedCooperationFormList: this.selectedCooperationFormList.join(','),
         selectedOperationPlanList: this.selectedOperationPlanList.join(','),
         selectedIndustryTypeList: this.selectedIndustryTypeList.join(','),
@@ -256,19 +255,26 @@ export default {
         this.loading = false
       })
     },
-    changeArea (item) {
-      if (!item) {
-        this.selectedAreaList = []
-      } else {
-        if (item === '全国') {
-          this.selectedAreaList = utils.Copy(this.areaOptions)
-          this.selectedAreaList.remove('全国')
-          return
-        }
+    allSelectCityClass () {
+      for (let item of this.cityClassOptions) {
         if (this.selectedAreaList.includes(item)) {
           this.selectedAreaList.remove(item)
+        }
+      }
+    },
+    changeArea (item, listName, optionList = null) {
+      if (!item) {
+        this[listName] = []
+      } else {
+        if (item === '全选') {
+          this[listName] = utils.Copy(this[optionList])
+          this[listName].remove('全选')
+          return
+        }
+        if (this[listName].includes(item)) {
+          this[listName].remove(item)
         } else {
-          this.selectedAreaList.push(item)
+          this[listName].push(item)
         }
       }
     },

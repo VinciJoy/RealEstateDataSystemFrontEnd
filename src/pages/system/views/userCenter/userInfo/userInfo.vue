@@ -2,7 +2,7 @@
   <a-row>
     <a-col :span="8" class="card">
       <a-col :span="8">
-        <img src="/static/imgs/default.jpeg" style="width: 100%"/>
+        <img title="点击修改头像" @click="cropperModalVisible = true" :src="userInfo.icon ? picBaseURL + userInfo.icon : '/static/imgs/default.jpeg'" style="width: 100%; cursor: pointer"/>
       </a-col>
       <a-col :span="16" style="padding-left: 10px">
         <div class="username">
@@ -72,6 +72,36 @@
         </a-form-model-item>
       </a-form-model>
     </a-modal>
+
+    <a-modal
+      :footer="null"
+      v-model="cropperModalVisible"
+      width="450px"
+      title="修改头像"
+    >
+      <a-upload
+        name="file"
+        :show-upload-list="false"
+        :before-upload="transformCoverPic"
+      >
+        <a-button><a-icon type="upload"/> 上传头像</a-button>
+      </a-upload>
+      <div style="height: 400px; width: 400px">
+        <VueCropper
+          class="mt-10"
+          ref="cropper"
+          :img="cropperImg"
+          :autoCrop="true"
+          :centerBox="true"
+          :canScale="true"
+          :fixed="true"
+          :fixedNumber="[4,4]"
+        ></VueCropper>
+      </div>
+      <a-row style="text-align: center" class="mt-10">
+        <a-button :disabled="!cropperImg" type="primary" style="margin-left:40px;width: 20%" @click="saveCoverPic">保 存</a-button>
+      </a-row>
+    </a-modal>
 <!--    modal end-->
 
   </a-row>
@@ -82,11 +112,14 @@ import {mapActions, mapGetters} from 'vuex'
 import userVerify from '../../components/userVerify'
 import phoneVerify from '../../components/phoneVerify'
 import api from '@system/api/user'
+import { VueCropper } from 'vue-cropper'
+import picApi from '@system/api/pic'
 
 export default {
   name: 'userInfo',
   components: {
     userVerify,
+    VueCropper,
     phoneVerify
   },
   data () {
@@ -97,6 +130,9 @@ export default {
       callback()
     }
     return {
+      cropperModalVisible: false,
+      cropperImg: '',
+      picBaseURL: '',
       passwordRules: {
         oldPassword: [
           {required: true, message: '请输入密码!', trigger: 'blur'},
@@ -133,11 +169,33 @@ export default {
   methods: {
     ...mapActions(['getUserInfo']),
     init () {
+      this.picBaseURL = process.env.API_ROOT + '/system/pics/temp/'
       this.certificateForm = this.userInfo.certificate
     },
     async certificateChange () {
       await this.getUserInfo()
       this.init()
+    },
+    transformCoverPic (file) {
+      let reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = () => {
+        this.cropperImg = reader.result
+      }
+      return false
+    },
+    saveCoverPic () {
+      this.$refs.cropper.getCropBlob(async data => {
+        let picUuid = ''
+        await picApi.uploadPic(data).then((res) => {
+          picUuid = res.data.data.uuid
+        })
+        await api.editUser(this.userInfo.ID, {icon: picUuid}).then((res) => {
+          this.$success('修改头像成功!')
+        })
+        this.getUserInfo()
+        this.cropperModalVisible = false
+      })
     },
     changePassword () {
       this.$refs.passwordForm.validate(valid => {

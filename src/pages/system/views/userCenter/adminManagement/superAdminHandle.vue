@@ -7,15 +7,16 @@
       <a-tab-pane key="1" tab="发布端信息">
         <a-row>
           <a-col>
-            <p>
+            <div>
               产业类信息：
-            </p>
+            </div>
             <a-table
               :columns="columns"
               :data-source="industryResources"
               :row-key="record => record.ID"
               :pagination="false"
               :loading="industryLoading"
+              @change="changeIndustrySort"
             >
               <template slot="isDraft" slot-scope="text, record">
                 {{ text.isDraft ? '草稿' : '发布' }}
@@ -25,7 +26,18 @@
               </template>
             </a-table>
             <a-row class="mt-20">
-              <a-pagination style="display: inline-block; float: right;" :page-size="pageSize" v-model="industryPageIndex" :total="industryCount" />
+              <div style="display: inline-block">
+                每页显示
+                <a-select style="width: 70px" v-model="industryPageSize">
+                  <a-select-option :value="5">5</a-select-option>
+                  <a-select-option :value="10">10</a-select-option>
+                  <a-select-option :value="20">20</a-select-option>
+                  <a-select-option :value="50">50</a-select-option>
+                  <a-select-option :value="100">100</a-select-option>
+                </a-select>
+                条
+              </div>
+              <a-pagination style="display: inline-block; float: right;" :page-size="industryPageSize" v-model="industryPageIndex" :total="industryCount" />
             </a-row>
           </a-col>
 
@@ -39,6 +51,7 @@
               :row-key="record => record.ID"
               :pagination="false"
               :loading="landLoading"
+              @change="changeLandSort"
             >
               <template slot="isDraft" slot-scope="text, record">
                 {{ text.isDraft ? '草稿' : '发布' }}
@@ -48,7 +61,18 @@
               </template>
             </a-table>
             <a-row class="mt-20">
-              <a-pagination style="display: inline-block; float: right;" :page-size="pageSize" v-model="landPageIndex" :total="landCount" />
+              <div style="display: inline-block">
+                每页显示
+                <a-select style="width: 70px" v-model="landPageSize">
+                  <a-select-option :value="5">5</a-select-option>
+                  <a-select-option :value="10">10</a-select-option>
+                  <a-select-option :value="20">20</a-select-option>
+                  <a-select-option :value="50">50</a-select-option>
+                  <a-select-option :value="100">100</a-select-option>
+                </a-select>
+                条
+              </div>
+              <a-pagination style="display: inline-block; float: right;" :page-size="landPageSize" v-model="landPageIndex" :total="landCount" />
             </a-row>
           </a-col>
         </a-row>
@@ -61,6 +85,7 @@
         <a-table
           :columns="consultColumns"
           :data-source="consultList"
+          @change="changeConsultSort"
           :row-key="record => record.ID"
           :pagination="false"
           :loading="consultLoading"
@@ -68,12 +93,23 @@
           <template slot="resourceType" slot-scope="text, record">
             {{ text.resourceType === 'landResource' ? '土地' : '产业' }}
           </template>
-          <template slot="auditStatus" slot-scope="text, record">
+          <template slot="consultStatus" slot-scope="text, record">
             {{ text.consultStatus | filterConsultStatus }}
           </template>
         </a-table>
         <a-row class="mt-20">
-          <a-pagination style="display: inline-block; float: right;" :page-size="pageSize" v-model="consultPageIndex" :total="consultCount" />
+          <div style="display: inline-block">
+            每页显示
+            <a-select style="width: 70px" v-model="consultPageSize">
+              <a-select-option :value="5">5</a-select-option>
+              <a-select-option :value="10">10</a-select-option>
+              <a-select-option :value="20">20</a-select-option>
+              <a-select-option :value="50">50</a-select-option>
+              <a-select-option :value="100">100</a-select-option>
+            </a-select>
+            条
+          </div>
+          <a-pagination style="display: inline-block; float: right;" :page-size="consultPageSize" v-model="consultPageIndex" :total="consultCount" />
         </a-row>
       </a-tab-pane>
     </a-tabs>
@@ -88,6 +124,7 @@ import publishIndustryResource from '../industryResource/publishIndustryResource
 import publishLandResource from '../landResource/publishLandResource'
 import { AUDIT_STATUS_2_CN, CONSULT_STATUS_2_CN } from '../../../../../utils/constants'
 import consultApi from '@system/api/consult'
+import utils from '@/utils/utils'
 
 const consultColumns = [
   {
@@ -97,29 +134,45 @@ const consultColumns = [
     key: 'title'
   },
   {
+    title: '咨询人',
+    dataIndex: 'userName',
+    key: 'userName',
+    sorter: true
+  },
+  {
+    title: '单位',
+    dataIndex: 'userCompany',
+    key: 'userCompany',
+    sorter: true
+  },
+  {
     title: '类 型',
     key: 'resourceType',
-    scopedSlots: { customRender: 'resourceType' }
+    scopedSlots: { customRender: 'resourceType' },
+    sorter: true
   },
   {
     title: '创建者',
     dataIndex: 'creator.user_name',
     ellipsis: true,
     width: 100,
-    key: 'creator'
+    key: 'creator',
+    sorter: true
   },
   {
     title: '创建时间',
     dataIndex: 'createdAt',
     ellipsis: true,
     width: 150,
-    key: 'createdAt'
+    key: 'createdAt',
+    sorter: true
   },
   {
     title: '状 态',
-    key: 'auditStatus',
+    key: 'consultStatus',
     width: 100,
-    scopedSlots: { customRender: 'auditStatus' }
+    scopedSlots: { customRender: 'consultStatus' },
+    sorter: true
   }
 ]
 
@@ -135,33 +188,31 @@ const columns = [
     dataIndex: 'creator.user_name',
     ellipsis: true,
     width: 100,
-    key: 'creator'
+    key: 'creator',
+    sorter: true
   },
   {
     title: '创建时间',
     dataIndex: 'createdAt',
     ellipsis: true,
     width: 150,
-    key: 'createdAt'
+    key: 'createdAt',
+    sorter: true
   },
   {
     title: '更新时间',
     dataIndex: 'updatedAt',
     ellipsis: true,
     width: 150,
-    key: 'updatedAt'
-  },
-  {
-    title: '状 态',
-    key: 'isDraft',
-    width: 100,
-    scopedSlots: { customRender: 'isDraft' }
+    key: 'updatedAt',
+    sorter: true
   },
   {
     title: '审核状态',
     key: 'auditStatus',
     width: 100,
-    scopedSlots: { customRender: 'auditStatus' }
+    scopedSlots: { customRender: 'auditStatus' },
+    sorter: true
   }
 ]
 
@@ -194,6 +245,15 @@ export default {
     },
     'industryPageIndex' () {
       this.getIndustries()
+    },
+    'industryPageSize' () {
+      this.getIndustries()
+    },
+    'consultPageSize' () {
+      this.getConsults()
+    },
+    'landPageSize' () {
+      this.getLands()
     }
   },
   data () {
@@ -202,6 +262,26 @@ export default {
       consultColumns,
       landStringify: '',
       industryStringify: '',
+      industryOrder: {
+        createdAt: null,
+        updatedAt: null,
+        auditStatus: null,
+        creator: null
+      },
+      landOrder: {
+        createdAt: null,
+        updatedAt: null,
+        auditStatus: null,
+        creator: null
+      },
+      consultOrder: {
+        userName: null,
+        consultStatus: null,
+        resourceType: null,
+        creator: null,
+        createdAt: null,
+        userCompany: null
+      },
       handleType: '',
       handleID: '',
       ak: 'a79kmTteEBy6rw3dpBZYMq86S2PGEmKo',
@@ -210,7 +290,9 @@ export default {
       consultList: [],
       admins: [],
       selectedAdmin: [],
-      pageSize: 10,
+      consultPageSize: 5,
+      industryPageSize: 5,
+      landPageSize: 5,
       industryCount: 0,
       consultCount: 0,
       consultPageIndex: 0,
@@ -240,8 +322,14 @@ export default {
     },
     getConsults () {
       consultApi.getConsults({
-        pageSize: this.pageSize,
+        pageSize: this.consultPageSize,
         pageIndex: this.consultPageIndex,
+        orderByUserName: utils.convertOrder(this.consultOrder.userName),
+        orderByUserCompany: utils.convertOrder(this.consultOrder.userCompany),
+        orderByConsultStatus: utils.convertOrder(this.consultOrder.consultStatus),
+        orderByResourceType: utils.convertOrder(this.consultOrder.resourceType),
+        orderByCreator: utils.convertOrder(this.consultOrder.creator),
+        orderByCreatedAt: utils.convertOrder(this.consultOrder.createdAt),
         adminID: 'notNull'
       }).then(res => {
         this.consultCount = res.data.data.count
@@ -249,10 +337,29 @@ export default {
         this.consultLoading = false
       })
     },
+    changeConsultSort  (p, f, s) {
+      this.consultOrder = {}
+      this.consultOrder[s.columnKey] = s.order
+      this.getConsults()
+    },
+    changeIndustrySort  (p, f, s) {
+      this.industryOrder = {}
+      this.industryOrder[s.columnKey] = s.order
+      this.getIndustries()
+    },
+    changeLandSort  (p, f, s) {
+      this.landOrder = {}
+      this.landOrder[s.columnKey] = s.order
+      this.getLands()
+    },
     getLands () {
       landApi.getLandResources({
-        pageSize: this.pageSize,
+        pageSize: this.landPageSize,
         pageIndex: this.landPageIndex,
+        orderByCreatedAt: utils.convertOrder(this.landOrder.createdAt),
+        orderByCreator: utils.convertOrder(this.landOrder.creator),
+        orderByUpdatedAt: utils.convertOrder(this.landOrder.updatedAt),
+        orderByAuditStatus: utils.convertOrder(this.landOrder.auditStatus),
         owner: false,
         adminID: 'notNull',
         isDraft: false
@@ -264,8 +371,12 @@ export default {
     },
     getIndustries () {
       industryApi.getIndustryResources({
-        pageSize: this.pageSize,
+        pageSize: this.industryPageSize,
         pageIndex: this.industryPageIndex,
+        orderByCreatedAt: utils.convertOrder(this.industryOrder.createdAt),
+        orderByCreator: utils.convertOrder(this.industryOrder.creator),
+        orderByUpdatedAt: utils.convertOrder(this.industryOrder.updatedAt),
+        orderByAuditStatus: utils.convertOrder(this.industryOrder.auditStatus),
         owner: false,
         adminID: 'notNull',
         isDraft: false

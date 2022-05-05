@@ -22,7 +22,7 @@
         <a-switch :disabled="!utils.IsAdmin(userInfo.role) || text.isDraft" v-model="record.visible" @click="changeVisible(record)" />
       </template>
       <template slot="action" slot-scope="text, record">
-        <a @click="showHistoryModal(record)">历史</a>
+        <a @click="showHistoryModal(record)">项目详情</a>
         <a-divider type="vertical" />
         <a @click="goToEdit(record)">编辑</a>
         <a-divider type="vertical" />
@@ -41,9 +41,25 @@
       </div>
       <a-empty v-show="!histories || !histories.length" />
       <div style="margin-top: 10px" v-for="(history, index) of histories" :key="'history' + index">
-        <a @click="showHistoryDetailModal(history.ID)">
-          修改时间：{{ history.createdAt }} 修改人：{{ history.creator.user_name }}
-        </a>
+        <div v-if="history.Type !== 'audit'">
+          <div>
+            <span>修改人: {{ history.UserName }}</span><span class="ml-10">修改时间：{{ history.DisplayTime }}</span>
+          </div>
+          <div>修改说明: {{ history.EditReason }}</div>
+        </div>
+        <div v-else>
+          <div>
+            <span>审核结果：{{ AUDIT_STATUS_2_CN[history.AuditStatus] }}</span>
+            <span class="ml-10">审核管理员：{{ history.UserName }}</span>
+            <span class="ml-10">审核时间：{{ history.DisplayTime }}</span>
+          </div>
+          <div>
+            常规审核意见：{{ history.NormalAudit }}
+          </div>
+          <div>
+            专业审核意见：{{ history.ProAudit }}
+          </div>
+        </div>
       </div>
     </a-modal>
 
@@ -63,6 +79,7 @@ import api from '@system/api/industryResource'
 import historyApi from '@system/api/history'
 import {mapGetters} from 'vuex'
 import publishIndustryResource from './publishIndustryResource'
+import { AUDIT_STATUS_2_CN } from '../../../../../utils/constants'
 
 const columns = [
   {
@@ -130,6 +147,7 @@ export default {
     return {
       histories: [],
       columns: columns,
+      AUDIT_STATUS_2_CN: AUDIT_STATUS_2_CN,
       historyModalVisible: false,
       historyStringify: '',
       historyDetailModalVisible: false,

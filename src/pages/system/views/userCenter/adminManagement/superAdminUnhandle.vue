@@ -2,19 +2,21 @@
   <div>
 
 <!--    tab begin-->
-    <a-tabs type="card">
+    <a-tabs v-model="activeTab" type="card">
 
       <a-tab-pane key="1" tab="发布端信息">
         <a-row>
           <a-col>
             <p>
-              产业类信息：
+              产业类信息：<a-button :disabled="!selectedIndustryRowKeys.length" @click="showAllocateTaskModal(true, 'industryResource')" type="primary">批量委托</a-button>
             </p>
             <a-table
               :columns="columns"
+              :row-selection="{ selectedRowKeys: selectedIndustryRowKeys, onChange: (rowKeys) => {selectedIndustryRowKeys = rowKeys} }"
               :data-source="industryResources"
               :row-key="record => record.ID"
               :pagination="false"
+              @change="changeIndustrySort"
               :loading="industryLoading"
             >
               <template slot="isDraft" slot-scope="text, record">
@@ -25,18 +27,31 @@
               </template>
             </a-table>
             <a-row class="mt-20">
-              <a-pagination style="display: inline-block; float: right;" :page-size="pageSize" v-model="industryPageIndex" :total="industryCount" />
+              <div style="display: inline-block">
+                每页显示
+                <a-select style="width: 70px" v-model="industryPageSize">
+                  <a-select-option :value="5">5</a-select-option>
+                  <a-select-option :value="10">10</a-select-option>
+                  <a-select-option :value="20">20</a-select-option>
+                  <a-select-option :value="50">50</a-select-option>
+                  <a-select-option :value="100">100</a-select-option>
+                </a-select>
+                条
+              </div>
+              <a-pagination style="display: inline-block; float: right;" :page-size="industryPageSize" v-model="industryPageIndex" :total="industryCount" />
             </a-row>
           </a-col>
 
           <a-col class="mt-20">
             <p>
-              土地类信息：
+              土地类信息：<a-button :disabled="!selectedLandRowKeys.length" @click="showAllocateTaskModal(true, 'landResource')" type="primary">批量委托</a-button>
             </p>
             <a-table
               :columns="columns"
               :data-source="landResources"
+              :row-selection="{ selectedRowKeys: selectedLandRowKeys, onChange: (rowKeys) => {selectedLandRowKeys = rowKeys} }"
               :row-key="record => record.ID"
+              @change="changeLandSort"
               :pagination="false"
               :loading="landLoading"
             >
@@ -48,7 +63,18 @@
               </template>
             </a-table>
             <a-row class="mt-20">
-              <a-pagination style="display: inline-block; float: right;" :page-size="pageSize" v-model="landPageIndex" :total="landCount" />
+              <div style="display: inline-block">
+                每页显示
+                <a-select style="width: 70px" v-model="landPageSize">
+                  <a-select-option :value="5">5</a-select-option>
+                  <a-select-option :value="10">10</a-select-option>
+                  <a-select-option :value="20">20</a-select-option>
+                  <a-select-option :value="50">50</a-select-option>
+                  <a-select-option :value="100">100</a-select-option>
+                </a-select>
+                条
+              </div>
+              <a-pagination style="display: inline-block; float: right;" :page-size="landPageSize" v-model="landPageIndex" :total="landCount" />
             </a-row>
           </a-col>
         </a-row>
@@ -56,13 +82,15 @@
 
       <a-tab-pane key="2" tab="客户端信息">
         <p>
-          咨询信息：
+          咨询信息：<a-button :disabled="!selectConsultRowKeys.length" @click="showAllocateTaskModal(true, 'consult')" type="primary">批量委托</a-button>
         </p>
         <a-table
           :columns="consultColumns"
           :data-source="consultList"
+          :row-selection="{ selectedRowKeys: selectConsultRowKeys, onChange: (rowKeys) => {selectConsultRowKeys = rowKeys} }"
           :row-key="record => record.ID"
           :pagination="false"
+          @change="changeConsultSort"
           :loading="consultLoading"
         >
           <template slot="resourceType" slot-scope="text, record">
@@ -73,7 +101,18 @@
           </template>
         </a-table>
         <a-row class="mt-20">
-          <a-pagination style="display: inline-block; float: right;" :page-size="pageSize" v-model="consultPageIndex" :total="consultCount" />
+          <div style="display: inline-block">
+            每页显示
+            <a-select style="width: 70px" v-model="consultPageSize">
+              <a-select-option :value="5">5</a-select-option>
+              <a-select-option :value="10">10</a-select-option>
+              <a-select-option :value="20">20</a-select-option>
+              <a-select-option :value="50">50</a-select-option>
+              <a-select-option :value="100">100</a-select-option>
+            </a-select>
+            条
+          </div>
+          <a-pagination style="display: inline-block; float: right;" :page-size="consultPageSize" v-model="consultPageIndex" :total="consultCount" />
         </a-row>
       </a-tab-pane>
 
@@ -108,7 +147,7 @@
       </a-row>
       <div style="text-align: center" class="mt-10">
         <a-button type="primary" @click="allocateTask(userInfo.ID)">超级管理员自审</a-button>
-        <a-button type="primary" @click="showAllocateTaskModal">管理员委托</a-button>
+        <a-button type="primary" @click="showAllocateTaskModal(false)">管理员委托</a-button>
       </div>
     </a-modal>
 
@@ -139,13 +178,14 @@
       </a-row>
       <div style="text-align: center" class="mt-10">
         <a-button type="primary" @click="allocateTask(userInfo.ID)">超级管理员自审</a-button>
-        <a-button type="primary" @click="showAllocateTaskModal">管理员委托</a-button>
+        <a-button type="primary" @click="showAllocateTaskModal(false)">管理员委托</a-button>
       </div>
     </a-modal>
 
     <a-modal
       v-model="adminModalVisible"
       @ok="allocateTask(null)"
+      :confirm-loading="loading"
       :zIndex="2"
     >
       <p>
@@ -192,6 +232,7 @@ import publishIndustryResource from '../industryResource/publishIndustryResource
 import publishLandResource from '../landResource/publishLandResource'
 import userApi from '@system/api/user'
 import {mapGetters} from 'vuex'
+import utils from '@/utils/utils'
 
 const consultColumns = [
   {
@@ -203,21 +244,24 @@ const consultColumns = [
   {
     title: '类 型',
     key: 'resourceType',
-    scopedSlots: { customRender: 'resourceType' }
+    scopedSlots: { customRender: 'resourceType' },
+    sorter: true
   },
   {
     title: '创建者',
     dataIndex: 'creator.user_name',
     ellipsis: true,
     width: 100,
-    key: 'creator'
+    key: 'creator',
+    sorter: true
   },
   {
     title: '创建时间',
     dataIndex: 'createdAt',
     ellipsis: true,
     width: 150,
-    key: 'createdAt'
+    key: 'createdAt',
+    sorter: true
   },
   {
     title: '操 作',
@@ -240,27 +284,24 @@ const columns = [
     dataIndex: 'creator.user_name',
     ellipsis: true,
     width: 100,
-    key: 'creator'
+    key: 'creator',
+    sorter: true
   },
   {
     title: '创建时间',
     dataIndex: 'createdAt',
     ellipsis: true,
     width: 150,
-    key: 'createdAt'
+    key: 'createdAt',
+    sorter: true
   },
   {
     title: '更新时间',
     dataIndex: 'updatedAt',
     ellipsis: true,
     width: 150,
-    key: 'updatedAt'
-  },
-  {
-    title: '状 态',
-    key: 'isDraft',
-    width: 100,
-    scopedSlots: { customRender: 'isDraft' }
+    key: 'updatedAt',
+    sorter: true
   },
   {
     title: '操 作',
@@ -294,6 +335,15 @@ export default {
     },
     'industryPageIndex' () {
       this.getIndustries()
+    },
+    'consultPageSize' () {
+      this.getConsults()
+    },
+    'landPageSize' () {
+      this.getLands()
+    },
+    'industryPageSize' () {
+      this.getIndustries()
     }
   },
   computed: {
@@ -302,7 +352,30 @@ export default {
   data () {
     return {
       columns,
+      activeTab: '1',
+      selectedIndustryRowKeys: [],
+      selectConsultRowKeys: [],
+      selectedLandRowKeys: [],
       consultColumns,
+      industryOrder: {
+        createdAt: null,
+        updatedAt: null,
+        auditStatus: null,
+        creator: null
+      },
+      landOrder: {
+        createdAt: null,
+        updatedAt: null,
+        auditStatus: null,
+        creator: null
+      },
+      consultOrder: {
+        userName: null,
+        resourceType: null,
+        creator: null,
+        createdAt: null,
+        userCompany: null
+      },
       landStringify: '',
       industryStringify: '',
       handleType: '',
@@ -320,7 +393,9 @@ export default {
       consultList: [],
       admins: [],
       selectedAdmin: [],
-      pageSize: 10,
+      consultPageSize: 5,
+      landPageSize: 5,
+      industryPageSize: 5,
       industryCount: 0,
       landCount: 0,
       consultCount: 0,
@@ -346,7 +421,10 @@ export default {
       this.landLoading = true
       this.consultLoading = true
       this.loading = true
-      userApi.getUsers({pageSize: this.pageSize, pageIndex: 0, admin: true}).then(res => {
+      if (this.$route.query['tab']) {
+        this.activeTab = this.$route.query['tab']
+      }
+      userApi.getUsers({pageSize: 100, pageIndex: 0, admin: true}).then(res => {
         this.admins = res.data.data.users
         this.loading = false
       })
@@ -356,8 +434,13 @@ export default {
     },
     getConsults () {
       consultApi.getConsults({
-        pageSize: this.pageSize,
+        pageSize: this.consultPageSize,
         pageIndex: this.consultPageIndex,
+        orderByUserName: utils.convertOrder(this.consultOrder.userName),
+        orderByUserCompany: utils.convertOrder(this.consultOrder.userCompany),
+        orderByResourceType: utils.convertOrder(this.consultOrder.resourceType),
+        orderByCreator: utils.convertOrder(this.consultOrder.creator),
+        orderByCreatedAt: utils.convertOrder(this.consultOrder.createdAt),
         adminID: 'null'
       }).then(res => {
         this.consultCount = res.data.data.count
@@ -367,8 +450,12 @@ export default {
     },
     getLands () {
       landApi.getLandResources({
-        pageSize: this.pageSize,
+        pageSize: this.landPageSize,
         pageIndex: this.landPageIndex,
+        orderByCreatedAt: utils.convertOrder(this.landOrder.createdAt),
+        orderByCreator: utils.convertOrder(this.landOrder.creator),
+        orderByUpdatedAt: utils.convertOrder(this.landOrder.updatedAt),
+        orderByAuditStatus: utils.convertOrder(this.landOrder.auditStatus),
         owner: false,
         adminID: 'null',
         isDraft: false
@@ -378,11 +465,30 @@ export default {
         this.landLoading = false
       })
     },
+    changeIndustrySort  (p, f, s) {
+      this.industryOrder = {}
+      this.industryOrder[s.columnKey] = s.order
+      this.getIndustries()
+    },
+    changeLandSort  (p, f, s) {
+      this.landOrder = {}
+      this.landOrder[s.columnKey] = s.order
+      this.getLands()
+    },
+    changeConsultSort  (p, f, s) {
+      this.consultOrder = {}
+      this.consultOrder[s.columnKey] = s.order
+      this.getConsults()
+    },
     getIndustries () {
       industryApi.getIndustryResources({
-        pageSize: this.pageSize,
+        pageSize: this.industryPageSize,
         pageIndex: this.industryPageIndex,
         owner: false,
+        orderByCreatedAt: utils.convertOrder(this.industryOrder.createdAt),
+        orderByCreator: utils.convertOrder(this.industryOrder.creator),
+        orderByUpdatedAt: utils.convertOrder(this.industryOrder.updatedAt),
+        orderByAuditStatus: utils.convertOrder(this.industryOrder.auditStatus),
         adminID: 'null',
         isDraft: false
       }).then(res => {
@@ -391,7 +497,7 @@ export default {
         this.industryLoading = false
       })
     },
-    allocateTask (id) {
+    async allocateTask (id) {
       if (!id && this.selectedAdmin.length === 0) {
         this.$error('请先选择委托的管理员！')
       } else {
@@ -408,31 +514,88 @@ export default {
           })
           return
         }
+
+        if (this.handleType === 'consult') {
+          this.loading = true
+          if (this.batchAllocate) {
+            for (let id of this.selectConsultRowKeys) {
+              await consultApi.editConsult(id, {
+                admin: adminID
+              })
+            }
+            this.selectConsultRowKeys = []
+            this.loading = false
+            this.$success('任务委托成功！')
+            this.getConsults()
+            this.adminModalVisible = false
+            this.landModalVisible = false
+            this.industryModalVisible = false
+            return
+          }
+        }
+
         if (this.handleType === 'landResource') {
-          landApi.editLandResource(this.handleID, {
-            admin: adminID
-          }).then(res => {
+          this.loading = true
+          if (this.batchAllocate) {
+            for (let id of this.selectedLandRowKeys) {
+              await landApi.editLandResource(id, {
+                admin: adminID
+              })
+            }
+            this.selectedLandRowKeys = []
+            this.loading = false
             this.$success('任务委托成功！')
             this.getLands()
             this.adminModalVisible = false
             this.landModalVisible = false
-          })
-          return
+            return
+          } else {
+            landApi.editLandResource(this.handleID, {
+              admin: adminID
+            }).then(res => {
+              this.$success('任务委托成功！')
+              this.getLands()
+              this.loading = false
+              this.adminModalVisible = false
+              this.landModalVisible = false
+            })
+            return
+          }
         }
         if (this.handleType === 'industryResource') {
-          industryApi.editIndustryResource(this.handleID, {
-            admin: adminID
-          }).then(res => {
+          this.loading = true
+          if (this.batchAllocate) {
+            for (let id of this.selectedIndustryRowKeys) {
+              await industryApi.editIndustryResource(id, {
+                admin: adminID
+              })
+            }
+            this.selectedIndustryRowKeys = []
+            this.loading = false
             this.$success('任务委托成功！')
             this.getIndustries()
             this.adminModalVisible = false
             this.industryModalVisible = false
-          })
+          } else {
+            industryApi.editIndustryResource(this.handleID, {
+              admin: adminID
+            }).then(res => {
+              this.loading = false
+              this.$success('任务委托成功！')
+              this.getIndustries()
+              this.adminModalVisible = false
+              this.industryModalVisible = false
+            })
+          }
         }
       }
     },
-    showAllocateTaskModal () {
+    showAllocateTaskModal (batchAllocate = false, handleType = null) {
       this.selectedAdmin = []
+      this.batchAllocate = batchAllocate
+      if (handleType) {
+        this.handleType = handleType
+      }
       this.adminModalVisible = true
     },
     showHandleModal (resourceType, resourceID = 0, consult = null) {

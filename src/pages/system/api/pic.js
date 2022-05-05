@@ -10,4 +10,9 @@ export default {
   getPic (uid) {
     return ajax(rootApi + uid + '/', 'get')
   },
+  uploadPic (file) {
+    let formData = new FormData()
+    formData.append('file', file)
+    return ajax(rootApi, 'post', {data: formData})
+  }
 }

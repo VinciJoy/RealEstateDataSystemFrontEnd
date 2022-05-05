@@ -34,12 +34,12 @@
             </span>
           </a-col>
 
-          <a-col class="mt-10">
+          <a-col v-show="selectedArea" class="mt-10">
             省份：
-            <span style="cursor: pointer" :class="!selectedProvince ? 'blue' : 'clickable-txt'" @click="selectedProvince = null">
+            <span style="cursor: pointer" :class="!selectedProvince.length ? 'blue' : 'clickable-txt'" @click="changeProvince('全部')">
               全部
             </span>
-            <span style="cursor: pointer" :class="selectedProvince === province ? 'blue' : 'clickable-txt'" @click="selectedProvince = province" v-for="province in provinceOptions[selectedArea]" :key="province">
+            <span style="cursor: pointer" :class="selectedProvince.includes(province) ? 'blue' : 'clickable-txt'" @click="changeProvince(province)" v-for="province in provinceOptions[selectedArea]" :key="province">
               {{ province }}
             </span>
           </a-col>
@@ -76,19 +76,19 @@
 
           <a-row class="mt-10">
               排序：
-            <span class="clickable-txt" @click="orderByUpdatedTime = 'ASC'" v-show="orderByUpdatedTime === ''">更新时间 </span>
+            <span class="clickable-txt" @click="clearOrderBy();orderByUpdatedTime = 'ASC'" v-show="orderByUpdatedTime === ''">更新时间 </span>
             <span style="cursor: pointer" class="blue" @click="orderByUpdatedTime = 'DESC'" v-show="orderByUpdatedTime === 'ASC'">更新时间↓</span>
             <span style="cursor: pointer" class="blue" @click="orderByUpdatedTime = ''" v-show="orderByUpdatedTime === 'DESC'">更新时间↑</span>
 
-            <span class="clickable-txt" @click="orderBySpace = 'ASC'" v-show="orderBySpace === ''">地上建筑面积 </span>
+            <span class="clickable-txt" @click="clearOrderBy();orderBySpace = 'ASC'" v-show="orderBySpace === ''">地上建筑面积 </span>
             <span style="cursor: pointer" class="blue" @click="orderBySpace = 'DESC'" v-show="orderBySpace === 'ASC'">地上建筑面积↓</span>
             <span style="cursor: pointer" class="blue" @click="orderBySpace = ''" v-show="orderBySpace === 'DESC'">地上建筑面积↑</span>
 
-            <span class="clickable-txt" @click="orderByPrice = 'ASC'" v-show="orderByPrice === ''">交易对价 </span>
+            <span class="clickable-txt" @click="clearOrderBy();orderByPrice = 'ASC'" v-show="orderByPrice === ''">交易对价 </span>
             <span style="cursor: pointer" class="blue" @click="orderByPrice = 'DESC'" v-show="orderByPrice === 'ASC'">交易对价↓</span>
             <span style="cursor: pointer" class="blue" @click="orderByPrice = ''" v-show="orderByPrice === 'DESC'">交易对价↑</span>
 
-            <span class="clickable-txt" @click="orderByRecommendation = 'ASC'" v-show="orderByRecommendation === ''">推荐指数 </span>
+            <span class="clickable-txt" @click="clearOrderBy();orderByRecommendation = 'ASC'" v-show="orderByRecommendation === ''">推荐指数 </span>
             <span style="cursor: pointer" class="blue" @click="orderByRecommendation = 'DESC'" v-show="orderByRecommendation === 'ASC'">推荐指数↓</span>
             <span style="cursor: pointer" class="blue" @click="orderByRecommendation = ''" v-show="orderByRecommendation === 'DESC'">推荐指数↑</span>
         </a-row>
@@ -105,10 +105,10 @@
           </p>
         </a-row>
 
-        <a-row v-for="item of itemList" :key="item.ID" class="mt-20" :gutter="20" style="height: 200px; cursor: pointer">
+        <a-row v-for="item of itemList" :key="item.ID" class="mt-20" :gutter="20" style="height: 210px; cursor: pointer">
           <a-col @click="goToDetail(item.ID)" :span="6" style="height: 100%; max-width: 100%; display: flex; justify-content: center">
-            <img v-if="item.coverPicUuid" style="max-width: 100%; max-height: 100%" :src="picBaseURL + item.coverPicUuid"/>
-            <img v-else style="width: 100%; height: 100%" src="static/imgs/default-img.jpeg"/>
+            <img v-if="item.coverPicUuid" style="width: 280px; height: 210px" :src="picBaseURL + item.coverPicUuid"/>
+            <img v-else style="width: 280px; height: 210px" src="static/imgs/default-img.jpeg"/>
           </a-col>
           <a-col @click="goToDetail(item.ID)" :span="18" style="height: 100%;">
             <a-col>
@@ -184,7 +184,8 @@ import options from '@/utils/cities'
 import { ITEM_TYPES, EXCHANGE_TYPES } from '@/utils/constants'
 import api from '@system/api/landResource'
 import {mapGetters} from 'vuex'
-import {AUDIT_STATUS} from "../../../../utils/constants";
+import {AUDIT_STATUS} from '../../../../utils/constants'
+import utils from '@/utils/utils'
 
 const itemFormations = [
   '土地使用权',
@@ -206,6 +207,7 @@ const areaOptions = [
 
 const provinceOptions = {
   '华东区域': [
+    '长三角',
     '上海市',
     '江苏省',
     '浙江省',
@@ -215,6 +217,7 @@ const provinceOptions = {
     '山东省'
   ],
   '华北区域': [
+    '京津冀',
     '北京市',
     '天津市',
     '河北省',
@@ -262,7 +265,7 @@ export default {
   data () {
     return {
       loading: false,
-      selectedProvince: null,
+      selectedProvince: [],
       selectedArea: null,
       options: options,
       ITEM_TYPES: ITEM_TYPES,
@@ -328,16 +331,46 @@ export default {
         orderByRecommendation: this.orderByRecommendation,
         orderByUpdatedTime: this.orderByUpdatedTime,
         orderBySpace: this.orderBySpace,
-        province: this.selectedProvince
+        province: this.selectedProvince.join(',')
       }).then(res => {
         this.count = res.data.data.count
         this.itemList = res.data.data.landResources
         this.loading = false
       })
     },
+    clearOrderBy () {
+      this.orderBySpace = ''
+      this.orderByPrice = ''
+      this.orderByRecommendation = ''
+      this.orderByUpdatedTime = ''
+    },
+    changeProvince (item) {
+      if (!item) {
+        this.selectedProvince = []
+      } else {
+        if (item === '全部') {
+          this.selectedProvince = utils.Copy(this.provinceOptions[this.selectedArea])
+          this.selectedProvince.remove('全部')
+          return
+        }
+        if (item === '长三角') {
+          this.selectedProvince = ['上海市', '浙江省', '江苏省']
+          this.selectedProvince.remove('长三角')
+          return
+        }
+        if (item === '京津冀') {
+          this.selectedProvince = ['北京市', '天津市', '河北省']
+          this.selectedProvince.remove('京津冀')
+          return
+        }
+        if (this.selectedProvince.includes(item)) {
+          this.selectedProvince.remove(item)
+        } else {
+          this.selectedProvince.push(item)
+        }
+      }
+    },
     finalScore (item) {
-      console.log('recommendation: ', item.recommendation)
-      console.log('score: ', item.score)
       return (item.score - '') + (item.recommendation - '')
     },
     goToDetail (id) {

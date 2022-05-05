@@ -34,9 +34,10 @@
             v-model="editForm.phone"
           />
         </a-form-model-item>
-        <a-form-model-item label="电话已验证">
-          <a-switch
-            v-model="editForm.phoneVerified"
+        <a-form-model-item label="备注">
+          <a-input
+            v-model="editForm.notice"
+            placeholder="请输入用户备注"
           />
         </a-form-model-item>
         <a-form-model-item label="角色" prop="role">
@@ -55,6 +56,11 @@
         <a-form-model-item label="认证" prop="certificationVerified">
           <a-switch v-model="editForm.certificationVerified">
           </a-switch>
+        </a-form-model-item>
+        <a-form-model-item label="电话已验证">
+          <a-switch
+            v-model="editForm.phoneVerified"
+          />
         </a-form-model-item>
       </a-form-model>
     </a-modal>

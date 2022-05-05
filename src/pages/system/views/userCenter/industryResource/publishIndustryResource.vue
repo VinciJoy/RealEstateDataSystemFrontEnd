@@ -104,7 +104,6 @@
             <h2 style="font-weight: bolder">项目封面图片：</h2>
             <a-col :span="12">
                 <a-upload
-                  :action="uploadPicURL"
                   name="file"
                   :file-list="form.coverPicList"
                   :withCredentials="true"
@@ -112,6 +111,7 @@
                   class="file-uploader"
                   :disabled="history"
                   list-type="picture-card"
+                  :before-upload="transformCoverPic"
                   @change="handleChange($event, ['form'],'coverPicList')"
                 >
                   <div v-if="form.coverPicList.length < 1">
@@ -422,7 +422,7 @@
         </div>
 
         <div class="mt-20 sub-gray-line">
-          <h2 style="font-weight: bolder">项目建设要求</h2>
+          <h2 style="font-weight: bolder">匹配项目建设要求：</h2>
           选址要求：
           <div class="mt-10">
             按<span style="margin-left: 22px">地</span><span style="margin-left: 22px">域</span>：
@@ -499,7 +499,9 @@
             </div>
           </div>
 
-          <a-button class="mt-20" type="primary" @click="showSubmitModal" v-if="!history">提 交 资 方 信 息</a-button>
+          <div style="text-align: center">
+            <a-button class="mt-20" type="primary" @click="showSubmitModal" v-if="!history">提 交 资 方 信 息</a-button>
+          </div>
         </div>
       </a-col>
 
@@ -519,9 +521,30 @@
           2、本人已知晓项目通过平台推送后，发布人所属项目方与平台所推荐意向购买人达成合作并签署合作协议的，
           平台将会向该项目方收取相应服务费(本项目未达成合作则不收取任何费用)。本人同意由摩贝云系统工作人员与本人联系，告知并签署相应协议。
         </a-row>
+        <a-row v-if="mode=== 'edit'" class="mt-10">
+          <p>修改说明(必填):</p>
+          <a-textarea placeholder="请输入修改说明" v-model.trim="form.editReason"></a-textarea>
+        </a-row>
         <a-row style="text-align: center" class="mt-10">
           <a-button :disabled="true" v-if="countDown > 0" style="margin-left:40px;width: 130px">{{ '还需阅读' + countDown + '秒' }}</a-button>
-          <a-button type="primary" v-else style="margin-left:40px;width: 20%" @click="submit">提 交</a-button>
+          <a-button :disabled="(mode === 'edit' && !form.editReason)" type="primary" v-else style="margin-left:40px;width: 20%" @click="submit">提 交</a-button>
+        </a-row>
+      </a-modal>
+
+      <a-modal :footer="null" v-model="cropperModalVisible" width="600px">
+        <div style="height: 550px; width: 550px">
+          <VueCropper
+            ref="cropper"
+            :img="cropperImg"
+            :autoCrop="true"
+            :centerBox="true"
+            :canScale="true"
+            :fixed="true"
+            :fixedNumber="[4,3]"
+          ></VueCropper>
+        </div>
+        <a-row style="text-align: center" class="mt-10">
+          <a-button type="primary" style="margin-left:40px;width: 20%" @click="saveCoverPic">保 存</a-button>
         </a-row>
       </a-modal>
       <!--      modal end-->
@@ -535,6 +558,8 @@ import utils from '@/utils/utils'
 import {HTTP, areaOptions, itemTypeOptions, cooperationFormOptions} from '@/utils/constants'
 import options from '@/utils/cities'
 import api from '@system/api/industryResource'
+import picApi from '@system/api/pic'
+import { VueCropper } from 'vue-cropper'
 
 const cooperationRequirementOptions = [
   '产业投资由产业方负责',
@@ -650,6 +675,7 @@ export default {
     'reload'
   ],
   components: {
+    VueCropper,
     userVerify
   },
   props: {
@@ -719,6 +745,8 @@ export default {
     return {
       mode: 'create',
       areaOptions,
+      cropperImg: '',
+      cropperModalVisible: false,
       form: {
         isDraft: true,
         hasProduction: false,
@@ -727,6 +755,7 @@ export default {
         introductionPicList: [],
         coverPicList: [],
         title: '',
+        editReason: '',
         coverPicUuid: '',
         smallSpace: 0,
         largeSpace: 0,
@@ -811,9 +840,38 @@ export default {
           if (typeof (temp.productionList) === 'undefined') {
             temp.productionList = []
           }
+          temp['editReason'] = ''
           this.form = temp
         })
       }
+    },
+    async saveCoverPic () {
+      let thumb = null
+      await this.$refs.cropper.getCropData(data => {
+        thumb = data
+      })
+      this.$refs.cropper.getCropBlob(data => {
+        picApi.uploadPic(data).then((res) => {
+          this.form.coverPicList = [{
+            response: res.data,
+            uuid: res.data.data.uuid,
+            uid: '-1',
+            name: 'cover.jpg',
+            status: 'done',
+            thumbUrl: thumb
+          }]
+          this.cropperModalVisible = false
+        })
+      })
+    },
+    transformCoverPic (file) {
+      let reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = () => {
+        this.cropperImg = reader.result
+        this.cropperModalVisible = true
+      }
+      return false
     },
     deleteProduction (index) {
       this.form.productionList.splice(index, 1)
@@ -841,6 +899,10 @@ export default {
     },
     showSubmitModal () {
       // todo: 数据合法性鉴定
+      if (!this.form.coverPicList.length) {
+        this.$error('请上传项目封面图片！')
+        return
+      }
 
       // 身份认证检测
       if (!this.userInfo.certificationVerified && this.userInfo.certificate.ID === 0) {
@@ -905,7 +967,11 @@ export default {
       if (!file.uuid && !file.preview && file.response.data.status === 'temp') {
         file.preview = await utils.getBase64(file.originFileObj)
       }
-      this.previewImage = (process.env.API_ROOT + '/system/pics/temp/' + file.uuid + '/') || file.preview
+      if (file.uuid) {
+        this.previewImage = process.env.API_ROOT + '/system/pics/temp/' + file.uuid + '/'
+      } else {
+        this.previewImage = file.preview
+      }
       this.previewVisible = true
     },
     deleteCase (index) {
@@ -948,6 +1014,8 @@ export default {
       this.showCaseIndex = this.form.operationCase.cases.length - 1
     },
     changeStatus (index) {
+      this.form.operationCase.status = false
+      this.form.plan.status = false
       this.form[index].status = !this.form[index].status
     },
     async handleChange (info, forms, list, type = 'pic') {
@@ -962,6 +1030,9 @@ export default {
         return
       }
 
+      if (list === 'coverPicList') {
+        return
+      }
       this.loading = true
 
       if (!info.file.response) {

@@ -105,6 +105,12 @@ function IsSuperAdmin (userRole) {
   return ROLE.SUPER_ADMIN === userRole
 }
 
+function convertOrder (order) {
+  if (order === 'ascend') return 'ASC'
+  if (order === 'descend') return 'DESC'
+  return null
+}
+
 function MobileValid (rule, value, callback) {
   if (/^1[345789]\d{9}$/.test(value) === false) {
     if (rule) {
@@ -130,6 +136,7 @@ export default {
   Copy: Copy,
   MobileValid: MobileValid,
   IsSuperAdmin: IsSuperAdmin,
+  convertOrder: convertOrder,
   IsAdmin: IsAdmin,
   getBase64: getBase64,
   CheckEmailExist: CheckEmailExist

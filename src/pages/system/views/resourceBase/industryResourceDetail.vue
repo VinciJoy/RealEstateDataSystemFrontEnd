@@ -34,7 +34,7 @@
                 <div style="float: right">
                   <a-button type="primary" :loading="loading" v-show="!itemBaseInfo.liked" @click="likeResource"><a-icon type="folder"/>收藏本信息</a-button>
                   <a-button :loading="loading" v-show="itemBaseInfo.liked" @click="likeResource"><a-icon type="folder"/>取消收藏</a-button>
-                  <a-button @click="showConsultModal" :loading="loading" type="primary">更多咨询</a-button>
+                  <a-button @click="showConsultModal" :loading="loading" type="primary">我感兴趣</a-button>
                 </div>
               </a-col>
             </a-col>
@@ -52,6 +52,20 @@
 
           <div v-show="selectedTag === 'basic'">
 
+            <div style="float: right; margin-right: 20px">
+              <div>
+                logo：
+              </div>
+              <div>
+                <div v-if="(form.brandLogoList && form.brandLogoList.length)" @click="handlePreview({uuid: form.brandLogoList[0].response.data.uuid})" class="upload-add" style="display: flex; justify-content: center">
+                  <img style="max-width: 100px; max-height: 100px; padding: 8px" :src="picBaseURL + form.brandLogoList[0].response.data.uuid" />
+                </div>
+                <div v-else>
+                  暂无
+                </div>
+              </div>
+            </div>
+
             <a-col class="mt-20">
               <h2 style="font-weight: bolder">项目类型：</h2>
               <span>{{ (form.itemTypeList && form.itemTypeList.length) ? form.itemTypeList.join("/") : '暂无' }}</span>
@@ -68,27 +82,16 @@
             </a-col>
 
             <a-row class="mt-20">
-              <h2 style="font-weight: bolder">资源方情况介绍：</h2>
+              <h2 style="font-weight: bolder">资源方品牌：</h2>
               <a-col :span="12">
                 <a-col>
                   产业资源品牌：<span>{{ form.brand ? form.brand : '暂无' }}</span>
                 </a-col>
               </a-col>
-              <a-col :span="1">
-                logo：
-              </a-col>
-              <a-col :span="8">
-                <div v-if="(form.brandLogoList && form.brandLogoList.length)" @click="handlePreview({uuid: form.brandLogoList[0].response.data.uuid})" class="upload-add" style="display: flex; justify-content: center">
-                  <img style="max-width: 100px; max-height: 100px; padding: 8px" :src="picBaseURL + form.brandLogoList[0].response.data.uuid" />
-                </div>
-                <div v-else>
-                  暂无
-                </div>
-              </a-col>
             </a-row>
 
             <a-col class="mt-20">
-              <h2 style="font-weight: bolder">公司及资源项目操作经验介绍：</h2>
+              <h2 style="font-weight: bolder">公司及运营经验简介：</h2>
               {{ form.operationExperienceIntroduction ? form.operationExperienceIntroduction : '暂无' }}
             </a-col>
 
@@ -144,16 +147,16 @@
 
               <a-row class="mt-10">
                 <h2 style="font-weight: bolder">照片/资料</h2>
-                <a-col :span="12">
+                <a-col :span="24">
                   <div v-if="form.operationCase.cases[showCaseIndex].otherPicList && form.operationCase.cases[showCaseIndex].otherPicList.length">
-                    <div style="display: inline-block" v-for="(pic, index) of form.operationCase.cases[showCaseIndex].otherPicList" :key="'otherPicList' + index">
-                      <div @click="handlePreview(pic)" class="upload-add" style="display: flex; justify-content: center">
-                        <img style="max-width: 100px; max-height: 100px; padding: 8px" :src="pic.thumbUrl" />
+                    <a-col style="margin-bottom: 10px" :span="24" v-for="(pic, index) of form.operationCase.cases[showCaseIndex].otherPicList" :key="'otherPicList' + index">
+                      <div @click="handlePreview(pic)" class="upload-add pic-block" style="margin: auto;display: flex; justify-content: center">
+                        <img style="width: 400px; height: 400px; padding: 8px" :src="pic.thumbUrl" />
                       </div>
-                      <div>
+                      <div style="text-align: center; width: 400px;margin: auto">
                         {{ pic.description ? pic.description : '暂无' }}
                       </div>
-                    </div>
+                    </a-col>
                   </div>
                   <div v-else>
                     暂无
@@ -189,12 +192,12 @@
 
               <a-row class="mt-10">
                 <h2 style="font-weight: bolder">照片/资料</h2>
-                <a-col :span="12">
-                  <div style="display: inline-block" v-for="(pic, index) of form.plan.otherPicList" :key="'otherPicList' + index">
-                    <div @click="handlePreview(pic)" class="upload-add" style="display: flex; justify-content: center">
-                      <img style="max-width: 100px; max-height: 100px; padding: 8px" :src="pic.thumbUrl" />
+                <a-col :span="24">
+                  <div style="margin-bottom: 10px" v-for="(pic, index) of form.plan.otherPicList" :key="'otherPicList' + index">
+                    <div @click="handlePreview(pic)" class="upload-add pic-block" style="margin: auto;display: flex; justify-content: center">
+                      <img style="width: 400px; height: 400px; padding: 8px" :src="pic.thumbUrl" />
                     </div>
-                    <div>
+                    <div style="text-align: center; width: 400px;margin: auto">
                       {{ pic.description ? pic.description : '暂无' }}
                     </div>
                   </div>
@@ -251,19 +254,37 @@
             <a-col class="mt-20">
               <h2 style="font-weight: bolder">合作模式要求：</h2>
               <div>
-                合作投资需求：{{ form.cooperationRequirement ? form.cooperationRequirement : '暂无' }}
+                合作投资需求：{{ form.cooperationRequirement && form.cooperationRequirement.length ? form.cooperationRequirement : '暂无' }}
               </div>
               <div>
-                产业方收益需求：{{ form.benefitRequirement ? form.benefitRequirement : '暂无' }}
+                产业方收益需求：{{ form.benefitRequirement && form.benefitRequirement.length ? form.benefitRequirement : '暂无' }}
               </div>
               <div>
-                其他合作要求：：{{ form.otherCooperationRequirement ? form.otherCooperationRequirement : '暂无' }}
+                其他合作要求：：{{ form.otherCooperationRequirement && form.otherCooperationRequirement.length ? form.otherCooperationRequirement : '暂无' }}
               </div>
             </a-col>
 
             <a-row class="mt-20" style="text-align: center">
               <span style="color: #a1a1a1">——————————  本月剩余5条免费土地信息，购买<span style="color: #40a9ff; cursor: pointer">更多信息</span>查看权限  ——————————</span>
             </a-row>
+
+            <a-row style="color: #a1a1a1" class="mt-20">
+              感兴趣的人：
+            </a-row>
+            <a-row>
+              <div style="color: #a1a1a1" v-if="!itemBaseInfo.interestedUserList || !itemBaseInfo.interestedUserList.length">
+                暂无
+              </div>
+              <template v-for="(interest, index) in itemBaseInfo.interestedUserList">
+                <img :key="'interest' + index" class="mt-10" :src="interest.Icon ? picBaseURL + interest.Icon : '/static/imgs/default.jpeg'" style="margin-right: 10px;width: 40px;height: 40px;border-radius: 20px"/>
+              </template>
+            </a-row>
+          </div>
+
+          <div v-if="selectedTag === 'review'">
+            <div class="mt-20">
+              <a-empty />
+            </div>
           </div>
         </a-col>
         <a-col :span="6"></a-col>
@@ -289,16 +310,16 @@
           请您填写如下信息，以便后续工作人员和您取得联系：
         </a-col>
         <a-col :span="12" class="mt-10">
-          姓名：<a-input v-model="consultInfo.name" style="width: 70%"></a-input>
+          姓名：<a-input :disabled="true" v-model="consultInfo.name" style="width: 70%"></a-input>
         </a-col>
         <a-col :span="12" class="mt-10">
-          电话：<a-input v-model="consultInfo.phone" style="width: 70%"></a-input>
+          电话：<a-input :disabled="true" v-model="consultInfo.phone" style="width: 70%"></a-input>
         </a-col>
         <a-col :span="12" class="mt-10">
-          公司：<a-input v-model="consultInfo.company" style="width: 70%"></a-input>
+          公司：<a-input :disabled="true" v-model="consultInfo.company" style="width: 70%"></a-input>
         </a-col>
         <a-col :span="12" class="mt-10">
-          职务：<a-input v-model="consultInfo.position" style="width: 70%"></a-input>
+          职务：<a-input :disabled="true" v-model="consultInfo.position" style="width: 70%"></a-input>
         </a-col>
         <a-col :span="24" class="mt-10">
           <div>
@@ -383,7 +404,8 @@ export default {
         title: '',
         liked: false,
         recommendation: 0,
-        coverPicUuid: ''
+        coverPicUuid: '',
+        interestedUserList: []
       }
     }
   },
@@ -451,6 +473,7 @@ export default {
         this.itemBaseInfo.recommendation = res.data.data.industryResource.recommendation
         this.itemBaseInfo.coverPicUuid = res.data.data.industryResource.coverPicUuid
         this.itemBaseInfo.liked = res.data.data.industryResource.liked
+        this.itemBaseInfo.interestedUserList = res.data.data.industryResource.interestedUserList
         if (this.form.operationCase.cases && this.form.operationCase.cases.length !== 0) {
           this.showCaseIndex = 0
         }
@@ -508,5 +531,15 @@ export default {
 </script>
 
 <style scoped>
+.selected {
+  color: #40a9ff;
+}
 
+.pic-block {
+  height: 400px;
+  width: 400px;
+  justify-content: center;
+  cursor: pointer;
+  float: none;
+}
 </style>

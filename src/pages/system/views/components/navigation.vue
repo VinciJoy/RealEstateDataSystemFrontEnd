@@ -43,9 +43,36 @@
     </div>
 
     <div class="navigation-user" v-else>
-      <span>
-        消息(1)
-      </span>
+      <a-dropdown>
+        <span>
+          消息({{ noticeCount }})
+        </span>
+        <a-menu slot="overlay">
+          <a-menu-item @click="$router.push('/user_center/super_admin_unhandle')" style="color: rgba(0, 0, 0, 0.85)!important" v-if="userInfo.superAdminUnhandleLandCount || userInfo.superAdminUnhandleIndustryCount">
+            MVP控制台发布端有未处理的信息
+          </a-menu-item>
+          <a-menu-item @click="$router.push('/user_center/admin_unhandle')" style="color: rgba(0, 0, 0, 0.85)!important" v-if="userInfo.adminUnhandleLandCount || userInfo.adminUnhandleIndustryCount">
+            NPC审核端发布端有未审核的信息
+          </a-menu-item>
+          <a-menu-item @click="$router.push('/user_center/super_admin_unhandle?tab=2')" style="color: rgba(0, 0, 0, 0.85)!important" v-if="userInfo.superAdminUnhandleConsultCount">
+            MVP控制台客户端有未处理的信息
+          </a-menu-item>
+          <a-menu-item @click="$router.push('/user_center/admin_unhandle?tab=2')" style="color: rgba(0, 0, 0, 0.85)!important" v-if="userInfo.adminUnhandleConsultCount">
+            NPC审核端客户端有未审核的信息
+          </a-menu-item>
+          <a-menu-item v-for="(resource, index) in userInfo.reject_resources" :key="'reject_resource' + index" style="text-align: center">
+            <a v-if="resource.resource_type === 'IndustryResource'" href="javascript:;" style="color: rgba(0, 0, 0, 0.85)!important" @click="handleRoute('/user_center/publish_industry_resource/' + resource.ID)">
+              {{ resource.title }} 被驳回，请重新修改
+            </a>
+            <a v-else href="javascript:;" style="color: rgba(0, 0, 0, 0.85)!important" @click="handleRoute('/user_center/publish_land_resource/' + resource.ID)">
+              {{ resource.title }} 被驳回，请重新修改
+            </a>
+          </a-menu-item>
+          <a-menu-item v-if="!noticeCount">
+            <a-empty style="color: rgba(0,0,0,.25)"/>
+          </a-menu-item>
+        </a-menu>
+      </a-dropdown>
       <a-dropdown>
         <span>
           {{ userInfo.user_name }} <a-icon type="down" />
@@ -78,7 +105,7 @@
         :wrapper-col="wrapperCol"
         :rules="loginRules"
       >
-        <a-form-model-item label="用户名" prop="user_name" ref="user_name">
+        <a-form-model-item label="昵称" prop="user_name" ref="user_name">
           <a-input v-model="loginForm.user_name"
                    tabindex="1"
                    @blur="
@@ -305,6 +332,25 @@ export default {
   },
   computed: {
     ...mapGetters(['modalStatus', 'userInfo']),
+    noticeCount () {
+      let ret = 0
+      if (this.userInfo.adminUnhandleLandCount || this.userInfo.adminUnhandleIndustryCount) {
+        ret += 1
+      }
+      if (this.userInfo.superAdminUnhandleLandCount || this.userInfo.superAdminUnhandleIndustryCount) {
+        ret += 1
+      }
+      if (this.userInfo.superAdminUnhandleConsultCount) {
+        ret += 1
+      }
+      if (this.userInfo.adminUnhandleConsultCount) {
+        ret += 1
+      }
+      if (this.userInfo.reject_resources) {
+        ret += this.userInfo.reject_resources.length
+      }
+      return ret
+    },
     modalVisible: {
       get () {
         return this.modalStatus.visible

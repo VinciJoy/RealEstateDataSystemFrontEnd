@@ -1,6 +1,6 @@
 <template>
   <a-row style="min-height: calc(100% - 180px)">
-    <a-col :span="3">
+    <a-col v-show="!publishPage" :span="3">
       <a-menu
         style="width: 100%;"
         :selected-keys="selectedKey"
@@ -84,7 +84,7 @@
       </a-menu>
     </a-col>
 
-    <a-col :span="21">
+    <a-col :span="publishPage ? 24 : 21">
       <div class="content-app">
         <transition name="fadeInUp" mode="out-in">
           <router-view></router-view>
@@ -143,6 +143,7 @@ export default {
   data () {
     return {
       MenuList: MenuList,
+      publishPage: false,
       utils: utils,
       selectedKey: []
     }
@@ -155,11 +156,16 @@ export default {
   },
   watch: {
     $route (to, from) {
-      this.selectMenu()
+      this.init()
     }
   },
   methods: {
     init () {
+      if (this.$route.path.includes('publish')) {
+        this.publishPage = true
+      } else {
+        this.publishPage = false
+      }
       this.selectMenu()
     },
     selectMenu () {

@@ -43,24 +43,24 @@
       </a-row>
       <a-row v-if="!isConsult" class="mt-20">
         <a-col style="border: 1px solid transparent" :span="2"></a-col>
-        <a-col :span="20">
+        <a-col class="mt-20" :span="20">
           <h3 style="font-weight: bolder; display: inline-block">审核状态：</h3>
           <a-select placeholder="请选择审核状态" v-model="form.auditStatus" style="width: 120px">
-            <a-select-option :disabled="index < 2" v-for="(auditStatus, index) of AUDIT_STATUS_2_CN" :key="auditStatus" :value="index">
+            <a-select-option :disabled="index < 2" v-for="(auditStatus, index) of AUDIT_STATUS_2_CN" :key="'auditStatus' + index" :value="index">
               {{ auditStatus }}
             </a-select-option>
           </a-select>
 
-          <div v-show="handleType === 'landResource'">
-            <h3 style="font-weight: bolder; display: inline-block">审核分数：</h3>
-            <a-input type="number" style="display: inline-block; width: 120px" v-model="form.auditScore"></a-input>
-          </div>
+<!--          <div v-show="handleType === 'landResource'">-->
+<!--            <h3 style="font-weight: bolder; display: inline-block">审核分数：</h3>-->
+<!--            <a-input type="number" style="display: inline-block; width: 120px" v-model="form.auditScore"></a-input>-->
+<!--          </div>-->
 
-          <a-tabs class="mt-10" type="card">
+          <a-tabs v-model="activeTabKey" class="mt-10" type="card">
             <a-tab-pane key="常规审核" tab="常规审核">
               <div>
                 <h3 style="font-weight: bolder;">常规审核意见：</h3>
-                <a-textarea v-model="form.normalAudit.advice"></a-textarea>
+                <a-textarea v-model.trim="form.normalAudit.advice"></a-textarea>
               </div>
               <div class="mt-10">
                 <h3 style="font-weight: bolder;">平台协议记录：</h3>
@@ -132,7 +132,7 @@
 
             <a-tab-pane v-if="handleType === 'landResource'" key="专业审核" tab="专业审核">
               <div>
-                <h3 style="font-weight: bolder;">项目关键点提炼：</h3>
+                <h3 v-if="form.keyPoint" style="font-weight: bolder;">项目关键点提炼：<a-radio @click="switchShowInFront('keyPoint')" :checked="form.keyPoint.showInFront">前台展示</a-radio></h3>
                 <table style="width: 100%" bordercolor="#e8e8e8" border="2">
                   <tr>
                     <th colspan="4" style="text-align: center">关键点1：项目指标清单</th>
@@ -140,80 +140,52 @@
                   <tr>
                     <th style="width: 25%">项目占地面积（m²）</th>
                     <td style="width: 25%">
-                      <span v-if="handleType === 'landResource'">
-                        {{ (dataForm.itemBaseInfoForm.itemBaseMode === 'occupy' ? spaceComputed / dataForm.itemBaseInfoForm.comprehensiveFAR : spaceComputed) | filterUndefined }}
-                      </span>
-                      <span v-if="handleType === 'industryResource'">
-                        123
+                      <span v-if="form.keyPoint">
+                        {{ form.keyPoint.landSpace | filterUndefined }}
                       </span>
                     </td>
                     <th style="width: 25%">项目综合容积率</th>
                     <td style="width: 25%">
-                      <span v-if="handleType === 'landResource'">
-                        {{ dataForm.itemBaseInfoForm.comprehensiveFAR | filterUndefined }}
-                      </span>
-                      <span v-if="handleType === 'industryResource'">
-                        123
+                      <span v-if="form.keyPoint">
+                        {{ form.keyPoint.comprehensiveFAR | filterUndefined }}
                       </span>
                     </td>
                   </tr>
                   <tr>
                     <th>项目总建筑面积（m²）</th>
                     <td>
-                      <span v-if="handleType === 'landResource'">
-                        <span v-if="dataForm.itemBaseInfoForm.itemBaseMode === 'use'">
-                          {{ (dataForm.itemBaseInfoForm.underGroundSpace ? (dataForm.itemBaseInfoForm.underGroundSpace - '' + spaceComputed * dataForm.itemBaseInfoForm.comprehensiveFAR) : '-') | filterUndefined }}
-                        </span>
-                        <span v-else>
-                          {{ (dataForm.itemBaseInfoForm.underGroundSpace - '' + spaceComputed) | filterUndefined }}
-                        </span>
-                      </span>
-                      <span v-if="handleType === 'industryResource'">
-                        123
+                      <span v-if="form.keyPoint">
+                        {{ form.keyPoint.totalSpace | filterUndefined }}
                       </span>
                     </td>
                     <th>项目地上建筑面积（m²）</th>
                     <td>
-                      <span v-if="handleType === 'landResource'">
-                        {{ (dataForm.itemBaseInfoForm.itemBaseMode === 'occupy' ? spaceComputed : spaceComputed * dataForm.itemBaseInfoForm.comprehensiveFAR) | filterUndefined }}
-                      </span>
-                      <span v-if="handleType === 'industryResource'">
-                        123
+                      <span v-if="form.keyPoint">
+                        {{ form.keyPoint.aboveSpace | filterUndefined }}
                       </span>
                     </td>
                   </tr>
                   <tr>
                     <th>项目地下建筑面积（m²）</th>
                     <td>
-                      <span v-if="handleType === 'landResource'">
-                        {{ dataForm.itemBaseInfoForm.underGroundSpace | filterUndefined }}
-                      </span>
-                      <span v-if="handleType === 'industryResource'">
-                        123
+                      <span v-if="form.keyPoint">
+                        {{ form.keyPoint.underSpace | filterUndefined }}
                       </span>
                     </td>
                     <th>项目地上可售建面（m²）</th>
-                    <td>
-                      <a-input type="number" v-model="form.marketableSpace"></a-input>
+                    <td v-if="form.keyPoint">
+                      <a-input type="number" v-model="form.keyPoint.marketableSpace"></a-input>
                     </td>
                   </tr>
                   <tr>
                     <th>项目地上自持建面（m²）</th>
-                    <td>
-                      <a-input type="number" v-model="form.controlledSpace"></a-input>
+                    <td v-if="form.keyPoint">
+                      <a-input type="number" v-model="form.keyPoint.controlledSpace"></a-input>
                     </td>
                     <th>项目可售比</th>
                     <td>
-                      <span v-if="handleType === 'landResource'">
-                        <span v-if="dataForm.itemBaseInfoForm.itemBaseMode === 'use'">
-                          {{ (dataForm.itemBaseInfoForm.underGroundSpace ? (dataForm.itemBaseInfoForm.underGroundSpace - '' + spaceComputed * dataForm.itemBaseInfoForm.comprehensiveFAR) /  form.marketableSpace : '-') | filterUndefined }}
-                        </span>
-                        <span v-else>
-                          {{ (dataForm.itemBaseInfoForm.underGroundSpace - '' + spaceComputed) / form.marketableSpace | filterUndefined }}
-                        </span>
-                      </span>
-                      <span v-if="handleType === 'industryResource'">
-                        123
+                      <span v-if="form.keyPoint">
+                        {{ form.keyPoint.saleablePercent | filterUndefined }}
                       </span>
                     </td>
                   </tr>
@@ -225,18 +197,18 @@
                   </tr>
                   <tr>
                     <th style="width: 25%">项目类型</th>
-                    <td style="width: 25%">{{ dataForm.itemType }}</td>
+                    <td v-if="form.keyPoint" style="width: 25%">{{ form.keyPoint.itemType }}</td>
                     <th style="width: 25%">项目取证进度</th>
                     <td style="width: 25%">123</td>
                   </tr>
                   <tr>
                     <th>项目土地出让时间</th>
-                    <td>
-                      <a-date-picker v-model="form.remiseDate" />
+                    <td v-if="form.keyPoint">
+                      <a-date-picker v-model="form.keyPoint.remiseDate" />
                     </td>
                     <th>项目现状评估</th>
                     <td>
-                      <a-select placeholder="请选择项目现状评估" style="width: 200px" v-model="form.projectStatus" :options="[
+                      <a-select v-if="form.keyPoint" placeholder="请选择项目现状评估" style="width: 200px" v-model="form.keyPoint.projectStatus" :options="[
                         {value: '七通一平净地', label: '七通一平净地'},
                         {value: '五通一平净地', label: '五通一平净地'},
                         {value: '三通一平净地', label: '三通一平净地'},
@@ -245,17 +217,18 @@
                         {value: '地上附带待拆迁物业', label: '地上附带待拆迁物业'},
                         {value: '自定义', label: '自定义'}
                       ]"></a-select>
-                      <a-input style="width: 200px" class="mt-10" placeholder="请输入自定义内容" v-model="userDefinedProjectStatus" v-if="form.projectStatus.includes('自定义')" ></a-input>
+                      <a-input style="width: 200px" class="mt-10" placeholder="请输入自定义内容" v-model="userDefinedProjectStatus" v-if="form.keyPoint && form.keyPoint.projectStatus && form.keyPoint.projectStatus.includes('自定义')" ></a-input>
                     </td>
                   </tr>
                   <tr>
                     <th>项目周边及四至评估</th>
                     <td>
                       <a-select
+                        v-if="form.keyPoint"
                         mode="multiple"
                         style="width: 200px"
                         placeholder="请选择项目周边及四至评估"
-                        v-model="form.aroundStatus"
+                        v-model="form.keyPoint.aroundStatus"
                         :options="[
                           {value: '四至道路通达', label: '四至道路通达'},
                           {value: '部分道路通达', label: '部分道路通达'},
@@ -268,14 +241,15 @@
                         ]"
                       >
                       </a-select>
-                      <a-input style="width: 200px" class="mt-10" placeholder="请输入自定义内容" @blur="addUserDefinedAroundStatus" v-model="userDefinedAroundStatus" v-if="form.aroundStatus.includes('自定义')" ></a-input>
+                      <a-input style="width: 200px" class="mt-10" placeholder="请输入自定义内容" @blur="addUserDefinedAroundStatus" v-model="userDefinedAroundStatus" v-if="form.keyPoint && form.keyPoint.aroundStatus && form.keyPoint.aroundStatus.includes('自定义')" ></a-input>
                     </td>
                     <th>项目交易方式</th>
                     <td>
                       <a-select
                         style="width: 200px"
+                        v-if="form.keyPoint"
                         placeholder="请选择项目交易方式"
-                        v-model="form.exchangeType" :options="[
+                        v-model="form.keyPoint.exchangeType" :options="[
                         {value: '股权转让', label: '股权转让'},
                         {value: '增资扩股', label: '增资扩股'},
                         {value: '资产在建工程转让', label: '资产在建工程转让'},
@@ -286,7 +260,7 @@
                         {value: '委托运营', label: '委托运营'},
                         {value: '自定义', label: '自定义'}
                       ]"></a-select>
-                      <a-input style="width: 200px" class="mt-10" placeholder="请输入自定义内容" v-model="userDefinedExchangeType" v-if="form.exchangeType.includes('自定义')" ></a-input>
+                      <a-input style="width: 200px" class="mt-10" placeholder="请输入自定义内容" v-model="userDefinedExchangeType" v-if="form.keyPoint && form.keyPoint.exchangeType && form.keyPoint.exchangeType.includes('自定义')" ></a-input>
                     </td>
                   </tr>
                 </table>
@@ -297,56 +271,41 @@
                   </tr>
                   <tr>
                     <th style="width: 25%">项目报价</th>
-                    <td style="width: 25%">
-                      {{ dataForm.totalTransactionAmount | filterUndefined }}
+                    <td style="width: 25%" v-if="form.keyPoint">
+                      {{ form.keyPoint.totalTransactionAmount | filterUndefined }}
                     </td>
                     <th style="width: 25%">项目土地出让金</th>
                     <td style="width: 25%">
-                      <span v-if="handleType === 'landResource'">
-                        {{ dataForm.landCostForm.landTransferFeeTotal | filterUndefined }}
-                      </span>
-                      <span v-if="handleType === 'industryResource'">
-                        123
+                      <span v-if="form.keyPoint">
+                        {{ form.keyPoint.landTransferFeeTotal | filterUndefined }}
                       </span>
                     </td>
                   </tr>
                   <tr>
                     <th>除土地出让金外有票成本</th>
                     <td>
-                      <span v-if="handleType === 'landResource'">
-                        {{ (dataForm.investAmount - dataForm.landCostForm.landTransferFeeTotal ) | filterUndefined }}
-                      </span>
-                      <span v-if="handleType === 'industryResource'">
-                        123
+                      <span v-if="form.keyPoint">
+                        {{ form.keyPoint.costWithoutLand | filterUndefined }}
                       </span>
                     </td>
                     <th>项目无票溢价</th>
                     <td>
-                      <span v-if="handleType === 'landResource'">
-                        {{ (dataForm.totalTransactionAmount - dataForm.investAmount) | filterUndefined }}
-                      </span>
-                      <span v-if="handleType === 'industryResource'">
-                        123
+                      <span v-if="form.keyPoint">
+                        {{ form.keyPoint.benefitWithoutTicket | filterUndefined }}
                       </span>
                     </td>
                   </tr>
                   <tr>
                     <th>项目计容楼面价</th>
                     <td>
-                      <span v-if="handleType === 'landResource'">
-                        {{ (dataForm.totalTransactionAmount / (dataForm.itemBaseInfoForm.itemBaseMode === 'occupy' ? spaceComputed : spaceComputed * dataForm.itemBaseInfoForm.comprehensiveFAR)) | filterUndefined }}
-                      </span>
-                      <span v-if="handleType === 'industryResource'">
-                        123
+                      <span v-if="form.keyPoint">
+                        {{ form.keyPoint.floorPrice | filterUndefined }}
                       </span>
                     </td>
                     <th>项目可售楼面价（单位：元）</th>
                     <td>
-                      <span v-if="handleType === 'landResource'">
-                        {{ (dataForm.totalTransactionAmount * 10000 / form.marketableSpace)  | filterUndefined }}
-                      </span>
-                      <span v-if="handleType === 'industryResource'">
-                        123
+                      <span v-if="form.keyPoint">
+                        {{ form.keyPoint.saleablePrice | filterUndefined }}
                       </span>
                     </td>
                   </tr>
@@ -354,7 +313,7 @@
               </div>
 
               <div class="mt-20">
-                <h3 style="font-weight: bolder;">项目专业审查提炼：</h3>
+                <h3 style="font-weight: bolder;">项目专业审查提炼：<a-radio @click="switchShowInFront('abstract')" :checked="form.abstract.showInFront">前台展示</a-radio></h3>
                 <table style="width: 100%" bordercolor="#e8e8e8" border="2">
                   <tr>
                     <th style="width: 25%">项目本身审查项类型</th>
@@ -580,13 +539,38 @@
               </div>
 
               <div class="mt-20">
-                <h3 style="font-weight: bolder;">项目投资建议：</h3>
+                <h3 style="font-weight: bolder;">项目投资建议：<a-radio @click="switchAdvice" :checked="form.adviceShowInFront">前台展示</a-radio></h3>
                 <a-textarea v-model="form.advice"></a-textarea>
               </div>
 
               <div class="mt-20" style="text-align: center">
                   <a-button type="primary" @click="submitAudit">完成审核</a-button>
                 </div>
+            </a-tab-pane>
+
+            <a-tab-pane key="审核记录" tab="审核记录">
+              <a-empty v-show="!histories || !histories.length" />
+              <div style="margin-top: 10px" v-for="(history, index) of histories" :key="'history' + index">
+                <div v-if="history.Type !== 'audit'">
+                  <div>
+                    <span>修改人: {{ history.UserName }}</span><span class="ml-10">修改时间：{{ history.DisplayTime }}</span>
+                  </div>
+                  <div>修改说明: {{ history.EditReason }}</div>
+                </div>
+                <div v-else>
+                  <div>
+                    <span>审核结果：{{ AUDIT_STATUS_2_CN[history.AuditStatus] }}</span>
+                    <span class="ml-10">审核管理员：{{ history.UserName }}</span>
+                    <span class="ml-10">审核时间：{{ history.DisplayTime }}</span>
+                  </div>
+                  <div>
+                    常规审核意见：{{ history.NormalAudit }}
+                  </div>
+                  <div>
+                    专业审核意见：{{ history.ProAudit }}
+                  </div>
+                </div>
+              </div>
             </a-tab-pane>
           </a-tabs>
         </a-col>
@@ -627,6 +611,7 @@ import AuditApi from '@system/api/audit'
 import industryApi from '@system/api/industryResource'
 import {HTTP} from '@/utils/constants'
 import consultApi from '@system/api/consult'
+import historyApi from '@system/api/history'
 
 export default {
   name: 'handleModal',
@@ -664,8 +649,10 @@ export default {
   },
   data () {
     return {
+      activeTabKey: '常规审核',
       AUDIT_STATUS_2_CN,
       CONSULT_STATUS_2_CN,
+      histories: [],
       userDefinedAroundStatus: '',
       uploadFileURL: '',
       loading: false,
@@ -682,6 +669,28 @@ export default {
         record: ''
       },
       form: {
+        keyPoint: {
+          showInFront: false,
+          itemType: null,
+          totalTransactionAmount: null,
+          landTransferFeeTotal: null,
+          costWithoutLand: null,
+          benefitWithoutTicket: null,
+          floorPrice: null,
+          saleablePrice: null,
+          projectStatus: [],
+          aroundStatus: [],
+          exchangeType: [],
+          remiseDate: null,
+          landSpace: 0,
+          totalSpace: 0,
+          controlledSpace: 0,
+          aboveSpace: 0,
+          underSpace: 0,
+          marketableSpace: 0,
+          saleablePercent: 0,
+          comprehensiveFAR: 0
+        },
         auditScore: 0,
         resourceType: '',
         resourceID: '',
@@ -695,6 +704,7 @@ export default {
           agreementFileList: []
         },
         abstract: {
+          showInFront: false,
           ownAudit: '',
           assetMortgage: null,
           sharedMortgage: null,
@@ -713,13 +723,9 @@ export default {
           aroundAudit: ''
         },
         advice: '',
-        projectStatus: [],
-        aroundStatus: [],
-        exchangeType: [],
+        adviceShowInFront: false,
         auditStatus: [],
-        remiseDate: null,
-        controlledSpace: 0,
-        marketableSpace: 0
+        underGroundSpace: 0
       }
     }
   },
@@ -741,26 +747,26 @@ export default {
   computed: {
     userDefinedProjectStatus: {
       get: function () {
-        if (!this.form.projectStatus.split('自定义/')[1]) return ''
-        return this.form.projectStatus.split('自定义/')[1].trim()
+        if (!this.form.keyPoint.projectStatus.split('自定义/')[1]) return ''
+        return this.form.keyPoint.projectStatus.split('自定义/')[1].trim()
       },
       set: function (val) {
         if (!val) {
-          this.form.projectStatus = '自定义/'
+          this.form.keyPoint.projectStatus = '自定义/'
         }
-        this.form.projectStatus = '自定义/' + val.trim()
+        this.form.keyPoint.projectStatus = '自定义/' + val.trim()
       }
     },
     userDefinedExchangeType: {
       get: function () {
-        if (!this.form.exchangeType.split('自定义/')[1]) return ''
-        return this.form.exchangeType.split('自定义/')[1].trim()
+        if (!this.form.keyPoint.exchangeType.split('自定义/')[1]) return ''
+        return this.form.keyPoint.exchangeType.split('自定义/')[1].trim()
       },
       set: function (val) {
         if (!val) {
-          this.form.exchangeType = '自定义/'
+          this.form.keyPoint.exchangeType = '自定义/'
         }
-        this.form.exchangeType = '自定义/' + val.trim()
+        this.form.keyPoint.exchangeType = '自定义/' + val.trim()
       }
     },
     spaceComputed: {
@@ -793,6 +799,12 @@ export default {
     }
   },
   methods: {
+    switchAdvice () {
+      this.$set(this.form, 'adviceShowInFront', !this.form.adviceShowInFront)
+    },
+    switchShowInFront (formName) {
+      this.$set(this.form[formName], 'showInFront', !this.form[formName].showInFront)
+    },
     initForm () {
       this.dataForm = {
         itemBaseInfoForm: {},
@@ -801,6 +813,13 @@ export default {
       this.form = {
         resourceType: '',
         resourceID: '',
+        keyPoint: {
+          showInFront: false,
+          remiseDate: null,
+          exchangeType: [],
+          projectStatus: [],
+          aroundStatus: []
+        },
         normalAudit: {
           advice: '',
           signedCooperation: null,
@@ -828,45 +847,80 @@ export default {
           aroundAudit: ''
         },
         advice: '',
-        projectStatus: [],
-        aroundStatus: [],
-        exchangeType: [],
-        auditStatus: [],
-        remiseDate: null,
-        controlledSpace: 0,
-        marketableSpace: 0
+        adviceShowInFront: false,
+        auditStatus: []
       }
     },
     addUserDefinedAroundStatus () {
-      this.form.aroundStatus.remove('自定义')
+      this.form.keyPoint.aroundStatus.remove('自定义')
       if (!this.userDefinedAroundStatus) return
-      this.form.aroundStatus.push('自定义/' + this.userDefinedAroundStatus)
+      this.form.keyPoint.aroundStatus.push('自定义/' + this.userDefinedAroundStatus)
     },
-    init () {
+    async init () {
       this.loading = true
       this.form.resourceType = this.handleType
       this.form.resourceID = this.handleID
-      this.uploadFileURL = process.env.API_ROOT + '/system/files/'
-      this.getAudit()
       if (this.isConsult) {
-        let temp = JSON.parse(this.consult.stringify)
-        this.consultForm.consultStatus = this.consult.consultStatus
-        this.consultForm.record = temp.consult.record
+        let temp = {}
+        this.consultForm = {}
+        if (this.consult.stringify) {
+          temp = JSON.parse(this.consult.stringify)
+          this.consultForm.consultStatus = this.consult.consultStatus
+          this.consultForm.record = temp.consult.record
+        }
+      } else {
+        this.activeTabKey = '常规审核'
+        this.uploadFileURL = process.env.API_ROOT + '/system/files/'
+        this.getAudit()
+        this.getHistory()
       }
       if (this.handleType === 'landResource') {
-        landApi.getLandResource(this.handleID).then(res => {
+        await landApi.getLandResource(this.handleID).then(res => {
           this.landStringify = res.data.data.stringify
           this.dataForm = JSON.parse(this.landStringify)
           this.loading = false
         })
       }
       if (this.handleType === 'industryResource') {
-        industryApi.getIndustryResource(this.handleID).then(res => {
+        await industryApi.getIndustryResource(this.handleID).then(res => {
           this.industryStringify = res.data.data.stringify
           this.dataForm = JSON.parse(this.industryStringify)
           this.loading = false
         })
       }
+      if (this.handleType === 'landResource') {
+        if (!this.form.keyPoint) {
+          this.form.keyPoint = {
+            showInFront: false
+          }
+        }
+        if (this.dataForm.itemBaseInfoForm.itemBaseMode === 'use') {
+          this.form.keyPoint.totalSpace = (this.dataForm.itemBaseInfoForm.underGroundSpace ? (this.dataForm.itemBaseInfoForm.underGroundSpace - '' + this.spaceComputed * this.dataForm.itemBaseInfoForm.comprehensiveFAR) : '-')
+          this.form.keyPoint.saleablePercent = (this.dataForm.itemBaseInfoForm.underGroundSpace ? (this.dataForm.itemBaseInfoForm.underGroundSpace - '' + this.spaceComputed * this.dataForm.itemBaseInfoForm.comprehensiveFAR) / this.form.keyPoint.marketableSpace : '-')
+        } else {
+          this.form.keyPoint.saleablePercent = (this.dataForm.itemBaseInfoForm.underGroundSpace - '' + this.spaceComputed) / this.form.keyPoint.marketableSpace
+          this.form.keyPoint.totalSpace = (this.dataForm.itemBaseInfoForm.underGroundSpace - '' + this.spaceComputed)
+        }
+        this.form.keyPoint.comprehensiveFAR = this.dataForm.itemBaseInfoForm.comprehensiveFAR
+        this.form.keyPoint.itemType = this.dataForm.itemType
+        this.form.keyPoint.totalTransactionAmount = this.dataForm.totalTransactionAmount
+        this.form.keyPoint.landTransferFeeTotal = this.dataForm.landCostForm.landTransferFeeTotal
+        this.form.keyPoint.costWithoutLand = (this.dataForm.investAmount - this.dataForm.landCostForm.landTransferFeeTotal)
+        this.form.keyPoint.benefitWithoutTicket = (this.dataForm.totalTransactionAmount - this.dataForm.investAmount)
+        this.form.keyPoint.floorPrice = (this.dataForm.totalTransactionAmount / (this.dataForm.itemBaseInfoForm.itemBaseMode === 'occupy' ? this.spaceComputed : this.spaceComputed * this.dataForm.itemBaseInfoForm.comprehensiveFAR))
+        this.form.keyPoint.saleablePrice = (this.dataForm.totalTransactionAmount * 10000 / this.form.keyPoint.marketableSpace)
+        this.form.keyPoint.landSpace = (this.dataForm.itemBaseInfoForm.itemBaseMode === 'occupy' ? this.spaceComputed / this.dataForm.itemBaseInfoForm.comprehensiveFAR : this.spaceComputed)
+        this.form.keyPoint.aboveSpace = (this.dataForm.itemBaseInfoForm.itemBaseMode === 'occupy' ? this.spaceComputed : this.spaceComputed * this.dataForm.itemBaseInfoForm.comprehensiveFAR)
+        this.form.keyPoint.underSpace = this.dataForm.itemBaseInfoForm.underGroundSpace
+      }
+    },
+    getHistory () {
+      historyApi.getHistories({
+        'resourceType': this.handleType,
+        'resourceID': this.handleID
+      }).then(res => {
+        this.histories = res.data.data.resourceHistories
+      })
     },
     getAudit () {
       AuditApi.getAudit({
@@ -917,21 +971,29 @@ export default {
         return
       }
 
+      if (this.form.auditStatus === 2 && this.form.normalAudit.advice.length < 10) {
+        this.$error('不通过的审核意见不能小于10个字!')
+        return
+      }
+
       this.form.auditScore -= ''
       if (this.handleType === 'landResource' && this.form.auditScore > 40) {
         this.$error('审核分数不能大于40!')
         return
       }
 
-
       if (this.handleType === 'landResource' && !this.form.auditScore) {
-        this.$error('审核分数不能小于1!')
-        return
+        this.form.auditScore = 40
       }
 
       if (this.handleType === 'landResource') {
+        let showInFront = {}
+        if (this.form.keyPoint.showInFront) showInFront['keyPoint'] = this.form.keyPoint
+        if (this.form.abstract.showInFront) showInFront['abstract'] = this.form.abstract
+        if (this.form.adviceShowInFront) showInFront['advice'] = this.form.advice
         landApi.editLandResource(this.handleID, {
           auditStatus: this.form.auditStatus,
+          showInFront: showInFront,
           audit: this.form
         }).then(res => {
           this.$success('审核成功！')

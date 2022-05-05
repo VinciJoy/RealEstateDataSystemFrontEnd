@@ -31,13 +31,50 @@
             <a-col style="font-size: 18px; line-height: 1.8">
               <a-col>
                 推荐指数:
-                <img v-for="i in (Math.floor(itemBaseInfo.recommendation / 2))" :key="'full_star' + i" src="../../../../../static/imgs/fullstar.png"/>
-                <img v-if="itemBaseInfo.recommendation % 2" src="../../../../../static/imgs/halfstar.png"/>
-                <img v-for="i in (Math.floor((10 - itemBaseInfo.recommendation) / 2))" :key="'un_star' + i" src="../../../../../static/imgs/unstar.png"/>
+                <img v-for="i in 2" :key="'full_star' + i" src="../../../../../static/imgs/fullstar.png"/>
+                <template v-if="finalScore(itemBaseInfo) <= 60">
+                  <img src="../../../../../static/imgs/unstar.png"/>
+                  <img src="../../../../../static/imgs/unstar.png"/>
+                  <img src="../../../../../static/imgs/unstar.png"/>
+                </template>
+                <template v-if="finalScore(itemBaseInfo) > 60 && finalScore(itemBaseInfo) < 66">
+                  <img src="../../../../../static/imgs/halfstar.png"/>
+                  <img src="../../../../../static/imgs/unstar.png"/>
+                  <img src="../../../../../static/imgs/unstar.png"/>
+                </template>
+                <template v-else-if="finalScore(itemBaseInfo) >= 66 && finalScore(itemBaseInfo) < 76">
+                  <img src="../../../../../static/imgs/fullstar.png"/>
+                  <img src="../../../../../static/imgs/unstar.png"/>
+                  <img src="../../../../../static/imgs/unstar.png"/>
+                </template>
+                <template v-else-if="finalScore(itemBaseInfo) >= 76 && finalScore(itemBaseInfo) < 86">
+                  <img src="../../../../../static/imgs/fullstar.png"/>
+                  <img src="../../../../../static/imgs/halfstar.png"/>
+                  <img src="../../../../../static/imgs/unstar.png"/>
+                </template>
+
+                <template v-else-if="finalScore(itemBaseInfo) >= 86 && finalScore(itemBaseInfo) < 96">
+                  <img src="../../../../../static/imgs/fullstar.png"/>
+                  <img src="../../../../../static/imgs/fullstar.png"/>
+                  <img src="../../../../../static/imgs/unstar.png"/>
+                </template>
+
+                <template v-else-if="finalScore(itemBaseInfo) >= 96 && finalScore(itemBaseInfo) < 101">
+                  <img src="../../../../../static/imgs/fullstar.png"/>
+                  <img src="../../../../../static/imgs/fullstar.png"/>
+                  <img src="../../../../../static/imgs/halfstar.png"/>
+                </template>
+
+                <template v-else-if="finalScore(itemBaseInfo) >= 101">
+                  <img src="../../../../../static/imgs/fullstar.png"/>
+                  <img src="../../../../../static/imgs/fullstar.png"/>
+                  <img src="../../../../../static/imgs/fullstar.png"/>
+                </template>
+
                 <div style="float: right">
                   <a-button type="primary" v-show="!itemBaseInfo.liked" @click="likeResource"><a-icon type="folder"/>收藏本信息</a-button>
                   <a-button v-show="itemBaseInfo.liked" @click="likeResource"><a-icon type="folder"/>取消收藏</a-button>
-                  <a-button @click="showConsultModal" type="primary">更多咨询</a-button>
+                  <a-button @click="showConsultModal" type="primary">我感兴趣</a-button>
                 </div>
               </a-col>
             </a-col>
@@ -52,7 +89,7 @@
             <span :class="'clickable-txt ' + (selectedTag === 'more' ? 'selected' : '')" @click="selectedTag = 'more'">更多资讯</span>
           </a-col>
 
-          <div v-show="selectedTag === 'basic'">
+          <div v-if="selectedTag === 'basic'">
             <a-col>
             <h2 style="font-weight: bolder">项目位置：</h2>
             <baidu-map
@@ -74,10 +111,10 @@
 
             <div style="display: inline-block; padding-left: 20px; vertical-align: top">
               <a-row class="mt-20">
-                <a-button @click="addThreeCircle('itemMap')" :disabled="form.itemMap.polygonPath.length === 0" type="primary">周 边 三 公 里</a-button>
+                <a-button @click="addThreeCircle('itemMap')" :disabled="form.itemMap.polygonPath.length === 0" type="primary">查看项目周边三公里范围</a-button>
               </a-row>
               <a-row class="mt-20">
-                <a-button @click="addFiveCircle('itemMap')" :disabled="form.itemMap.polygonPath.length === 0" type="primary">周 边 五 公 里</a-button>
+                <a-button @click="addFiveCircle('itemMap')" :disabled="form.itemMap.polygonPath.length === 0" type="primary">查看项目周边五公里范围</a-button>
               </a-row>
             </div>
           </a-col>
@@ -87,7 +124,7 @@
 
               <table class="mt-10" style="width: 100%" bordercolor="#e8e8e8" border="2">
               <tr>
-                <th :rowspan="form.itemBaseInfoForm.itemBaseMode === 'occupy' ? 7 : 6">地上指标</th>
+                <th :rowspan="(form.itemBaseInfoForm.otherSpace ? form.itemBaseInfoForm.otherSpace.length : 0) + (form.itemBaseInfoForm.itemBaseMode === 'occupy' ? 7 : 6)">地上指标</th>
                 <th>{{ form.itemBaseInfoForm.itemBaseMode === 'occupy' ? '地上建筑面积（m²）' : '经营占地面积（m²）'}}</th>
                 <td style="background-color: #fafafa; cursor:auto">
                   <span>
@@ -143,17 +180,22 @@
                   </span>
                 </td>
               </tr>
-              <tr>
-                <th>{{ form.itemBaseInfoForm.itemBaseMode === 'occupy' ? '其中——其他建筑面积（m²）' : '其中——其他占地面积（m²）'}}</th>
+                <tr>
+                  <th colspan="4" style="text-align: center">{{ form.itemBaseInfoForm.itemBaseMode === 'occupy' ? '其中——其他建筑面积（m²）' : '其中——其他占地面积（m²）'}}</th>
+                </tr>
+              <tr :key="'otherSpace' + index" v-for="(item, index) of form.itemBaseInfoForm.otherSpace">
+                <th>
+                  {{ item[0] }}占地面积（m²）
+                </th>
                 <td>
                   <span>
-                    {{ form.itemBaseInfoForm.otherSpace | filterUndefined }}
+                    {{ item[1] | filterUndefined }}
                   </span>
                 </td>
                 <th>其他容积率</th>
                 <td>
                   <span>
-                    {{ form.itemBaseInfoForm.otherFAR | filterUndefined }}
+                    {{ item[2] | filterUndefined }}
                   </span>
                 </td>
               </tr>
@@ -211,107 +253,84 @@
               <p>{{ form.projectStatus ? form.projectStatus : '暂无项目现状' }}</p>
             </a-col>
 
-            <a-col class="mt-20">
+            <a-col
+              v-if="
+              !((!form.landStatusPicList || form.landStatusPicList.length === 0)
+              && (!form.streetPicList || form.streetPicList.length === 0)
+              && (!form.effectPicList || form.effectPicList.length === 0)
+              && (!form.facilityPicList || form.facilityPicList.length === 0)
+              && (!form.otherPicList || form.otherPicList.length === 0))" class="mt-20">
               <a-col>
                 <h2 style="font-weight: bolder">项目图片资料：</h2>
 
-<!--                <baidu-map-->
-<!--                  v-if="mapVisible"-->
-<!--                  :ak="ak"-->
-<!--                  :dragging="false"-->
-<!--                  style="width: 600px; height: 400px; display: inline-block"-->
-<!--                  :center="form.streetMap.center"-->
-<!--                  :scroll-wheel-zoom="false"-->
-<!--                  :zoom="form.streetMap.zoom"-->
-<!--                >-->
-<!--                  <BaiduScale anchor="BMAP_ANCHOR_BOTTOM_RIGHT"></BaiduScale>-->
-<!--                  <BaiduMapType :map-types="['BMAP_NORMAL_MAP', 'BMAP_SATELLITE_MAP', 'BMAP_HYBRID_MAP']" anchor="BMAP_ANCHOR_TOP_LEFT"></BaiduMapType>-->
-<!--                  <BaiduPolygon :clicking="true" :path="form.streetMap.polygonPath" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="2" :editing="true"/>-->
-<!--                </baidu-map>-->
-
                 <a-row>
-                  <a-col>
-                    <p class="pic-title">
+                  <a-col class="pic-list-block" v-if="form.landStatusPicList && form.landStatusPicList.length !== 0">
+                    <h3 style="font-weight: bolder">
                       地块/项目现状照片
-                    </p>
+                    </h3>
                     <div class="pic-desc-block" v-for="(pic, index) of form.landStatusPicList" :key="'streetPicList' + index">
                       <div @click="handlePreview(pic)" class="upload-add pic-block">
                         <img class="pic-img" :src="pic.thumbUrl" />
                       </div>
                       <p class="pic-desc">
-                        {{ pic.description ? pic.description : '暂无描述' }}
+                        {{ pic.description }}
                       </p>
-                    </div>
-                    <div v-if="!form.landStatusPicList || form.landStatusPicList.length === 0">
-                      暂无
                     </div>
                   </a-col>
 
-                  <a-col>
-                    <p class="pic-title">
+                  <a-col class="pic-list-block" v-if="form.streetPicList && form.streetPicList.length !== 0">
+                    <h3 class="pic-title">
                       项目四至现状
-                    </p>
+                    </h3>
                     <div class="pic-desc-block" v-for="(pic, index) of form.streetPicList" :key="'streetPicList' + index">
                       <div @click="handlePreview(pic)" class="upload-add pic-block">
                         <img class="pic-img" :src="pic.thumbUrl" />
                       </div>
                       <p class="pic-desc">
-                        {{ pic.description ? pic.description : '暂无描述' }}
+                        {{ pic.description }}
                       </p>
-                    </div>
-                    <div v-if="!form.streetPicList || form.streetPicList.length === 0">
-                      暂无
                     </div>
                   </a-col>
 
-                  <a-col>
-                    <p class="pic-title">
+                  <a-col class="pic-list-block" v-if="form.effectPicList && form.effectPicList.length !== 0">
+                    <h3 class="pic-title">
                       规划方案及效果图
-                    </p>
+                    </h3>
                     <div class="pic-desc-block" v-for="(pic, index) of form.effectPicList" :key="'streetPicList' + index">
                       <div @click="handlePreview(pic)" class="upload-add pic-block">
                         <img class="pic-img" :src="pic.thumbUrl" />
                       </div>
                       <p class="pic-desc">
-                        {{ pic.description ? pic.description : '暂无描述' }}
+                        {{ pic.description }}
                       </p>
-                    </div>
-                    <div v-if="!form.effectPicList || form.effectPicList.length === 0">
-                      暂无
                     </div>
                   </a-col>
 
-                  <a-col>
-                    <p class="pic-title">
+                  <a-col class="pic-list-block" v-if="form.facilityPicList && form.facilityPicList.length !== 0">
+                    <h3 class="pic-title">
                       周边配套设施
-                    </p>
+                    </h3>
                     <div class="pic-desc-block" v-for="(pic, index) of form.facilityPicList" :key="'streetPicList' + index">
                       <div @click="handlePreview(pic)" class="upload-add pic-block">
                         <img class="pic-img" :src="pic.thumbUrl" />
                       </div>
                       <p class="pic-desc">
-                        {{ pic.description ? pic.description : '暂无描述' }}
+                        {{ pic.description }}
                       </p>
-                    </div>
-                    <div v-if="!form.facilityPicList || form.facilityPicList.length === 0">
-                      暂无
                     </div>
                   </a-col>
 
-                  <a-col>
-                    <p class="pic-title">
+                  <a-col class="pic-list-block" v-if="form.otherPicList && form.otherPicList.length !== 0">
+                    <h3 class="pic-title">
                       {{ form.otherPicListName ? form.otherPicListName : '其他' }}
-                    </p>
+                    </h3>
                     <div class="pic-desc-block" v-for="(pic, index) of form.otherPicList" :key="'otherPicList' + index">
                       <div @click="handlePreview(pic)" class="upload-add pic-block">
                         <img class="pic-img" :src="pic.thumbUrl" />
                       </div>
                       <p class="pic-desc">
-                        {{ pic.description ? pic.description : '暂无描述' }}
+                        {{ pic.description }}
                       </p>
-                    </div>
-                    <div v-if="!form.otherPicList || form.otherPicList.length === 0">
-                      暂无
                     </div>
                   </a-col>
 
@@ -353,16 +372,6 @@
           </a-row>
 
             <a-row class="mt-20">
-              <h2 style="font-weight: bolder">项目公司名称:</h2>
-              <a-col style="font-size: 14px" v-for="(shareHolder, index) of form.itemBaseInfoForm.shareHolders" :key="'项目公司' + (index + 1) + '名称'" :span="8">
-                {{ shareHolder.name }}
-              </a-col>
-              <a-col style="font-size: 14px" v-if="form.itemBaseInfoForm.shareHolders.length === 0">
-                暂无项目公司信息
-              </a-col>
-            </a-row>
-
-            <a-row class="mt-20">
               <h4 style="font-weight: bolder; display: inline-block">交易中对价金额: {{ form.totalTransactionAmount }} 万元</h4>
               <h4 style="font-weight: bolder; display: inline-block; margin-left: 100px">已投入有票成本费: {{ form.investAmount }} 万元</h4>
               <h4 style="font-weight: bolder; display: inline-block; margin-left: 100px">其中，土地成本合计: {{ form.landAmount }} 万元</h4>
@@ -381,6 +390,266 @@
             <a-row class="mt-20" style="text-align: center">
               <span style="color: #a1a1a1">——————————  本月剩余5条免费土地信息，购买<span style="color: #40a9ff; cursor: pointer">更多信息</span>查看权限  ——————————</span>
             </a-row>
+
+            <a-row style="color: #a1a1a1" class="mt-20">
+              感兴趣的人：
+            </a-row>
+            <a-row>
+              <div style="color: #a1a1a1" v-if="!itemBaseInfo.interestedUserList || !itemBaseInfo.interestedUserList.length">
+                暂无
+              </div>
+              <template v-for="(interest, index) in itemBaseInfo.interestedUserList">
+                <img :key="'interest' + index" class="mt-10" :src="interest.Icon ? picBaseURL + interest.Icon : '/static/imgs/default.jpeg'" style="margin-right: 10px;width: 40px;height: 40px;border-radius: 20px"/>
+              </template>
+            </a-row>
+          </div>
+
+          <div v-if="selectedTag === 'review'">
+            <div class="mt-20" v-if="!reviewForm || (!reviewForm.keyPoint && !reviewForm.abstract && !reviewForm.advice)">
+              <a-empty />
+            </div>
+
+            <div v-if="reviewForm.keyPoint">
+                <h3 style="font-weight: bolder;">项目关键点提炼：</h3>
+                <table style="width: 100%" bordercolor="#e8e8e8" border="2">
+                  <tr>
+                    <th colspan="4" style="text-align: center">关键点1：项目指标清单</th>
+                  </tr>
+                  <tr>
+                    <th style="width: 25%">项目占地面积（m²）</th>
+                    <td style="width: 25%">
+                      <span>
+                        {{ reviewForm.keyPoint.landSpace | filterUndefined }}
+                      </span>
+                    </td>
+                    <th style="width: 25%">项目综合容积率</th>
+                    <td style="width: 25%">
+                      <span>
+                        {{ reviewForm.keyPoint.comprehensiveFAR | filterUndefined }}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>项目总建筑面积（m²）</th>
+                    <td>
+                      <span>
+                        {{ reviewForm.keyPoint.totalSpace | filterUndefined }}
+                      </span>
+                    </td>
+                    <th>项目地上建筑面积（m²）</th>
+                    <td>
+                      <span>
+                        {{ reviewForm.keyPoint.aboveSpace | filterUndefined }}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>项目地下建筑面积（m²）</th>
+                    <td>
+                      <span>
+                        {{ reviewForm.keyPoint.underSpace | filterUndefined }}
+                      </span>
+                    </td>
+                    <th>项目地上可售建面（m²）</th>
+                    <td>
+                      <span>{{ reviewForm.keyPoint.marketableSpace | filterUndefined }}</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>项目地上自持建面（m²）</th>
+                    <td>
+                      <span>{{ reviewForm.keyPoint.controlledSpace | filterUndefined }}</span>
+                    </td>
+                    <th>项目可售比</th>
+                    <td>
+                      <span>
+                        {{ reviewForm.keyPoint.saleablePercent | filterUndefined }}
+                      </span>
+                    </td>
+                  </tr>
+                </table>
+
+                <table style="width: 100%" bordercolor="#e8e8e8" class="mt-20" border="2">
+                  <tr>
+                    <th colspan="4" style="text-align: center">关键点2：项目现状评估</th>
+                  </tr>
+                  <tr>
+                    <th style="width: 25%">项目类型</th>
+                    <td style="width: 25%">{{ reviewForm.keyPoint.itemType }}</td>
+                    <th style="width: 25%">项目取证进度</th>
+                    <td style="width: 25%">123</td>
+                  </tr>
+                  <tr>
+                    <th>项目土地出让时间</th>
+                    <td>
+                      <span>
+                        {{ reviewForm.keyPoint.remiseDate | filterDate }}
+                      </span>
+                    </td>
+                    <th>项目现状评估</th>
+                    <td>
+                      <span>
+                        {{ reviewForm.keyPoint.projectStatus}}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>项目周边及四至评估</th>
+                    <td>
+                      <span>
+                        {{ reviewForm.keyPoint.aroundStatus.join('/') }}
+                      </span>
+                    </td>
+                    <th>项目交易方式</th>
+                    <td>
+                      <span>
+                        {{ reviewForm.keyPoint.exchangeType }}
+                      </span>
+                    </td>
+                  </tr>
+                </table>
+
+                <table style="width: 100%" class="mt-20" bordercolor="#e8e8e8" border="2">
+                  <tr>
+                    <th colspan="4" style="text-align: center">关键点3：项目报价 单位：万元</th>
+                  </tr>
+                  <tr>
+                    <th style="width: 25%">项目报价</th>
+                    <td style="width: 25%">
+                      {{ reviewForm.keyPoint.totalTransactionAmount | filterUndefined }}
+                    </td>
+                    <th style="width: 25%">项目土地出让金</th>
+                    <td style="width: 25%">
+                      <span>
+                        {{ reviewForm.keyPoint.landTransferFeeTotal | filterUndefined }}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>除土地出让金外有票成本</th>
+                    <td>
+                      <span>
+                        {{ reviewForm.keyPoint.costWithoutLand | filterUndefined }}
+                      </span>
+                    </td>
+                    <th>项目无票溢价</th>
+                    <td>
+                      <span>
+                        {{ reviewForm.keyPoint.benefitWithoutTicket | filterUndefined }}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>项目计容楼面价</th>
+                    <td>
+                      <span>
+                        {{ reviewForm.keyPoint.floorPrice | filterUndefined }}
+                      </span>
+                    </td>
+                    <th>项目可售楼面价（单位：元）</th>
+                    <td>
+                      <span>
+                        {{ reviewForm.keyPoint.saleablePrice | filterUndefined }}
+                      </span>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+
+            <div v-if="reviewForm.abstract" class="mt-20">
+                <h3 style="font-weight: bolder;">项目专业审查提炼：</h3>
+                <table style="width: 100%" bordercolor="#e8e8e8" border="2">
+                  <tr>
+                    <th style="width: 25%">项目本身审查项类型</th>
+                    <td style="width: 25%">
+                      <span>
+                        {{ reviewForm.abstract.ownAudit }}
+                      </span>
+                    </td>
+                    <th style="width: 25%">项目周边审查项类型</th>
+                    <td style="width: 25%">
+                      <span>
+                        {{ reviewForm.abstract.aroundAudit }}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>资产抵押</th>
+                    <td>
+                      {{ reviewForm.abstract.assetMortgage | filterSelected }}
+                    </td>
+                    <th>周边是否存在影响施工的不利因素</th>
+                    <td>
+                      {{ reviewForm.abstract.disadvantageBuilding | filterSelected }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>股权抵押</th>
+                    <td>
+                      {{ reviewForm.abstract.sharedMortgage | filterSelected }}
+                    </td>
+                    <th>周边是否存在引起客户反感的设施并计算实际距离</th>
+                    <td>
+                      {{ reviewForm.abstract.customerDislike | filterSelected }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>地块过往是否有引起客户反感的用途</th>
+                    <td>
+                      {{ reviewForm.abstract.usedCustomerDislike | filterSelected }}
+                    </td>
+                    <th>周边是否存在辐射影响的设施并计算实际距离</th>
+                    <td>
+                      {{ reviewForm.abstract.radiationEffect | filterSelected }}
+                    </td>
+                  </tr>
+                   <tr>
+                    <th>地块是否存在地质风险</th>
+                    <td>
+                      {{ reviewForm.abstract.geologicRisk | filterSelected }}
+                    </td>
+                    <th>周边是否存在空气污染的设施并计算实际距离</th>
+                    <td>
+                      {{ reviewForm.abstract.airPollution | filterSelected }}
+                    </td>
+                  </tr>
+                   <tr>
+                    <th>地块内是否存在需拆迁的建筑物</th>
+                    <td>
+                      {{ reviewForm.abstract.removal | filterSelected }}
+                    </td>
+                    <th>周边是否存在噪音污染的设施并计算实际距离</th>
+                    <td>
+                      {{ reviewForm.abstract.noisePollution | filterSelected }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>地块内是否存在受保护的历史文物</th>
+                    <td>
+                      {{ reviewForm.abstract.culturalRelic | filterSelected }}
+                    </td>
+                    <th>周边是否存在安全隐患设施并计算实际距离</th>
+                    <td>
+                      {{ reviewForm.abstract.potentialDanger | filterSelected }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>地块内的市政设施是否存在影响后期居住的缺陷</th>
+                    <td>
+                      {{ reviewForm.abstract.facilityDisadvantage | filterSelected }}
+                    </td>
+                    <th>未来3年-4年规划中，地块周边是否出现上述不利因素</th>
+                    <td>
+                      {{ reviewForm.abstract.disadvantageIn3To4years | filterSelected }}
+                    </td>
+                  </tr>
+                </table>
+              </div>
+
+            <div v-if="reviewForm.advice" class="mt-20">
+              <h3 style="font-weight: bolder;">项目投资建议：</h3>
+              <span style="word-break: break-all">{{ reviewForm.advice }}</span>
+            </div>
           </div>
         </a-col>
         <a-col :span="6"></a-col>
@@ -401,16 +670,16 @@
           请您填写如下信息，以便后续工作人员和您取得联系：
         </a-col>
         <a-col :span="12" class="mt-10">
-          姓名：<a-input v-model="consultInfo.name" style="width: 70%"></a-input>
+          姓名：<a-input :disabled="true" v-model="consultInfo.name" style="width: 70%"></a-input>
         </a-col>
         <a-col :span="12" class="mt-10">
-          电话：<a-input v-model="consultInfo.phone" style="width: 70%"></a-input>
+          电话：<a-input :disabled="true" v-model="consultInfo.phone" style="width: 70%"></a-input>
         </a-col>
         <a-col :span="12" class="mt-10">
-          公司：<a-input v-model="consultInfo.company" style="width: 70%"></a-input>
+          公司：<a-input :disabled="true" v-model="consultInfo.company" style="width: 70%"></a-input>
         </a-col>
         <a-col :span="12" class="mt-10">
-          职务：<a-input v-model="consultInfo.position" style="width: 70%"></a-input>
+          职务：<a-input :disabled="true" v-model="consultInfo.position" style="width: 70%"></a-input>
         </a-col>
         <a-col :span="24" class="mt-10">
           <div>
@@ -483,8 +752,10 @@ export default {
         if (this.form.itemBaseInfoForm.officeSpace) {
           res += this.form.itemBaseInfoForm.officeSpace - ''
         }
-        if (this.form.itemBaseInfoForm.otherSpace) {
-          res += this.form.itemBaseInfoForm.otherSpace - ''
+        if (this.form.itemBaseInfoForm.otherSpace && Array.isArray(this.form.itemBaseInfoForm.otherSpace) && this.form.itemBaseInfoForm.otherSpace.length) {
+          for (let item of this.form.itemBaseInfoForm.otherSpace) {
+            res += item[1] - ''
+          }
         }
         return res
       }
@@ -503,7 +774,9 @@ export default {
   data () {
     return {
       mapVisible: false,
+      picBaseURL: '',
       loading: false,
+      reviewForm: {},
       consultModalVisible: false,
       consultInfo: {
         resourceType: 'landResource',
@@ -573,18 +846,40 @@ export default {
       itemBaseInfo: {
         title: '',
         recommendation: 0,
+        score: 0,
         itemType: '',
         updatedAt: '',
-        liked: false
+        liked: false,
+        interestedUserList: []
       }
     }
   },
   filters: {
-    filterUndefined (data) {
-      if (data === undefined) {
-        return '\\'
+    filterSelected (data) {
+      if (data === undefined || data === null) {
+        return '未选择'
       }
-      return data
+      if (data) {
+        return '是'
+      }
+      return '否'
+    },
+    filterDate (date) {
+      let d = new Date(date)
+      return d.getFullYear() + '/' + d.getMonth() + '/' + d.getDate()
+    },
+    filterUndefined (data) {
+      if (data === '-') return data
+      if (data === undefined) {
+        return '暂无数据'
+      }
+      if (data === Infinity) {
+        return '暂无数据'
+      }
+      if (data + '' === 'NaN') {
+        return '暂无数据'
+      }
+      return (data - '').toFixed(2)
     }
   },
   mounted () {
@@ -597,12 +892,18 @@ export default {
       api.getLandResource(this.$route.params.id).then((res) => {
         this.mapVisible = false
         this.form = JSON.parse(res.data.data.stringify)
+        if (!Array.isArray(this.form.itemBaseInfoForm.otherSpace)) {
+          this.form.itemBaseInfoForm.otherSpace = []
+        }
+        this.reviewForm = JSON.parse(res.data.data.landResource.auditStringify)
         this.itemBaseInfo.updatedAt = res.data.data.landResource.updatedAt
         this.itemBaseInfo.title = res.data.data.landResource.title
         this.itemBaseInfo.recommendation = res.data.data.landResource.recommendation
         this.itemBaseInfo.itemType = res.data.data.landResource.itemType
         this.itemBaseInfo.coverPicUuid = res.data.data.landResource.coverPicUuid
         this.itemBaseInfo.liked = res.data.data.landResource.liked
+        this.itemBaseInfo.score = res.data.data.landResource.score
+        this.itemBaseInfo.interestedUserList = res.data.data.landResource.interestedUserList
 
         this.mapVisible = true
       }).catch(res => {
@@ -619,6 +920,9 @@ export default {
           this.consultInfo.position = this.userInfo.certificate.position
         }
       }
+    },
+    finalScore (item) {
+      return (item.score - '') + (item.recommendation - '')
     },
     createConsult () {
       this.loading = true
@@ -692,21 +996,22 @@ export default {
 }
 
 .pic-block {
-  height: 200px;
-  width: 200px;
+  height: 400px;
+  width: 400px;
   justify-content: center;
-  cursor: default;
+  cursor: pointer;
+  float: none;
 }
 
 .pic-desc {
-  height: 200px;
   word-wrap:break-word;
   word-break:break-all;
   overflow: hidden;
 }
 
 .pic-desc-block {
-  height: 210px;
+  width: 400px;
+  text-align: center;
 }
 
 .selected {
@@ -719,8 +1024,8 @@ th {
 }
 
 .pic-img {
-  max-width: 200px;
-  max-height: 200px;
+  width: 400px;
+  height: 400px;
   -webkit-user-drag: none;
   padding: 8px;
 }
@@ -730,8 +1035,13 @@ td {
 }
 
 .pic-title {
-  margin-bottom: 0;
-  margin-top: 40px;
+  font-weight: bolder;
+  margin-top: 20px;
 }
 
+.pic-list-block {
+  width: 400px;
+  text-align: center;
+  margin: auto;
+}
 </style>

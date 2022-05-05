@@ -35,6 +35,10 @@
   margin-top: 10px;
 }
 
+.pl-10 {
+  padding-left: 10px;
+}
+
 .ml-10 {
   margin-left: 10px;
 }
@@ -155,6 +159,10 @@
   color: #40a9ff;
   text-decoration: none;
   outline: 0;
+}
+
+.gray {
+    color: #b0b0b0;
 }
 
 .gray-font {
