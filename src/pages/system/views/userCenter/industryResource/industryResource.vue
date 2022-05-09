@@ -24,6 +24,8 @@
       <template slot="action" slot-scope="text, record">
         <a @click="showHistoryModal(record)">项目详情</a>
         <a-divider type="vertical" />
+        <a @click="showProgressModal(record)">进度跟进</a>
+        <a-divider type="vertical" />
         <a @click="goToEdit(record)">编辑</a>
         <a-divider type="vertical" />
         <a @click="deleteIndustryResource(record.ID)">删除</a>
@@ -35,7 +37,7 @@
     </a-row>
 
 <!--    modal begin-->
-    <a-modal v-model="historyModalVisible" :footer="null">
+    <a-modal width="60%" v-model="historyModalVisible" :footer="null">
       <div v-show="loading" style="text-align: center">
         <a-spin tip="加载中..."></a-spin>
       </div>
@@ -69,6 +71,8 @@
       </div>
       <publishIndustryResource :history="true" :historyStringify="historyStringify"></publishIndustryResource>
     </a-modal>
+
+    <progressModal :resourceType="'industryResource'" @closeProgressModal="progressModalVisible = false" :progressResourceID="progressResourceID" :progressModalVisible="progressModalVisible"></progressModal>
 <!--    modal end-->
   </div>
 </template>
@@ -80,6 +84,7 @@ import historyApi from '@system/api/history'
 import {mapGetters} from 'vuex'
 import publishIndustryResource from './publishIndustryResource'
 import { AUDIT_STATUS_2_CN } from '../../../../../utils/constants'
+import progressModal from '../../components/progressModal'
 
 const columns = [
   {
@@ -133,7 +138,6 @@ const columns = [
     title: '操 作',
     key: 'action',
     ellipsis: true,
-    width: 200,
     scopedSlots: { customRender: 'action' }
   }
 ]
@@ -141,12 +145,14 @@ const columns = [
 export default {
   name: 'industryResource',
   components: {
-    publishIndustryResource: publishIndustryResource
+    publishIndustryResource: publishIndustryResource,
+    progressModal: progressModal
   },
   data () {
     return {
       histories: [],
       columns: columns,
+      progressModalVisible: false,
       AUDIT_STATUS_2_CN: AUDIT_STATUS_2_CN,
       historyModalVisible: false,
       historyStringify: '',
@@ -156,6 +162,7 @@ export default {
       pageSize: 10,
       pageIndex: 1,
       count: 0,
+      progressResourceID: 0,
       loading: false
     }
   },
@@ -197,6 +204,10 @@ export default {
         this.industryResources = res.data.data.industryResources
         this.loading = false
       })
+    },
+    showProgressModal (record) {
+      this.progressResourceID = record.ID
+      this.progressModalVisible = true
     },
     showHistoryDetailModal (id) {
       this.historyDetailModalVisible = true

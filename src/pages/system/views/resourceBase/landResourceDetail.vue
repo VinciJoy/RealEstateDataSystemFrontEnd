@@ -405,8 +405,30 @@
           </div>
 
           <div v-if="selectedTag === 'review'">
-            <div class="mt-20" v-if="!reviewForm || (!reviewForm.keyPoint && !reviewForm.abstract && !reviewForm.advice)">
+            <div class="mt-20" v-if="(!histories || !histories.length) && (!reviewForm || (!reviewForm.keyPoint && !reviewForm.abstract && !reviewForm.advice))">
               <a-empty />
+            </div>
+
+            <div style="margin-top: 10px" v-for="(history, index) of histories" :key="'history' + index">
+              <div v-if="history.Type !== 'audit'">
+                <div>
+                  <span>修改人: {{ history.UserName }}</span><span class="ml-10">修改时间：{{ history.DisplayTime }}</span>
+                </div>
+                <div>修改说明: {{ history.EditReason }}</div>
+              </div>
+              <div v-else>
+                <div>
+                  <span>审核结果：{{ AUDIT_STATUS_2_CN[history.AuditStatus] }}</span>
+                  <span class="ml-10">审核管理员：{{ history.UserName }}</span>
+                  <span class="ml-10">审核时间：{{ history.DisplayTime }}</span>
+                </div>
+                <div>
+                  常规审核意见：{{ history.NormalAudit }}
+                </div>
+                <div>
+                  专业审核意见：{{ history.ProAudit }}
+                </div>
+              </div>
             </div>
 
             <div v-if="reviewForm.keyPoint">
@@ -497,7 +519,7 @@
                     <th>项目周边及四至评估</th>
                     <td>
                       <span>
-                        {{ reviewForm.keyPoint.aroundStatus.join('/') }}
+                        {{ reviewForm.keyPoint.aroundStatus ? reviewForm.keyPoint.aroundStatus.join('/') : '' }}
                       </span>
                     </td>
                     <th>项目交易方式</th>
@@ -706,6 +728,8 @@ import BaiduCircle from 'vue-baidu-map/components/overlays/Circle'
 import BaiduNavigation from 'vue-baidu-map/components/controls/Navigation'
 import consultApi from '@system/api/consult'
 import {mapGetters} from 'vuex'
+import historyApi from '@system/api/history'
+import { AUDIT_STATUS_2_CN } from '../../../../utils/constants'
 
 export default {
   name: 'landResourceDetail',
@@ -777,6 +801,8 @@ export default {
       picBaseURL: '',
       loading: false,
       reviewForm: {},
+      AUDIT_STATUS_2_CN: AUDIT_STATUS_2_CN,
+      histories: [],
       consultModalVisible: false,
       consultInfo: {
         resourceType: 'landResource',
@@ -865,6 +891,9 @@ export default {
       return '否'
     },
     filterDate (date) {
+      if (!date) {
+        return ''
+      }
       let d = new Date(date)
       return d.getFullYear() + '/' + d.getMonth() + '/' + d.getDate()
     },
@@ -920,6 +949,15 @@ export default {
           this.consultInfo.position = this.userInfo.certificate.position
         }
       }
+      this.getHistory()
+    },
+    getHistory () {
+      historyApi.getHistories({
+        'resourceType': 'landResource',
+        'resourceID': this.$route.params.id
+      }).then(res => {
+        this.histories = res.data.data.resourceHistories
+      })
     },
     finalScore (item) {
       return (item.score - '') + (item.recommendation - '')

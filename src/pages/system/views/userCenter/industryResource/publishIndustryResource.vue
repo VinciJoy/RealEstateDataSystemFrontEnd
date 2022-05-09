@@ -421,6 +421,12 @@
 
         </div>
 
+        <h2 style="font-weight: bolder" class="mt-20">项目优势自荐</h2>
+        <a-textarea :disabled="history" v-model="form.advantage"></a-textarea>
+        <span class="gray-font" style="font-size: 14px; font-weight: normal">
+          提示：可介绍包括项目能给区域带来的人流、对区域配套设施的完善、提高地产项目售价、提升去化速度等各种利好，带动就业人口、亩均纳税，以及项目的稀缺性、项目运营特色等各方面优势。
+        </span>
+
         <div class="mt-20 sub-gray-line">
           <h2 style="font-weight: bolder">匹配项目建设要求：</h2>
           选址要求：
@@ -465,12 +471,6 @@
               投资金额：本产品系预计投资金额 <a-input :disabled="history" type="number" style="width: 80px" size="small" v-model="production.lessInvestment"></a-input> 亿元 —— <a-input :disabled="history" style="width: 80px" type="number" size="small" v-model="production.largeInvestment"></a-input> 亿元
             </div>
           </div>
-
-          <h2 style="font-weight: bolder" class="mt-20">项目优势自荐</h2>
-          <a-textarea :disabled="history" v-model="form.advantage"></a-textarea>
-          <span class="gray-font" style="font-size: 14px; font-weight: normal">
-            提示：可介绍包括项目能给区域带来的人流、对区域配套设施的完善、提高地产项目售价、提升去化速度等各种利好，带动就业人口、亩均纳税，以及项目的稀缺性、项目运营特色等各方面优势。
-          </span>
 
           <h2 style="font-weight: bolder" class="mt-20">合作模式要求</h2>
           <div>

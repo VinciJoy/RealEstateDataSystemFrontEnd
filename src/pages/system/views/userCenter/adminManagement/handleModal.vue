@@ -123,6 +123,9 @@
                     </a-radio-group>
                   </p>
                   说明：<a-input v-model="form.normalAudit.paperDesc" style="width: 400px"></a-input>
+                  <div class="mt-10">
+                    <span style="vertical-align: top">补充说明：</span><a-textarea v-model="form.normalAudit.moreDesc" style="width: 400px"></a-textarea>
+                  </div>
                 </div>
                 <div class="mt-20" style="text-align: center">
                   <a-button type="primary" @click="submitAudit">完成审核</a-button>
@@ -701,6 +704,7 @@ export default {
           uploadedAgreement: null,
           acceptedPaper: null,
           paperDesc: '',
+          moreDesc: '',
           agreementFileList: []
         },
         abstract: {
@@ -826,7 +830,8 @@ export default {
           cooperationDesc: '',
           uploadedAgreement: null,
           acceptedPaper: null,
-          paperDesc: ''
+          paperDesc: '',
+          moreDesc: ''
         },
         abstract: {
           ownAudit: '',

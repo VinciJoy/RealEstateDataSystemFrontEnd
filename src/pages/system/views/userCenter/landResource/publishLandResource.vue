@@ -723,7 +723,7 @@
                 <div v-if="nodeVisible && (form.showNodeIndex === 1)">
                   <div class="mt-20" v-for="node in firstNode" :key="node.index">
                     <a-radio :disabled="history" @click.prevent="changeStatus('first', node.index)" v-model="form.progressForm.first[node.index].status">{{ node.name }}</a-radio>
-                    <a-button :disabled="history" v-if="form.progressForm.first[node.index].status" @click="showUploadModal('first', node.index)" type="primary" style="float: right; width: 100px" size="small">上传证照（可选）</a-button>
+                    <a-button :disabled="history" v-if="form.progressForm.first[node.index].status" @click="showUploadModal('first', node.index)" type="primary" style="float: right; width: 150px" size="small">上传证照（可选）</a-button>
                   </div>
                 </div>
                 <div v-if="nodeVisible && (form.showNodeIndex === 2)">
@@ -733,7 +733,7 @@
                   </a-radio-group>
                   <div class="mt-20" v-if="secondNodeStatus === 2" v-for="node in secondNode" :key="node.index">
                     <a-radio :disabled="history" @click.prevent="changeStatus('second', node.index)" v-model="form.progressForm.second[node.index].status">{{ node.name }}</a-radio>
-                    <a-button :disabled="history" v-if="form.progressForm.second[node.index].status" @click="showUploadModal('second', node.index)" type="primary" style="float: right; width: 100px" size="small">上传证照（可选）</a-button>
+                    <a-button :disabled="history" v-if="form.progressForm.second[node.index].status" @click="showUploadModal('second', node.index)" type="primary" style="float: right; width: 150px" size="small">上传证照（可选）</a-button>
                   </div>
                 </div>
                 <div v-if="nodeVisible && (form.showNodeIndex === 3)">

@@ -19,6 +19,8 @@
       <span slot="action" slot-scope="text, record">
         <a @click="showHistoryModal(record)">项目详情</a>
         <a-divider type="vertical" />
+        <a @click="showProgressModal(record)">进度跟进</a>
+        <a-divider type="vertical" />
         <a @click="goToEdit(record)">编辑</a>
         <a-divider type="vertical" />
         <a @click="deleteLandResource(record.ID)">删除</a>
@@ -65,6 +67,7 @@
       <publishLandResource :history="true" :historyStringify="historyStringify"></publishLandResource>
     </a-modal>
 
+    <progressModal :resourceType="'landResource'" @closeProgressModal="progressModalVisible = false" :progressResourceID="progressResourceID" :progressModalVisible="progressModalVisible"></progressModal>
 <!--    预加载地图相关组件，防止显示历史信息时莫名其妙的bug-->
     <baidu-map
       :ak="ak"
@@ -98,6 +101,7 @@ import utils from '@/utils/utils'
 import historyApi from '@system/api/history'
 import publishLandResource from './publishLandResource'
 import { AUDIT_STATUS_2_CN } from '../../../../../utils/constants'
+import progressModal from '../../components/progressModal'
 
 const columns = [
   {
@@ -149,14 +153,17 @@ export default {
     BaiduGeolocation: BaiduGeolocation,
     BaiduPolygon: BaiduPolygon,
     BaiduSearch: BaiduSearch,
-    BaiduCircle: BaiduCircle
+    BaiduCircle: BaiduCircle,
+    progressModal: progressModal
   },
   data () {
     return {
       loading: false,
+      progressResourceID: null,
       ak: 'a79kmTteEBy6rw3dpBZYMq86S2PGEmKo',
       historyDetailModalVisible: false,
       historyModalVisible: false,
+      progressModalVisible: false,
       histories: [],
       utils: utils,
       columns: columns,
@@ -209,6 +216,10 @@ export default {
         this.loading = false
       })
     },
+    showProgressModal (record) {
+      this.progressResourceID = record.ID
+      this.progressModalVisible = true
+    },
     init () {
       this.loading = true
       if (utils.IsAdmin(this.userInfo.role)) {
@@ -255,5 +266,4 @@ export default {
 </script>
 
 <style scoped>
-
 </style>
