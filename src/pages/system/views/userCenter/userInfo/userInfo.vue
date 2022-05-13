@@ -5,8 +5,13 @@
         <img title="点击修改头像" @click="cropperModalVisible = true" :src="userInfo.icon ? picBaseURL + userInfo.icon : '/static/imgs/default.jpeg'" style="width: 100%; cursor: pointer"/>
       </a-col>
       <a-col :span="16" style="padding-left: 10px">
-        <div class="username">
-          {{ userInfo.user_name }}
+        <div>
+          <div style="display: inline-block" class="username">
+            {{ userInfo.user_name }}
+          </div>
+          <a @click="membershipVisible = true" style="display: inline-block; float: right; margin-top: 10px" class="tag-desc">
+            开通会员
+          </a>
         </div>
         <div>
           <div v-if="!userInfo.certificationVerified && userInfo.certificate.ID === 0" @click="certificateModalVisible = true" class="tag-desc clickable-txt">点击完成实名认证<a-icon style="color: gray;" class="ml-5" theme="filled" type="down-circle" /></div>
@@ -102,6 +107,8 @@
         <a-button :disabled="!cropperImg" type="primary" style="margin-left:40px;width: 20%" @click="saveCoverPic">保 存</a-button>
       </a-row>
     </a-modal>
+
+    <membership @closeMembershipModal="membershipVisible = false" :membershipVisible="membershipVisible"></membership>
 <!--    modal end-->
 
   </a-row>
@@ -111,6 +118,7 @@
 import {mapActions, mapGetters} from 'vuex'
 import userVerify from '../../components/userVerify'
 import phoneVerify from '../../components/phoneVerify'
+import membership from '../../components/membership'
 import api from '@system/api/user'
 import { VueCropper } from 'vue-cropper'
 import picApi from '@system/api/pic'
@@ -120,6 +128,7 @@ export default {
   components: {
     userVerify,
     VueCropper,
+    membership,
     phoneVerify
   },
   data () {
@@ -131,6 +140,7 @@ export default {
     }
     return {
       cropperModalVisible: false,
+      membershipVisible: false,
       cropperImg: '',
       picBaseURL: '',
       passwordRules: {
