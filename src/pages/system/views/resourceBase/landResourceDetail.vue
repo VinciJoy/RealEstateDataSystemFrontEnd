@@ -999,6 +999,8 @@ export default {
         lng: lng / this.form[map].polygonPath.length,
         lat: lat / this.form[map].polygonPath.length
       }
+      this.form[map].zoom = 13
+      this.form[map].center = this.form[map].threeCirclePath.center
       this.form[map].threeCirclePath.radius = 3000
     },
     addFiveCircle (map) {
@@ -1017,6 +1019,8 @@ export default {
         lng: lng / this.form[map].polygonPath.length,
         lat: lat / this.form[map].polygonPath.length
       }
+      this.form[map].zoom = 13
+      this.form[map].center = this.form[map].fiveCirclePath.center
       this.form[map].fiveCirclePath.radius = 5000
     },
     async handlePreview (file) {
