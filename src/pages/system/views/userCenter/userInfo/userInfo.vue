@@ -9,7 +9,8 @@
           <div style="display: inline-block" class="username">
             {{ userInfo.user_name }}
           </div>
-          <a @click="membershipVisible = true" style="display: inline-block; float: right; margin-top: 10px" class="tag-desc">
+          <p v-if="userInfo.isMembership" style="font-weight: normal;display: inline-block; float: right; margin-top: 10px" class="blue tag-desc">摩贝会员</p>
+          <a v-else @click="membershipVisible = true" style="display: inline-block; float: right; margin-top: 10px" class="tag-desc">
             开通会员
           </a>
         </div>

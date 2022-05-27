@@ -42,6 +42,18 @@
             </router-link>
           </a-menu-item>
         </a-sub-menu>
+        <a-menu-item v-if="utils.IsAdmin(userInfo.role)" key="mobeiStudyManage">
+          <router-link :to="{ name: 'mobeiStudyManage'}">
+            <a-icon type="layout" />
+            <span>摩贝学堂</span>
+          </router-link>
+        </a-menu-item>
+        <a-menu-item v-if="utils.IsAdmin(userInfo.role)" key="videoManage">
+          <router-link :to="{ name: 'videoManage'}">
+            <a-icon type="layout" />
+            <span>视频管理</span>
+          </router-link>
+        </a-menu-item>
         <a-sub-menu key="resource Base">
           <span slot="title"><a-icon type="pie-chart" /><span>资源 Base</span></span>
         <a-menu-item key="userCenterLandResource">
@@ -102,6 +114,12 @@ const MenuList = {
   superAdminUnhandle: [
     'superAdminUnhandle'
   ],
+  videoManage: [
+    'videoManage'
+  ],
+  mobeiStudyManage: [
+    'mobeiStudyManage'
+  ],
   likedResource: [
     'likedResource'
   ],
@@ -161,11 +179,7 @@ export default {
   },
   methods: {
     init () {
-      if (this.$route.path.includes('publish')) {
-        this.publishPage = true
-      } else {
-        this.publishPage = false
-      }
+      this.publishPage = this.$route.path.includes('publish')
       this.selectMenu()
     },
     selectMenu () {

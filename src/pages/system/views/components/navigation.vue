@@ -26,7 +26,9 @@
         </a-menu-item>
       </a-sub-menu>
       <a-menu-item key="mobeiStudy">
-        摩贝学堂
+        <router-link :to="{ name: 'mobeiStudy'}">
+          <span>摩贝学堂</span>
+        </router-link>
       </a-menu-item>
       <a-menu-item key="mobeiBBS">
         摩贝论坛

@@ -39,6 +39,11 @@ export default new Router({
       component: () => import(/* webpackChunkName: "land_resource" */ '@system/views/resourceBase/landResource.vue')
     },
     {
+      path: '/mobei_study',
+      name: 'mobeiStudy',
+      component: () => import(/* webpackChunkName: "land_resource" */ '@system/views/mobeiStudy/mobeiStudy.vue')
+    },
+    {
       path: '/industry_resource',
       name: 'industryResource',
       component: () => import(/* webpackChunkName: "industry_resource" */ '@system/views/resourceBase/industryResource.vue')
@@ -62,6 +67,16 @@ export default new Router({
           path: 'user_info',
           name: 'userInfo',
           component: () => import(/* webpackChunkName: "user_center" */ '@system/views/userCenter/userInfo/userInfo.vue')
+        },
+        {
+          path: 'mobei_study_manage',
+          name: 'mobeiStudyManage',
+          component: () => import(/* webpackChunkName: "user_center" */ '@system/views/userCenter/mobeiStudy/mobeiStudy.vue')
+        },
+        {
+          path: 'video_manage',
+          name: 'videoManage',
+          component: () => import(/* webpackChunkName: "user_center" */ '@system/views/userCenter/videoManage/videoManage.vue')
         },
         {
           path: 'liked_resource',

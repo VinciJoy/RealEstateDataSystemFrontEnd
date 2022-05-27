@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import api from '@system/api/membership'
+import api from '@system/api/alipay'
 
 export default {
   name: 'membership',

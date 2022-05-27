@@ -8,5 +8,10 @@ export default {
     return ajax(rootApi, 'get', {
       params
     })
+  },
+  buyItem (params) {
+    return ajax(rootApi + 'buyItem/', 'get', {
+      params
+    })
   }
 }
