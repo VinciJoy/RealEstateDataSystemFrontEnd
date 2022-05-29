@@ -64,7 +64,9 @@ export default {
   },
   methods: {
     init () {
-      this.buyVideoList = this.userInfo.buyVideo.split(',')
+      if (this.userInfo.buyVideo) {
+        this.buyVideoList = this.userInfo.buyVideo.split(',')
+      }
       this.getMobeiStudy()
     },
     changeTab (tab) {
