@@ -20,7 +20,7 @@
       </div>
     </div>
     <membership @closeMembershipModal="membershipVisible = false" :membershipVisible="membershipVisible"></membership>
-    <buyItem :id="id" @closeBuyItem="buyItemVisible = false" :title="'购买视频'" :price="price" :content="'点击购买：' + title" :buyItemVisible="buyItemVisible"></buyItem>
+    <buyItem :id="form.id" @closeBuyItem="buyItemVisible = false" :title="'购买视频'" :price="form.price" :content="'点击购买：' + form.title" :buyItemVisible="buyItemVisible"></buyItem>
   </div>
 </template>
 
@@ -108,9 +108,11 @@ export default {
           this.form.desc = res.data.data.video.desc
           this.form.id = res.data.data.video.ID
           this.form.watchedCount = res.data.data.video.watchedCount
+          this.form.price = res.data.data.video.price
         })
       } else {
         this.form.thumbUrl = this.thumbUrl
+        this.form.price = this.price
         this.form.title = this.title
         this.form.desc = this.desc
         this.form.id = this.id
