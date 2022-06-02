@@ -70,6 +70,17 @@
       <p v-if="videoForm.type === 2">
         视频价格：<a-input v-model="videoForm.price" type="number" style="width: 120px"></a-input>
       </p>
+      <p>
+        上传附件：
+        <a-upload
+          :action="uploadFileURL"
+          :withCredentials="true"
+          :file-list="videoForm.fileList"
+          @change="handleFileChange"
+        >
+          <a-button> <a-icon type="upload" />上传附件</a-button>
+        </a-upload>
+      </p>
       视频封面：
       <a-col v-for="(item, index) in videoForm.coverList" :key="'bannerList' + index">
         <img width="50%" :src="item.thumbUrl" />
@@ -154,11 +165,13 @@ export default {
   data () {
     return {
       videoList: [],
+      uploadFileURL: '',
       videoForm: {
         coverList: [],
         type: 0,
         desc: '',
         price: 0,
+        fileList: [],
         tags: []
       },
       columns: columns,
@@ -177,6 +190,19 @@ export default {
   methods: {
     init () {
       this.getVideos()
+      this.uploadFileURL = process.env.API_ROOT + '/system/files/'
+    },
+    handleFileChange (info) {
+      let fileList = [...info.fileList]
+
+      fileList = fileList.map(file => {
+        if (file.response) {
+          // Component will show file.url as link
+          file.url = this.uploadFileURL + 'temp/' + file.response.data.uuid
+        }
+        return file
+      })
+      this.videoForm.fileList = fileList
     },
     getVideos () {
       videoApi.getVideos({
@@ -193,6 +219,10 @@ export default {
       this.videoModalVisible = true
     },
     goToEdit (record) {
+      this.videoForm.fileList = []
+      if (record.fileList) {
+        this.videoForm.fileList = JSON.parse(record.fileList)
+      }
       this.videoForm.ID = record.ID
       this.videoForm.url = record.url
       this.videoForm.title = record.title
@@ -222,6 +252,7 @@ export default {
       form.cover = JSON.stringify(this.videoForm.coverList)
       form.title = this.videoForm.title
       form.url = this.videoForm.url
+      form.fileList = JSON.stringify(this.videoForm.fileList)
       form.type = this.videoForm.type
       form.desc = this.videoForm.desc
       form.tags = this.videoForm.tags.join(',')

@@ -79,6 +79,11 @@ export default {
       default: 0
     }
   },
+  watch: {
+    'getVideoFromID'() {
+      this.init()
+    }
+  },
   data () {
     return {
       form: {
@@ -92,23 +97,26 @@ export default {
     }
   },
   mounted () {
-    if (this.getVideoFromID) {
-      videoApi.getVideo(this.getVideoFromID).then(res => {
-        this.form.thumbUrl = JSON.parse(res.data.data.video.cover)[0].thumbUrl
-        this.form.title = res.data.data.video.title
-        this.form.desc = res.data.data.video.desc
-        this.form.id = res.data.data.video.ID
-        this.form.watchedCount = res.data.data.video.watchedCount
-      })
-    } else {
-      this.form.thumbUrl = this.thumbUrl
-      this.form.title = this.title
-      this.form.desc = this.desc
-      this.form.id = this.id
-      this.form.watchedCount = this.watchedCount
-    }
+    this.init()
   },
   methods: {
+    init () {
+      if (this.getVideoFromID) {
+        videoApi.getVideo(this.getVideoFromID).then(res => {
+          this.form.thumbUrl = JSON.parse(res.data.data.video.cover)[0].thumbUrl
+          this.form.title = res.data.data.video.title
+          this.form.desc = res.data.data.video.desc
+          this.form.id = res.data.data.video.ID
+          this.form.watchedCount = res.data.data.video.watchedCount
+        })
+      } else {
+        this.form.thumbUrl = this.thumbUrl
+        this.form.title = this.title
+        this.form.desc = this.desc
+        this.form.id = this.id
+        this.form.watchedCount = this.watchedCount
+      }
+    },
     goToVideo () {
       if (this.disabled) {
         return

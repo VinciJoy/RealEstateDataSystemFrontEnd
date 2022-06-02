@@ -16,8 +16,9 @@
           <a-col @click="changeTab('proBlock')" :class="'tab ' + (selectedTab === 'proBlock'? 'blue selected' : 'clickable-txt')" :span="3">私房高阶</a-col>
         </a-row>
         <a-row style="border-bottom: #e0e0e0 solid 1px;padding-bottom: 40px" :key="'block' + index" v-for="(block, index) in form[selectedTab]">
-          <a-col :span="24">
-            <p class="block-title">{{ block.title }}</p>
+          <a-col style="margin: 20px 0px" :span="24">
+            <span class="block-title">{{ block.title }}</span>
+            <span class="block-subtitle">{{ block.subTitle }}</span>
           </a-col>
           <a-col style="margin-top: 10px" :span="6" :key="'block' + index + 'video' + index2" v-for="(video, index2) in block.videoList">
             <videoBlock :getVideoFromID="video" :currentBlock="selectedTab" :isNotBuy="selectedTab === 'proBlock' && !buyVideoList.includes(video + '')" :isNotMembership="selectedTab === 'vipBlock' && !userInfo.isMembership" v-if="index2 < (showCount[selectedTab][index] ? showCount[selectedTab][index] : 8)"></videoBlock>
@@ -105,5 +106,10 @@ export default {
   margin-top: 20px;
   font-weight: bolder;
   font-size: 20px;
+}
+
+.block-subtitle {
+  font-size: 16px;
+  color: #9c9c9c;
 }
 </style>

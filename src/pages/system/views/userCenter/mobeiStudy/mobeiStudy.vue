@@ -39,6 +39,9 @@
             模块标题：<a-input v-model.trim="item.title" style="width: 400px"></a-input><a @click="form[currentBlock].remove(item)" style="float: right">[删除]</a>
           </a-col>
           <a-col class="mt-10" :span="24">
+            副标题：<a-input v-model.trim="item.subTitle" style="width: 400px"></a-input>
+          </a-col>
+          <a-col class="mt-10" :span="24">
             <a-col class="mb-20" :span="6" v-for="(video, index2) in item.videoList" :key="currentBlock + index1 + 'video' + index2">
               <videoBlock :getVideoFromID="video"></videoBlock>
               <div @click="item.videoList.remove(video)" style="text-align: center; margin-top: 10px" class="clickable-txt">[删除]</div>
