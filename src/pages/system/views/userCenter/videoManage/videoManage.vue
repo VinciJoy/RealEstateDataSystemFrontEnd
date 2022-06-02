@@ -49,6 +49,11 @@
         <a-input v-model.trim="videoForm.desc" style="width: 60%"></a-input>
       </p>
       <p>
+        标签\系列:
+        <a-select v-model.trim="videoForm.tags" mode="tags" style="width: 60%" placeholder="请选择标签">
+        </a-select>
+      </p>
+      <p>
         视频分类：
         <a-select v-model="videoForm.type" style="width: 120px">
           <a-select-option :value="0">
@@ -153,7 +158,8 @@ export default {
         coverList: [],
         type: 0,
         desc: '',
-        price: 0
+        price: 0,
+        tags: []
       },
       columns: columns,
       cropperImg: '',
@@ -192,9 +198,11 @@ export default {
       this.videoForm.title = record.title
       this.videoForm.type = record.type
       this.videoForm.price = record.price
+      this.videoForm.tags = record.tags.split(',')
       this.videoForm.desc = record.desc
       this.videoForm.coverList = JSON.parse(record.cover)
       this.videoModalVisible = true
+      this.videoForm.tags.remove('')
     },
     saveVideo () {
       let form = {}
@@ -216,6 +224,7 @@ export default {
       form.url = this.videoForm.url
       form.type = this.videoForm.type
       form.desc = this.videoForm.desc
+      form.tags = this.videoForm.tags.join(',')
       form.price = this.videoForm.price - ''
 
       if (this.videoForm.ID) {

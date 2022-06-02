@@ -20,7 +20,7 @@
             <p class="block-title">{{ block.title }}</p>
           </a-col>
           <a-col style="margin-top: 10px" :span="6" :key="'block' + index + 'video' + index2" v-for="(video, index2) in block.videoList">
-            <videoBlock :id="video.ID" :price="video.price" :isNotBuy="selectedTab === 'proBlock' && !buyVideoList.includes(video.ID + '')" :isNotMembership="selectedTab === 'vipBlock' && !userInfo.isMembership" v-if="index2 < (showCount[selectedTab][index] ? showCount[selectedTab][index] : 8)" :desc="video.desc" :title="video.title" :thumbUrl="video.cover[0].thumbUrl"></videoBlock>
+            <videoBlock :getVideoFromID="video" :currentBlock="selectedTab" :isNotBuy="selectedTab === 'proBlock' && !buyVideoList.includes(video + '')" :isNotMembership="selectedTab === 'vipBlock' && !userInfo.isMembership" v-if="index2 < (showCount[selectedTab][index] ? showCount[selectedTab][index] : 8)"></videoBlock>
           </a-col>
           <a-col v-if="block.videoList.length > 8" :span="24" class="mt-10" style="text-align: center">
             <p @click="changeShowCount(index, 999)" v-if="block.videoList.length > (showCount[selectedTab][index] ? showCount[selectedTab][index] : 8)" class="clickable-txt"><a-icon type="down" />显示全部视频</p>

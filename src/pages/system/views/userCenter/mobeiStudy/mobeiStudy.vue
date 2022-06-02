@@ -40,7 +40,7 @@
           </a-col>
           <a-col class="mt-10" :span="24">
             <a-col class="mb-20" :span="6" v-for="(video, index2) in item.videoList" :key="currentBlock + index1 + 'video' + index2">
-              <videoBlock :desc="video.desc" :title="video.title" :thumbUrl="video.cover[0].thumbUrl"></videoBlock>
+              <videoBlock :getVideoFromID="video"></videoBlock>
               <div @click="item.videoList.remove(video)" style="text-align: center; margin-top: 10px" class="clickable-txt">[删除]</div>
             </a-col>
             <a-col class="mb-20" :span="24">
@@ -60,7 +60,7 @@
     <a-modal :footer="null" width="80%" v-model="addVideoModalVisible">
       <a-row>
         <a-col v-if="item.type === typeToNumber[currentBlock]" @dblclick="performAddVideo(item)" class="mt-20" :span="8" v-for="(item, index) in videoList" :key="'video' + index">
-          <videoBlock :desc="item.desc" :title="item.title" :thumbUrl="item.cover[0].thumbUrl"></videoBlock>
+          <videoBlock :disabled="true" :desc="item.desc" :title="item.title" :thumbUrl="item.cover[0].thumbUrl"></videoBlock>
         </a-col>
       </a-row>
     </a-modal>
@@ -128,6 +128,39 @@ export default {
       })
     },
     save () {
+      for (let block of this.form.freeBlock) {
+        let tempVideoList = []
+        for (let video of block.videoList) {
+          if (video.ID) {
+            tempVideoList.push(video.ID)
+          } else {
+            tempVideoList.push(video)
+          }
+        }
+        block.videoList = tempVideoList
+      }
+      for (let block of this.form.vipBlock) {
+        let tempVideoList = []
+        for (let video of block.videoList) {
+          if (video.ID) {
+            tempVideoList.push(video.ID)
+          } else {
+            tempVideoList.push(video)
+          }
+        }
+        block.videoList = tempVideoList
+      }
+      for (let block of this.form.proBlock) {
+        let tempVideoList = []
+        for (let video of block.videoList) {
+          if (video.ID) {
+            tempVideoList.push(video.ID)
+          } else {
+            tempVideoList.push(video)
+          }
+        }
+        block.videoList = tempVideoList
+      }
       mobeiApi.createMobeiStudy(this.form).then(res => {
         this.$success('摩贝学堂修改成功！')
       })
@@ -138,7 +171,7 @@ export default {
       this.currentPartIndex = partIndex
     },
     performAddVideo (item) {
-      this.form[this.currentBlock][this.currentPartIndex].videoList.push(item)
+      this.form[this.currentBlock][this.currentPartIndex].videoList.push(item.ID)
       this.addVideoModalVisible = false
     },
     handleChange (info, listName) {

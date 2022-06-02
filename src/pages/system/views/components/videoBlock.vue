@@ -7,15 +7,15 @@
       <div v-if="isNotBuy" style="width: 360px; height: 270px;background-color: rgba(0, 0, 0, 0.5);position: absolute">
         <p style="color: white; padding: 10px; font-weight: bolder; font-size: 20px">未购买</p>
       </div>
-      <img style="width: 360px; height: 270px;" :src="thumbUrl"/>
+      <img style="width: 360px; height: 270px;" :src="form.thumbUrl"/>
       <div style="padding: 10px 20px; background: white">
         <p>
-          <span style="font-size: 20px">{{ title }}</span>
-          <span style="float: right; font-size: 20px; font-weight: bolder">{{ price ? ('价格：' + price) + ' 元' : ''}}</span>
+          <span style="font-size: 20px">{{ form.title }}</span>
+          <span v-if="currentBlock === 'proBlock'" style="float: right; font-size: 20px; font-weight: bolder">{{ price ? ('价格：' + price) + ' 元' : ''}}</span>
         </p>
         <p style="font-size: 15px">
-          <span>{{ desc ? desc: '暂无描述' }}</span>
-          <span style="float: right;"><a-icon type="user" />{{ formatNum(clickCount) }}</span>
+          <span>{{ form.desc ? form.desc: '暂无描述' }}</span>
+          <span style="float: right;"><a-icon type="user" />{{ formatNum(form.watchedCount) }}</span>
         </p>
       </div>
     </div>
@@ -28,6 +28,7 @@
 import utils from '@/utils/utils'
 import membership from '../components/membership'
 import buyItem from '../components/buyItem'
+import videoApi from '@system/api/video'
 
 export default {
   name: 'videoBlock',
@@ -36,7 +37,18 @@ export default {
     buyItem
   },
   props: {
+    disabled: {
+      type: Boolean,
+      default: false
+    },
     thumbUrl: {
+      type: String
+    },
+    getVideoFromID: {
+      type: Number,
+      default: 0
+    },
+    currentBlock: {
       type: String
     },
     isNotMembership: {
@@ -62,19 +74,45 @@ export default {
       type: String,
       default: ''
     },
-    clickCount: {
+    watchedCount: {
       type: Number,
       default: 0
     }
   },
   data () {
     return {
+      form: {
+        thumbUrl: '',
+        desc: '',
+        id: 0,
+        title: ''
+      },
       membershipVisible: false,
       buyItemVisible: false
     }
   },
+  mounted () {
+    if (this.getVideoFromID) {
+      videoApi.getVideo(this.getVideoFromID).then(res => {
+        this.form.thumbUrl = JSON.parse(res.data.data.video.cover)[0].thumbUrl
+        this.form.title = res.data.data.video.title
+        this.form.desc = res.data.data.video.desc
+        this.form.id = res.data.data.video.ID
+        this.form.watchedCount = res.data.data.video.watchedCount
+      })
+    } else {
+      this.form.thumbUrl = this.thumbUrl
+      this.form.title = this.title
+      this.form.desc = this.desc
+      this.form.id = this.id
+      this.form.watchedCount = this.watchedCount
+    }
+  },
   methods: {
     goToVideo () {
+      if (this.disabled) {
+        return
+      }
       if (this.isNotBuy) {
         this.buyItemVisible = true
         return
@@ -83,7 +121,7 @@ export default {
         this.membershipVisible = true
         return
       }
-      console.log('go to video')
+      this.$router.push('video/' + this.form.id)
     },
     formatNum (clickCount) {
       return utils.nFormatter(clickCount, 3)

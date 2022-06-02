@@ -12,6 +12,9 @@ export default {
       params
     })
   },
+  getVideo (id, params) {
+    return ajax(rootApi + id + '/', 'get', {params})
+  },
   editVideo (id, data) {
     return ajax(rootApi + id + '/', 'patch', {data})
   },
