@@ -1,6 +1,6 @@
 <template>
   <a-config-provider :locale="zh_CN">
-    <div id="app">
+    <div id="app" oncontextmenu="return false">
       <navigation></navigation>
       <router-view v-if="isRouterAlive"></router-view>
       <systemFooter></systemFooter>

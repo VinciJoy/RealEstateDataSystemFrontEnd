@@ -12,9 +12,9 @@
       <span slot="title" slot-scope="text, record">
         {{ text.title }}
       </span>
-      <span slot="visible" slot-scope="text, record">
-        <a-switch v-model="record.visible" @click="editVideo(record.ID, {visible: record.visible})" />
-      </span>
+<!--      <span slot="visible" slot-scope="text, record">-->
+<!--        <a-switch v-model="record.visible" @click="editVideo(record.ID, {visible: record.visible})" />-->
+<!--      </span>-->
       <span slot="action" slot-scope="text, record">
         <a @click="goToEdit(record)">编辑</a>
         <a-divider type="vertical" />
@@ -145,11 +145,11 @@ const columns = [
     dataIndex: 'updatedAt',
     key: 'updatedAt'
   },
-  {
-    title: '可 见',
-    key: 'visible',
-    scopedSlots: { customRender: 'visible' }
-  },
+  // {
+  //   title: '可 见',
+  //   key: 'visible',
+  //   scopedSlots: { customRender: 'visible' }
+  // },
   {
     title: '操 作',
     key: 'action',
