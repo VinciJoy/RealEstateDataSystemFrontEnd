@@ -120,6 +120,9 @@ const MenuList = {
   superAdminUnhandle: [
     'superAdminUnhandle'
   ],
+  systemSetting: [
+    'systemSetting'
+  ],
   videoManage: [
     'videoManage'
   ],

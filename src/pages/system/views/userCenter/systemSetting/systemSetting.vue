@@ -15,6 +15,7 @@
 
 <script>
 import api from '@system/api/systemSetting'
+import {mapActions, mapGetters} from 'vuex'
 
 export default {
   name: 'systemSetting',
@@ -29,8 +30,16 @@ export default {
     }
   },
   mounted () {
+    this.form.notice = this.systemSetting.notice
+    this.oneMonthPrice = this.systemSetting.membershipPrice[0][1]
+    this.oneSeasonPrice = this.systemSetting.membershipPrice[1][1]
+    this.oneYearPrice = this.systemSetting.membershipPrice[2][1]
+  },
+  computed: {
+    ...mapGetters(['systemSetting'])
   },
   methods: {
+    ...mapActions(['getSystemSetting']),
     createSystemSetting () {
       let temp = [
         ['1', this.oneMonthPrice],
@@ -40,6 +49,7 @@ export default {
       this.form.membershipPrice = JSON.stringify(temp)
       api.settingSystem(this.form).then(res => {
         this.$success('系统设置修改成功！')
+        this.getSystemSetting()
       })
     }
   }
