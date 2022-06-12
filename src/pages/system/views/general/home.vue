@@ -282,9 +282,15 @@ export default {
   mounted () {
     this.picBaseURL = process.env.API_ROOT + '/system/pics/temp/'
     this.init()
+    if (this.systemSetting.notice) {
+      this.$warning({
+        title: '系统通知',
+        content: this.systemSetting.notice
+      })
+    }
   },
   computed: {
-    ...mapGetters(['userInfo'])
+    ...mapGetters(['userInfo', 'systemSetting'])
 
   },
   methods: {

@@ -371,9 +371,10 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['getUserInfo', 'changeModalStatus']),
+    ...mapActions(['getSystemSetting', 'getUserInfo', 'changeModalStatus']),
     init () {
       this.getUserInfo()
+      this.getSystemSetting()
     },
     handleRoute (route) {
       this.activeKeys = []

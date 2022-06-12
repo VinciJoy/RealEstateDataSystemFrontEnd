@@ -13,22 +13,22 @@
       <a-col class="membership-type-container" :span="8">
         <div @click="becomeMembership(1)" class="membership-type">
           <h2>一个月会员</h2>
-          <p class="blue">1000元</p>
-          <p class="date">至{{ monthLater(1) }}</p>
+          <p class="blue">{{ this.systemSetting.membershipPrice[0][1] }}元</p>
+          <p class="date">至{{ monthLater('1') }}</p>
         </div>
       </a-col>
       <a-col class="membership-type-container" :span="8">
         <div @click="becomeMembership(3)" class="membership-type">
           <h2>季度会员</h2>
-          <p class="blue">2000元</p>
-          <p class="date">至{{ monthLater(3) }}</p>
+          <p class="blue">{{ this.systemSetting.membershipPrice[1][1] }}元</p>
+          <p class="date">至{{ monthLater('3') }}</p>
         </div>
       </a-col>
       <a-col class="membership-type-container" :span="8">
         <div @click="becomeMembership(12)" class="membership-type">
           <h2>年度会员</h2>
-          <p class="blue">5000元</p>
-          <p class="date">至{{ monthLater(12) }}</p>
+          <p class="blue">{{ this.systemSetting.membershipPrice[2][1] }}元</p>
+          <p class="date">至{{ monthLater('12') }}</p>
         </div>
       </a-col>
     </a-row>
@@ -42,6 +42,7 @@
 
 <script>
 import api from '@system/api/alipay'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'membership',
@@ -55,6 +56,9 @@ export default {
     return {
       accepted: false
     }
+  },
+  computed: {
+    ...mapGetters(['systemSetting'])
   },
   methods: {
     monthLater (month) {

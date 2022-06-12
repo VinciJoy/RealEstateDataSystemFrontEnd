@@ -79,6 +79,11 @@ export default new Router({
           component: () => import(/* webpackChunkName: "user_center" */ '@system/views/userCenter/mobeiStudy/mobeiStudy.vue')
         },
         {
+          path: 'system_setting',
+          name: 'systemSetting',
+          component: () => import(/* webpackChunkName: "user_center" */ '@system/views/userCenter/systemSetting/systemSetting.vue')
+        },
+        {
           path: 'video_manage',
           name: 'videoManage',
           component: () => import(/* webpackChunkName: "user_center" */ '@system/views/userCenter/videoManage/videoManage.vue')

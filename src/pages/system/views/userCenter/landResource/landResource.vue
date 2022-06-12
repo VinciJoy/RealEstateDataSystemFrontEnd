@@ -17,10 +17,10 @@
         {{ text.isDraft ? '草稿' : '发布' }}
       </span>
       <span slot="action" slot-scope="text, record">
-        <a @click="showHistoryModal(record)">项目详情</a>
-        <a-divider type="vertical" />
-        <a @click="showProgressModal(record)">进度跟进</a>
-        <a-divider type="vertical" />
+        <a v-if="utils.IsAdmin(userInfo.role)" @click="showHistoryModal(record)">项目详情</a>
+        <a-divider v-if="utils.IsAdmin(userInfo.role)" type="vertical" />
+        <a v-if="utils.IsAdmin(userInfo.role)" @click="showProgressModal(record)">进度跟进</a>
+        <a-divider v-if="utils.IsAdmin(userInfo.role)" type="vertical" />
         <a @click="goToEdit(record)">编辑</a>
         <a-divider type="vertical" />
         <a @click="deleteLandResource(record.ID)">删除</a>

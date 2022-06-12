@@ -18,7 +18,7 @@
           <th @dragover.prevent @drop="changeMilestone(0)">-</th>
         </tr>
         <tr @dragover.prevent @drop="changeMilestone(0)" @dragstart="dragConsult = interested" draggable="true" v-if="interestedList" v-for="(interested, index) in interestedList" :key="'interested' + index">
-          <td>{{ interested.userName }}</td>
+          <td>{{ interested.userName }}<a @click="deleteInterested(interested.ID)"> [删除]</a></td>
           <td>{{ interested.updatedAt }}</td>
           <td><a-input v-model="interested.detail" @blur="changeDetail(interested)"></a-input></td>
           <td>{{ interested.adminName }}</td>
@@ -44,7 +44,7 @@
           <th @dragover.prevent @drop="changeMilestone(1)">-</th>
         </tr>
         <tr @dragover.prevent @drop="changeMilestone(1)" @dragstart="dragConsult = item" draggable="true" v-if="needContactList" v-for="(item, index) in needContactList" :key="'needContactList' + index">
-          <td>{{ item.userName }}</td>
+          <td>{{ item.userName }}<a @click="deleteInterested(item.ID)"> [删除]</a></td>
           <td>{{ item.updatedAt }}</td>
           <td><a-input v-model="item.detail" @blur="changeDetail(item)"></a-input></td>
           <td>{{ item.adminName }}</td>
@@ -59,7 +59,7 @@
           <th @dragover.prevent @drop="changeMilestone(2)">-</th>
         </tr>
         <tr @dragover.prevent @drop="changeMilestone(2)" @dragstart="dragConsult = item" draggable="true" v-if="alreadyContactList" v-for="(item, index) in alreadyContactList" :key="'alreadyContactList' + index">
-          <td>{{ item.userName }}</td>
+          <td>{{ item.userName }}<a @click="deleteInterested(item.ID)"> [删除]</a></td>
           <td>{{ item.updatedAt }}</td>
           <td><a-input v-model="item.detail" @blur="changeDetail(item)"></a-input></td>
           <td>{{ item.adminName }}</td>
@@ -74,7 +74,7 @@
           <th @dragover.prevent @drop="changeMilestone(3)">-</th>
         </tr>
         <tr @dragover.prevent @drop="changeMilestone(3)" @dragstart="dragConsult = item" draggable="true" v-if="alreadySignedList" v-for="(item, index) in alreadySignedList" :key="'alreadySignedList' + index">
-          <td>{{ item.userName }}</td>
+          <td>{{ item.userName }}<a @click="deleteInterested(item.ID)"> [删除]</a></td>
           <td>{{ item.updatedAt }}</td>
           <td><a-input v-model="item.detail" @blur="changeDetail(item)"></a-input></td>
           <td>{{ item.adminName }}</td>
@@ -89,7 +89,7 @@
           <th @dragover.prevent @drop="changeMilestone(4)">-</th>
         </tr>
         <tr @dragover.prevent @drop="changeMilestone(4)" @dragstart="dragConsult = item" draggable="true" v-if="negotiationList" v-for="(item, index) in negotiationList" :key="'negotiationList' + index">
-          <td>{{ item.userName }}</td>
+          <td>{{ item.userName }}<a @click="deleteInterested(item.ID)"> [删除]</a></td>
           <td>{{ item.updatedAt }}</td>
           <td><a-input v-model="item.detail" @blur="changeDetail(item)"></a-input></td>
           <td>{{ item.adminName }}</td>
@@ -104,7 +104,7 @@
           <th @dragover.prevent @drop="changeMilestone(5)">-</th>
         </tr>
         <tr @dragover.prevent @drop="changeMilestone(5)" @dragstart="dragConsult = item" draggable="true" v-if="frameworkList" v-for="(item, index) in frameworkList" :key="'frameworkList' + index">
-          <td>{{ item.userName }}</td>
+          <td>{{ item.userName }}<a @click="deleteInterested(item.ID)"> [删除]</a></td>
           <td>{{ item.updatedAt }}</td>
           <td><a-input v-model="item.detail" @blur="changeDetail(item)"></a-input></td>
           <td>{{ item.adminName }}</td>
@@ -119,7 +119,7 @@
           <th @dragover.prevent @drop="changeMilestone(6)">-</th>
         </tr>
         <tr @dragover.prevent @drop="changeMilestone(6)" @dragstart="dragConsult = item" draggable="true" v-if="formalList" v-for="(item, index) in formalList" :key="'formalList' + index">
-          <td>{{ item.userName }}</td>
+          <td>{{ item.userName }}<a @click="deleteInterested(item.ID)"> [删除]</a></td>
           <td>{{ item.updatedAt }}</td>
           <td><a-input v-model="item.detail" @blur="changeDetail(item)"></a-input></td>
           <td>{{ item.adminName }}</td>
@@ -263,6 +263,12 @@ export default {
       this.uploadFileURL = process.env.API_ROOT + '/system/files/'
       this.getConsults()
     },
+    deleteInterested (id) {
+      consultApi.deleteConsult(id).then(res => {
+        this.$success('删除成功！')
+        this.getConsults()
+      })
+    },
     handleChange (info, item) {
       let fileList = [...info.fileList]
 
@@ -275,7 +281,6 @@ export default {
       })
       if (info.file.status === 'done' || info.file.status === 'removed') {
         let f = JSON.stringify(info.fileList)
-        console.log(info.fileList)
         consultApi.editConsult(item.ID, {
           fileList: f
         }).then(res => {

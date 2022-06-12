@@ -352,6 +352,7 @@
       </a-row>
     </a-modal>
 <!--    modal end-->
+    <membership @closeMembershipModal="membershipVisible = false" :membershipVisible="membershipVisible"></membership>
   </a-row>
 </template>
 
@@ -359,9 +360,10 @@
 import api from '@system/api/industryResource'
 import consultApi from '@system/api/consult'
 import utils from '@/utils/utils'
-import { mapGetters } from 'vuex'
+import {mapActions, mapGetters} from 'vuex'
 import historyApi from '@system/api/history'
 import { AUDIT_STATUS_2_CN } from '../../../../utils/constants'
+import membership from '../components/membership'
 
 const cityClassOptions = [
   '一线城市',
@@ -394,9 +396,13 @@ const areaOptions = [
 
 export default {
   name: 'industryResourceDetail',
+  components: {
+    membership
+  },
   data () {
     return {
       loading: false,
+      membershipVisible: false,
       histories: [],
       picBaseURL: '',
       AUDIT_STATUS_2_CN: AUDIT_STATUS_2_CN,
@@ -482,10 +488,27 @@ export default {
       return res
     }
   },
-  mounted () {
-    this.init()
+  async mounted () {
+    await this.getUserInfo()
+    let flag = true
+    if (!this.userInfo.isMembership && this.userInfo.free_resources && this.userInfo.free_resources.length >= 5) {
+      flag = false
+      for (let resource in this.userInfo.free_resources) {
+        if (resource[0] === this.$route.params.id) {
+          flag = true
+        }
+      }
+    }
+    if (flag) {
+      this.init()
+    } else {
+      // 提示开会员
+      this.$error('普通用户只能浏览5条资源/月！')
+      this.membershipVisible = true
+    }
   },
   methods: {
+    ...mapActions(['getUserInfo']),
     init () {
       this.picBaseURL = process.env.API_ROOT + '/system/pics/temp/'
       this.consultInfo.resourceID = this.$route.params.id - ''

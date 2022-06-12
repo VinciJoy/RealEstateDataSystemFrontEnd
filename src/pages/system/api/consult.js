@@ -10,6 +10,9 @@ export default {
   editConsult (id, data) {
     return ajax(rootApi + id + '/', 'put', {data})
   },
+  deleteConsult (id) {
+    return ajax(rootApi + id + '/', 'delete')
+  },
   getConsults (params) {
     if (!params['pageSize']) {
       params['pageSize'] = 20

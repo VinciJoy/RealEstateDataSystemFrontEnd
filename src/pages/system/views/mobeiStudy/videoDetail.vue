@@ -3,7 +3,7 @@
     <a-col style="border: 1px solid transparent" :span="2"></a-col>
     <a-col :span="20">
       <a-col :span="16">
-        <video poster="../../../../../static/imgs/loading.gif" :src="video.url" controls="controls" style="width:100%; height: auto"></video>
+        <video poster="../../../../../static/imgs/bofang.jpg" :src="video.url" controls="controls" style="width:100%; height: auto"></video>
         <a-col :span="24">
           <h1>
             {{ video.title }}
@@ -23,7 +23,7 @@
         <h2>
           {{ video.tag }}
         </h2>
-        <template v-for="(v, index) in video.relatedVideo">
+        <template v-for="(v, index) in video.relatedVideo" v-if="index < 3">
           <div v-if="v.type === 1 && !userInfo.isMembership" :key="'video_cover' + index" style="width: 360px; height: 270px;background-color: rgba(0,0,0,0.5);position: absolute">
             <p style="color: white; padding: 10px; font-weight: bolder; font-size: 20px">会员专享</p>
           </div>

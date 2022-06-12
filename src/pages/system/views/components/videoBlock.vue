@@ -1,7 +1,7 @@
 <template>
   <div>
     <div @click="goToVideo" style="width: 362px; cursor:pointer; margin: auto; border: 1px solid #e8e8e8">
-      <div v-if="isNotMembership" style="width: 360px; height: 270px;background-color: rgba(0,0,0,0.5);position: absolute">
+      <div v-if="!isNotBuy && isNotMembership" style="width: 360px; height: 270px;background-color: rgba(0,0,0,0.5);position: absolute">
         <p style="color: white; padding: 10px; font-weight: bolder; font-size: 20px">会员专享</p>
       </div>
       <div v-if="isNotBuy" style="width: 360px; height: 270px;background-color: rgba(0, 0, 0, 0.5);position: absolute">
@@ -123,12 +123,12 @@ export default {
       if (this.disabled) {
         return
       }
-      if (this.isNotBuy) {
-        this.buyItemVisible = true
-        return
-      }
       if (this.isNotMembership) {
         this.membershipVisible = true
+        return
+      }
+      if (this.isNotBuy) {
+        this.buyItemVisible = true
         return
       }
       this.$router.push('video/' + this.form.id)

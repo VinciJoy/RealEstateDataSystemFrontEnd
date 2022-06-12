@@ -12,6 +12,12 @@
           <span>个人信息</span>
           </router-link>
         </a-menu-item>
+        <a-menu-item v-if="utils.IsSuperAdmin(userInfo.role)" key="systemSetting">
+          <router-link :to="{ name: 'systemSetting'}">
+          <a-icon type="setting" />
+          <span>系统设置</span>
+          </router-link>
+        </a-menu-item>
         <a-sub-menu v-if="utils.IsSuperAdmin(userInfo.role)" key="superAdminManagement">
           <span slot="title"><a-icon type="dashboard" /><span>MVP控制台</span></span>
           <a-menu-item key="superAdminUnhandle">
@@ -42,13 +48,13 @@
             </router-link>
           </a-menu-item>
         </a-sub-menu>
-        <a-menu-item v-if="utils.IsAdmin(userInfo.role)" key="mobeiStudyManage">
+        <a-menu-item v-if="utils.IsSuperAdmin(userInfo.role)" key="mobeiStudyManage">
           <router-link :to="{ name: 'mobeiStudyManage'}">
             <a-icon type="layout" />
             <span>摩贝学堂</span>
           </router-link>
         </a-menu-item>
-        <a-menu-item v-if="utils.IsAdmin(userInfo.role)" key="videoManage">
+        <a-menu-item v-if="utils.IsSuperAdmin(userInfo.role)" key="videoManage">
           <router-link :to="{ name: 'videoManage'}">
             <a-icon type="layout" />
             <span>视频管理</span>

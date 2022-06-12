@@ -1029,13 +1029,13 @@
                   2、本人已知晓项目通过平台推送后，发布人所属项目方与平台所推荐意向购买人达成合作并签署合作协议的，
                   平台将会向该项目方收取相应服务费(本项目未达成合作则不收取任何费用)。本人同意由摩贝云系统工作人员与本人联系，告知并签署相应协议。
                 </a-row>
-                <a-row v-if="mode=== 'edit'" class="mt-10">
+                <a-row v-if="mode=== 'edit' && !form.isDraft" class="mt-10">
                   <p>修改说明(必填):</p>
                   <a-textarea placeholder="请输入修改说明" v-model.trim="form.editReason"></a-textarea>
                 </a-row>
                 <a-row style="text-align: center" class="mt-10">
                   <a-button :disabled="true" v-if="countDown > 0" style="margin-left:40px;width: 130px">{{ '还需阅读' + countDown + '秒' }}</a-button>
-                  <a-button :disabled="(mode === 'edit' && !form.editReason)" type="primary" v-else style="margin-left:40px;width: 20%" @click="submit">提 交</a-button>
+                  <a-button :disabled="(mode=== 'edit' && !form.isDraft && !form.editReason)" type="primary" v-else style="margin-left:40px;width: 20%" @click="submit">提 交</a-button>
                 </a-row>
               </a-modal>
 

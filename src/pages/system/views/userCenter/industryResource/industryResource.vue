@@ -22,10 +22,10 @@
         <a-switch :disabled="!utils.IsAdmin(userInfo.role) || text.isDraft" v-model="record.visible" @click="changeVisible(record)" />
       </template>
       <template slot="action" slot-scope="text, record">
-        <a @click="showHistoryModal(record)">项目详情</a>
-        <a-divider type="vertical" />
-        <a @click="showProgressModal(record)">进度跟进</a>
-        <a-divider type="vertical" />
+        <a v-if="utils.IsAdmin(userInfo.role)" @click="showHistoryModal(record)">项目详情</a>
+        <a-divider v-if="utils.IsAdmin(userInfo.role)" type="vertical" />
+        <a v-if="utils.IsAdmin(userInfo.role)" @click="showProgressModal(record)">进度跟进</a>
+        <a-divider v-if="utils.IsAdmin(userInfo.role)" type="vertical" />
         <a @click="goToEdit(record)">编辑</a>
         <a-divider type="vertical" />
         <a @click="deleteIndustryResource(record.ID)">删除</a>

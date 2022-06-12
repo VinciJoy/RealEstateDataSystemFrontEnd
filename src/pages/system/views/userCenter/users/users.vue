@@ -80,6 +80,9 @@
       <span slot="role" slot-scope="text, record">
         {{ record | role2CN }}
       </span>
+      <span slot="membershipExpired" slot-scope="text, record">
+        <a-date-picker @change="changeMembershipExpired(record.ID, $event)" :value="record.membershipExpiredAt" />
+      </span>
       <span slot="verify" @click="showCertificateModal(record)" slot-scope="text, record">
         <a>{{ text.certificationVerified | verified2CN }}</a>
       </span>
@@ -145,6 +148,10 @@ const columns = [
     title: '更新时间',
     dataIndex: 'updatedAt',
     key: 'updatedAt'
+  },
+  {
+    title: '会员到期时间',
+    scopedSlots: {customRender: 'membershipExpired'}
   },
   {
     title: '认 证',
@@ -226,6 +233,14 @@ export default {
         this.count = res.data.data.count
         this.users = res.data.data.users
         this.loading = false
+      })
+    },
+    changeMembershipExpired (id, date, dateString) {
+      api.editUser(id, {
+        membershipExpired: date.format('YYYY-MM-DD')
+      }).then(res => {
+        this.$success('修改会员日期成功!')
+        this.init()
       })
     },
     showCertificateModal (record) {

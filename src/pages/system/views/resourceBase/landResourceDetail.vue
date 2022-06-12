@@ -715,6 +715,7 @@
       </a-row>
     </a-modal>
 <!--    modal end-->
+    <membership @closeMembershipModal="membershipVisible = false" :membershipVisible="membershipVisible"></membership>
   </a-row>
 </template>
 
@@ -727,9 +728,10 @@ import BaiduPolygon from 'vue-baidu-map/components/overlays/Polygon'
 import BaiduCircle from 'vue-baidu-map/components/overlays/Circle'
 import BaiduNavigation from 'vue-baidu-map/components/controls/Navigation'
 import consultApi from '@system/api/consult'
-import {mapGetters} from 'vuex'
+import {mapActions, mapGetters} from 'vuex'
 import historyApi from '@system/api/history'
 import { AUDIT_STATUS_2_CN } from '../../../../utils/constants'
+import membership from '../components/membership'
 
 export default {
   name: 'landResourceDetail',
@@ -739,6 +741,7 @@ export default {
     BaiduMapType,
     BaiduPolygon,
     BaiduCircle,
+    membership,
     BaiduNavigation
   },
   computed: {
@@ -798,6 +801,7 @@ export default {
   data () {
     return {
       mapVisible: false,
+      membershipVisible: false,
       picBaseURL: '',
       loading: false,
       reviewForm: {},
@@ -911,10 +915,27 @@ export default {
       return (data - '').toFixed(2)
     }
   },
-  mounted () {
-    this.init()
+  async mounted () {
+    await this.getUserInfo()
+    let flag = true
+    if (!this.userInfo.isMembership && this.userInfo.free_resources && this.userInfo.free_resources.length >= 5) {
+      flag = false
+      for (let resource in this.userInfo.free_resources) {
+        if (resource[0] === this.$route.params.id) {
+          flag = true
+        }
+      }
+    }
+    if (flag) {
+      this.init()
+    } else {
+      // 提示开会员
+      this.$error('普通用户只能浏览5条资源/月！')
+      this.membershipVisible = true
+    }
   },
   methods: {
+    ...mapActions(['getUserInfo']),
     init () {
       this.picBaseURL = process.env.API_ROOT + '/system/pics/temp/'
       this.consultInfo.resourceID = this.$route.params.id - ''

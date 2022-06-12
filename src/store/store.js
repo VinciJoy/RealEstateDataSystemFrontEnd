@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import api from '@system/api/user'
+import systemSettingApi from '@system/api/systemSetting'
 import { defaultUserInfo } from '@/utils/constants'
 
 Vue.use(Vuex)
@@ -10,7 +11,11 @@ const rootState = {
     mode: 'login', // or 'register',
     visible: false
   },
-  userInfo: defaultUserInfo
+  userInfo: defaultUserInfo,
+  systemSetting: {
+    notice: '',
+    membership_price: ''
+  }
 }
 
 const rootGetters = {
@@ -19,6 +24,9 @@ const rootGetters = {
   },
   'userInfo' (state) {
     return state.userInfo
+  },
+  'systemSetting' (state) {
+    return state.systemSetting
   }
 }
 
@@ -26,6 +34,9 @@ const rootMutations = {
   // mutations 更新 state 的值
   SET_userInfo: (state, payload) => {
     state.userInfo = payload
+  },
+  SET_systemSetting: (state, payload) => {
+    state.systemSetting = payload
   },
   CHANGE_modalStatus (state, {mode, visible}) {
     if (mode !== undefined) {
@@ -44,6 +55,20 @@ const rootActions = {
       commit('SET_userInfo', res.data.data.user)
     }).catch(() => {
       commit('SET_userInfo', defaultUserInfo)
+    })
+  },
+  async getSystemSetting ({commit}) {
+    await systemSettingApi.getSystemSetting().then(res => {
+      let temp = {
+        notice: res.data.data.systemSetting.notice,
+        membershipPrice: JSON.parse(res.data.data.systemSetting.membershipPrice)
+      }
+      commit('SET_systemSetting', temp)
+    }).catch(() => {
+      commit('SET_systemSetting', {
+        notice: '',
+        membership_price: ''
+      })
     })
   },
   changeModalStatus ({commit}, payload) {

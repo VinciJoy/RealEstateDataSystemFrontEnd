@@ -184,6 +184,11 @@ export default {
       loading: false
     }
   },
+  watch: {
+    'pageIndex' () {
+      this.getVideos()
+    }
+  },
   mounted () {
     this.init()
   },
@@ -210,6 +215,7 @@ export default {
         pageIndex: this.pageIndex
       }).then(res => {
         this.videoList = res.data.data.videos
+        this.count = res.data.data.count
       })
     },
     goToAdd () {
