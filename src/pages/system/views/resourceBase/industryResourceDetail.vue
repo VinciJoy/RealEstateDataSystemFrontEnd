@@ -265,7 +265,7 @@
             </a-col>
 
             <a-row class="mt-20" style="text-align: center">
-              <span style="color: #a1a1a1">——————————  本月剩余5条免费土地信息，购买<span style="color: #40a9ff; cursor: pointer">更多信息</span>查看权限  ——————————</span>
+              <span style="color: #a1a1a1">——————————  本月剩余{{ 5 - (userInfo.free_resources ? userInfo.free_resources.length : 0) }}条免费土地信息，购买<span style="color: #40a9ff; cursor: pointer">更多信息</span>查看权限  ——————————</span>
             </a-row>
 
             <a-row style="color: #a1a1a1" class="mt-20">

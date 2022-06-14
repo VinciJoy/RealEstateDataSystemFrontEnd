@@ -81,7 +81,7 @@
         {{ record | role2CN }}
       </span>
       <span slot="membershipExpired" slot-scope="text, record">
-        <a-date-picker @change="changeMembershipExpired(record.ID, $event)" :value="record.membershipExpiredAt" />
+        <a-date-picker :disabled="!utils.IsSuperAdmin(userInfo.role)" @change="changeMembershipExpired(record.ID, $event)" :value="record.membershipExpiredAt" />
       </span>
       <span slot="verify" @click="showCertificateModal(record)" slot-scope="text, record">
         <a>{{ text.certificationVerified | verified2CN }}</a>
@@ -114,8 +114,9 @@
 <script>
 import api from '@system/api/user'
 import { ROLE } from '@/utils/constants'
-import utils from '@/utils/utils'
 import userVerify from '../../components/userVerify'
+import utils from '@/utils/utils'
+import {mapGetters} from "vuex";
 
 const columns = [
   {
@@ -179,6 +180,7 @@ export default {
       },
       editForm: {},
       editTitle: '',
+      utils,
       editModalVisible: false,
       columns: columns,
       users: [],
@@ -221,6 +223,9 @@ export default {
         return '未认证'
       }
     }
+  },
+  computed: {
+    ...mapGetters(['userInfo'])
   },
   methods: {
     init () {
