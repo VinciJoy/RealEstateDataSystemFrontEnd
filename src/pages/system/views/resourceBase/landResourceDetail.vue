@@ -387,7 +387,7 @@
               <a-button type="primary">委托第三方测算</a-button>
               <a-button type="primary" style="margin-left: 20px">专业支持辅助</a-button>
             </a-row>
-            <a-row class="mt-20" style="text-align: center">
+            <a-row v-if="!userInfo.isMembership" class="mt-20" style="text-align: center">
               <span style="color: #a1a1a1">——————————  本月剩余{{ 5 - (userInfo.free_resources ? userInfo.free_resources.length : 0) }}条免费土地信息，购买<span style="color: #40a9ff; cursor: pointer">更多信息</span>查看权限  ——————————</span>
             </a-row>
 
